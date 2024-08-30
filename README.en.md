@@ -1,8 +1,9 @@
 # IP Address Collection and Management Service
 This service is designed for collecting and updating IP addresses (IPv4 and IPv6) and their CIDR zones for specified domains. It is implemented as a web server using asynchronous PHP 8.1+ with the AMPHP library and integrates with Linux utilities like `whois` and `ipcalc`. The service provides interfaces for retrieving lists of domains, IPv4 addresses, IPv6 addresses, as well as CIDRv4 and CIDRv6 zones in various formats, including plain text, JSON, and scripts for adding to "Address List" on Mikrotik routers (RouterOS).
-![iplist](https://github.com/user-attachments/assets/2e363fd8-1df7-4554-bf9e-98f58c13df96)
 
 Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
+
+![iplist](https://github.com/user-attachments/assets/2e363fd8-1df7-4554-bf9e-98f58c13df96)
 
 ## Key Features
 
@@ -145,7 +146,7 @@ php index.php
 :delay 10s
 :log info "New iplist_youtube_v4_cidr added successfully";
 ```
-![1](https://github.com/user-attachments/assets/5c88ea7a-7d5b-41de-8405-e1d2b13b96a2)
+- ![1](https://github.com/user-attachments/assets/5c88ea7a-7d5b-41de-8405-e1d2b13b96a2)
 - Save the script
 - Go to System -> Scheduler
 - Create a new task with a name of your choice, for example `iplist_youtube_v4_cidr`
@@ -154,12 +155,12 @@ php index.php
 ```
 iplist_youtube_v4_cidr
 ```
-![2](https://github.com/user-attachments/assets/1b364ddc-a4b7-4563-987c-3dd382eb082d)
+- ![2](https://github.com/user-attachments/assets/1b364ddc-a4b7-4563-987c-3dd382eb082d)
 - Open the script in System -> Scripts and run it by clicking the `Run Script` button
 - In the Logs section, you should see the message `New iplist_youtube_v4_cidr added successfully`
-![3](https://github.com/user-attachments/assets/4ef15415-60f5-4c70-9f18-c8bece797e3d)
+- ![3](https://github.com/user-attachments/assets/4ef15415-60f5-4c70-9f18-c8bece797e3d)
 - In IP -> Firewall -> Address Lists, a new list should appear (in this example, named `youtube.com`)
-![4](https://github.com/user-attachments/assets/72d00414-252c-4ddb-84ed-80b09e247e39)
+- ![4](https://github.com/user-attachments/assets/72d00414-252c-4ddb-84ed-80b09e247e39)
 
 ### License
 The MIT License (MIT). Please see [LICENSE](./LICENSE) for more information.

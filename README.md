@@ -1,9 +1,9 @@
 ### IP Address Collection and Management Service for Mikrotik RouterOS Script, JSON or Text Format 
 For english readme: [README.en.md](README.en.md)
 
-![iplist](https://github.com/user-attachments/assets/2e363fd8-1df7-4554-bf9e-98f58c13df96)
-
 Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
+
+![iplist](https://github.com/user-attachments/assets/2e363fd8-1df7-4554-bf9e-98f58c13df96)
 
 # Сервис сбора IP-адресов и CIDR зон
 Данный сервис предназначен для сбора и обновления IP-адресов (IPv4 и IPv6), а также их CIDR зон для указанных доменов.
@@ -154,7 +154,7 @@ php index.php
 :delay 10s
 :log info "New iplist_youtube_v4_cidr added successfully";
 ```
-![1](https://github.com/user-attachments/assets/5c88ea7a-7d5b-41de-8405-e1d2b13b96a2)
+- ![1](https://github.com/user-attachments/assets/5c88ea7a-7d5b-41de-8405-e1d2b13b96a2)
 - Сохраните скрипт
 - Откройте раздел планировщика System -> Scheduler
 - Создайте новое задание с произвольным именем, например `iplist_youtube_v4_cidr`
@@ -163,12 +163,12 @@ php index.php
 ```
 iplist_youtube_v4_cidr
 ```
-![2](https://github.com/user-attachments/assets/1b364ddc-a4b7-4563-987c-3dd382eb082d)
+- ![2](https://github.com/user-attachments/assets/1b364ddc-a4b7-4563-987c-3dd382eb082d)
 - Откройте скрипт в разделе System -> Scripts и запустите его нажатием на кнопку `Run Script`
 - В разделе Logs вы должны увидеть сообщение `New iplist_youtube_v4_cidr added successfully`
-![3](https://github.com/user-attachments/assets/4ef15415-60f5-4c70-9f18-c8bece797e3d)
+- ![3](https://github.com/user-attachments/assets/4ef15415-60f5-4c70-9f18-c8bece797e3d)
 - А в разделе IP -> Firewall -> Address Lists должен появиться новый список (в примере с именем `youtube.com`)
-![4](https://github.com/user-attachments/assets/72d00414-252c-4ddb-84ed-80b09e247e39)
+- ![4](https://github.com/user-attachments/assets/72d00414-252c-4ddb-84ed-80b09e247e39)
 
 ### License
 The MIT License (MIT). Please see [LICENSE](./LICENSE) for more information.
