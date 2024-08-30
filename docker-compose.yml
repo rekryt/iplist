@@ -1,0 +1,23 @@
+services:
+    app:
+        restart: unless-stopped
+        build:
+            context: .
+        env_file:
+            - ./.env
+        volumes:
+            - ./src/:/app/src/
+            - ./storage/:/app/storage/
+            - ./config/:/app/config/
+        ports:
+            - '8080:8080'
+        logging:
+            driver: 'json-file'
+            options:
+                max-size: '50m'
+#        networks:
+#            - web
+#networks:
+#    web:
+#        external: true
+#        name: web

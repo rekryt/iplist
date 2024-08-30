@@ -1,0 +1,25 @@
+{
+    "domains": [
+        "youtube.com",
+        "www.youtube.com",
+        "m.youtube.com",
+        "www.m.youtube.com",
+        "googlevideo.com",
+        "www.googlevideo.com",
+        "ytimg.com",
+        "i.ytimg.com"
+    ],
+    "dns": ["127.0.0.11:53", "77.88.8.88:53", "8.8.8.8:53"],
+    "timeout": 43200,
+    "ip4": [],
+    "ip6": [],
+    "cidr4": [],
+    "cidr6": [],
+    "external": {
+        "domains": ["https://raw.githubusercontent.com/nickspaargaren/no-google/master/categories/youtubeparsed"],
+        "ip4": ["https://raw.githubusercontent.com/touhidurrr/iplist-youtube/main/ipv4_list.txt"],
+        "ip6": ["https://raw.githubusercontent.com/touhidurrr/iplist-youtube/main/ipv6_list.txt"],
+        "cidr4": ["https://raw.githubusercontent.com/touhidurrr/iplist-youtube/main/cidr4.txt"],
+        "cidr6": ["https://raw.githubusercontent.com/touhidurrr/iplist-youtube/main/cidr6.txt"]
+    }
+}
