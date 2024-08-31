@@ -30,7 +30,8 @@ class IPListService {
         }
         foreach (scandir($dir) as $file) {
             if (str_ends_with($file, '.json')) {
-                $this->loadConfig(substr($file, 0, -5), json_decode(file_get_contents($dir . $file)));
+                $name = substr($file, 0, -5);
+                $this->loadConfig($name, json_decode(file_get_contents($dir . $file)));
             }
         }
     }
@@ -44,6 +45,11 @@ class IPListService {
         return self::$_instance ??= new self($logger);
     }
 
+    /**
+     * @param string $name
+     * @param object $config
+     * @return void
+     */
     private function loadConfig(string $name, object $config): void {
         $this->sites[$name] = SiteFactory::create($name, $config);
     }

@@ -62,6 +62,7 @@ final class Site {
         $this->ip4 = SiteFactory::normalize(array_merge($this->ip4, $ip4));
         $this->ip6 = SiteFactory::normalize(array_merge($this->ip6, $ip6));
 
+        $this->saveConfig();
         App::getLogger()->debug('Reloaded for ' . $this->name);
 
         EventLoop::delay($this->timeout, function () {
@@ -111,5 +112,31 @@ final class Site {
         }
 
         App::getLogger()->debug('External reloaded for ' . $this->name);
+    }
+
+    /**
+     * @return object
+     */
+    public function getConfig(): object {
+        return (object) [
+            'domains' => SiteFactory::normalizeArray($this->domains),
+            'dns' => $this->dns,
+            'timeout' => $this->timeout,
+            'ip4' => SiteFactory::normalizeArray($this->ip4, true),
+            'ip6' => SiteFactory::normalizeArray($this->ip6, true),
+            'cidr4' => SiteFactory::normalizeArray($this->cidr4, true),
+            'cidr6' => SiteFactory::normalizeArray($this->cidr6, true),
+            'external' => $this->external,
+        ];
+    }
+
+    /**
+     * @return void
+     */
+    private function saveConfig(): void {
+        file_put_contents(
+            PATH_ROOT . '/config/' . $this->name . '.json',
+            json_encode($this->getConfig(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
+        );
     }
 }
