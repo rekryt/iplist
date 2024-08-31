@@ -57,21 +57,43 @@ class SiteFactory {
         }
 
         $domains = self::normalize($domains);
-        $ip4 = self::normalize($ip4);
-        $ip6 = self::normalize($ip6);
-        $cidr4 = self::normalize(IP4Helper::processCIDR($ip4, self::normalize($cidr4)));
-        $cidr6 = self::normalize(IP6Helper::processCIDR($ip6, self::normalize($cidr6)));
+        $ip4 = self::normalize($ip4, true);
+        $ip6 = self::normalize($ip6, true);
+        $cidr4 = self::normalize(IP4Helper::processCIDR($ip4, self::normalize($cidr4)), true);
+        $cidr6 = self::normalize(IP6Helper::processCIDR($ip6, self::normalize($cidr6)), true);
 
         return new Site($name, $domains, $dns, $timeout, $ip4, $ip6, $cidr4, $cidr6, $external);
     }
 
     /**
      * @param array $array
+     * @param bool $excludeLocalIPs
      * @return array
      */
-    public static function normalize(array $array): array {
+    public static function normalize(array $array, bool $excludeLocalIPs = false): array {
         return array_values(
-            array_unique(array_filter($array, fn(string $item) => !str_starts_with($item, '#') && strlen($item) > 0))
+            array_unique(
+                array_filter(
+                    $array,
+                    fn(string $item) => !str_starts_with($item, '#') &&
+                        strlen($item) > 0 &&
+                        (!$excludeLocalIPs ||
+                            (!str_starts_with($item, '10.') &&
+                                !str_starts_with($item, '172.16.') &&
+                                !str_starts_with($item, '192.168.') &&
+                                !str_starts_with($item, 'fd')))
+                )
+            )
         );
+    }
+
+    /**
+     * @param array $array
+     * @param bool $excludeLocalIPs
+     * @return array
+     */
+    public static function normalizeArray(array $array, bool $excludeLocalIPs = false): array {
+        sort($array);
+        return SiteFactory::normalize($array, $excludeLocalIPs);
     }
 }

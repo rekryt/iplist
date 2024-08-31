@@ -53,14 +53,14 @@ final class Site {
             $ip6 = array_merge($ip6, $ipv6results);
         }
 
-        $newIp4 = SiteFactory::normalize(array_diff($ip4, $this->ip4));
-        $this->cidr4 = SiteFactory::normalize(IP4Helper::processCIDR($newIp4, $this->cidr4));
+        $newIp4 = SiteFactory::normalize(array_diff($ip4, $this->ip4), true);
+        $this->cidr4 = SiteFactory::normalize(IP4Helper::processCIDR($newIp4, $this->cidr4), true);
 
-        $newIp6 = SiteFactory::normalize(array_diff($ip6, $this->ip6));
-        $this->cidr6 = SiteFactory::normalize(IP6Helper::processCIDR($newIp6, $this->cidr6));
+        $newIp6 = SiteFactory::normalize(array_diff($ip6, $this->ip6), true);
+        $this->cidr6 = SiteFactory::normalize(IP6Helper::processCIDR($newIp6, $this->cidr6), true);
 
-        $this->ip4 = SiteFactory::normalize(array_merge($this->ip4, $ip4));
-        $this->ip6 = SiteFactory::normalize(array_merge($this->ip6, $ip6));
+        $this->ip4 = SiteFactory::normalize(array_merge($this->ip4, $ip4), true);
+        $this->ip6 = SiteFactory::normalize(array_merge($this->ip6, $ip6), true);
 
         $this->saveConfig();
         App::getLogger()->debug('Reloaded for ' . $this->name);
@@ -85,20 +85,27 @@ final class Site {
 
         if (isset($this->external->ip4)) {
             foreach ($this->external->ip4 as $url) {
-                $this->ip4 = SiteFactory::normalize(array_merge($this->ip4, explode("\n", file_get_contents($url))));
+                $this->ip4 = SiteFactory::normalize(
+                    array_merge($this->ip4, explode("\n", file_get_contents($url))),
+                    true
+                );
             }
         }
 
         if (isset($this->external->ip6)) {
             foreach ($this->external->ip6 as $url) {
-                $this->ip6 = SiteFactory::normalize(array_merge($this->ip6, explode("\n", file_get_contents($url))));
+                $this->ip6 = SiteFactory::normalize(
+                    array_merge($this->ip6, explode("\n", file_get_contents($url))),
+                    true
+                );
             }
         }
 
         if (isset($this->external->cidr4)) {
             foreach ($this->external->cidr4 as $url) {
                 $this->cidr4 = SiteFactory::normalize(
-                    array_merge($this->cidr4, explode("\n", file_get_contents($url)))
+                    array_merge($this->cidr4, explode("\n", file_get_contents($url))),
+                    true
                 );
             }
         }
@@ -106,7 +113,8 @@ final class Site {
         if (isset($this->external->cidr6)) {
             foreach ($this->external->cidr6 as $url) {
                 $this->cidr6 = SiteFactory::normalize(
-                    array_merge($this->cidr6, explode("\n", file_get_contents($url)))
+                    array_merge($this->cidr6, explode("\n", file_get_contents($url))),
+                    true
                 );
             }
         }
