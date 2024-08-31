@@ -2,6 +2,9 @@
 
 namespace OpenCCK\App\Controller;
 
+use OpenCCK\Domain\Entity\Site;
+use OpenCCK\Domain\Factory\SiteFactory;
+
 class JsonController extends AbstractIPListController {
     /**
      * @return string
@@ -9,24 +12,14 @@ class JsonController extends AbstractIPListController {
     public function getBody(): string {
         $this->setHeaders(['content-type' => 'application/json']);
 
-        $site = $this->request->getQueryParameter('site') ?? '';
+        $sites = SiteFactory::normalizeArray($this->request->getQueryParameters()['site'] ?? []);
         $data = $this->request->getQueryParameter('data') ?? '';
-        if ($site == '') {
-            if ($data == '') {
-                return json_encode($this->service->sites);
-            } else {
-                $result = [];
-                foreach ($this->service->sites as $site) {
-                    $result[$site->name] = $site->$data;
-                }
-                return json_encode($result);
-            }
+
+        if (count($sites)) {
+            $items = array_filter($this->service->sites, fn(Site $siteEntity) => in_array($siteEntity->name, $sites));
         } else {
-            if ($data == '') {
-                return json_encode($this->service->sites[$site]);
-            } else {
-                return json_encode($this->service->sites[$site]->$data);
-            }
+            $items = $this->service->sites;
         }
+        return json_encode($data == '' ? $items : array_map(fn(Site $siteEntity) => $siteEntity->$data, $items));
     }
 }

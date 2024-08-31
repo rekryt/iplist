@@ -547,42 +547,87 @@ use OpenCCK\App\Controller\TextController;
             border-radius: 10px;
         }
     </style>
+    <style>
+        .main {
+            display: flex;
+            justify-content: center;
+            font-size: 18px;
+            line-height: 1.2;
+        }
+        .main-section {
+            justify-content: center;
+            row-gap: 4px;
+            column-gap: 16px;
+        }
+        .main-form {
+        }
+        .main-formItem {
+            margin-bottom: 0;
+        }
+        .main-formItem_wide {
+            flex: 0 0 100%;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .main-formItemComment {
+            flex: 0 0 100%;
+            display: block;
+            font-size: 12px;
+            line-height: 1;
+            width: 150px;
+            text-align: center;
+        }
+        .main-formSelect {}
+        .main-formSelect_site {}
+    </style>
 </head>
 <body>
-    <form action="" method="get">
-        <section>
-            <label>
-                Format:
-                <select name="format">
-                    <option value="json">JSON</option>
-                    <option value="text">Text</option>
-                    <option value="mikrotik">MikroTik</option>
-                </select>
-            </label>
-            <label>
-                Site:
-                <select name="site">
-                    <option value="">All</option>
-                    <?php foreach ($this->service->sites as $site): ?>
-                        <option value="<?= $site->name ?>"><?= $site->name ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </label>
-            <label>
-                Data:
-                <select name="data">
-                    <option value="">All</option>
-                    <option value="domains">domains</option>
-                    <option value="ip4">ip4</option>
-                    <option value="cidr4">cidr4</option>
-                    <option value="ip6">ip6</option>
-                    <option value="cidr6">cidr6</option>
-                </select>
-            </label>
-        </section>
-        <section>
-            <button type="submit">Submit</button>
-        </section>
-    </form>
+    <main class="main">
+        <form action="" method="get" class="main-form">
+            <section class="main-section">
+                <label class="main-formItem">
+                    Format:
+                    <select name="format" class="main-formSelect">
+                        <option value="json">JSON</option>
+                        <option value="mikrotik">MikroTik</option>
+                        <option value="text">Text</option>
+                        <option value="comma">Comma</option>
+                    </select>
+                </label>
+                <label class="main-formItem">
+                    Data:
+                    <select name="data" class="main-formSelect">
+                        <option value="">All</option>
+                        <option value="domains">domains</option>
+                        <option value="ip4">ip4</option>
+                        <option value="cidr4">cidr4</option>
+                        <option value="ip6">ip6</option>
+                        <option value="cidr6">cidr6</option>
+                    </select>
+                </label>
+                <label class="main-formItem main-formItem_wide">
+                    <span>
+                        Site:
+                        <select name="site" class="main-formSelect main-formSelect_site" multiple>
+                            <?php foreach ($this->service->sites as $site): ?>
+                                <option value="<?= $site->name ?>"><?= $site->name ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </span>
+                    <span class="main-formItemComment">Don't choose sites if you want to get everything</span>
+                </label>
+            </section>
+            <section>
+                <button type="submit">Submit</button>
+            </section>
+        </form>
+    </main>
+    <footer>
+        <p style="text-align: center">
+            <a href="https://github.com/rekryt/iplist">GitHub</a>
+            <a href="https://github.com/rekryt/iplist/issues">Issues</a>
+        </p>
+    </footer>
 </body>
 </html>

@@ -2,6 +2,8 @@
 
 namespace OpenCCK\App\Controller;
 
+use OpenCCK\Domain\Factory\SiteFactory;
+
 class MikrotikController extends AbstractIPListController {
     /**
      * @return string
@@ -9,32 +11,42 @@ class MikrotikController extends AbstractIPListController {
     public function getBody(): string {
         $this->setHeaders(['content-type' => 'text/plain']);
 
-        $site = $this->request->getQueryParameter('site') ?? '';
+        $sites = SiteFactory::normalizeArray($this->request->getQueryParameters()['site'] ?? []);
         $data = $this->request->getQueryParameter('data') ?? '';
         if ($data == '') {
             return "# Error: The 'data' GET parameter is required in the URL to access this page, but it cannot have the value 'All'";
         }
-        $response = '/ip firewall address-list' . "\n";
-        if ($site == '') {
-            foreach ($this->service->sites as $site) {
-                $response .= $this->render($site->name, $site->$data);
+
+        $response = [];
+        if (count($sites)) {
+            foreach ($sites as $site) {
+                $response = array_merge($response, $this->generateList($site, $this->service->sites[$site]->$data));
             }
-            return $response;
         } else {
-            return $response . $this->render($site, $this->service->sites[$site]->$data);
+            foreach ($this->service->sites as $siteEntity) {
+                $response = array_merge($response, $this->generateList($siteEntity->name, $siteEntity->$data));
+            }
         }
+
+        return implode(
+            "\n",
+            array_merge(
+                ['/ip firewall address-list'],
+                SiteFactory::normalizeArray($response, in_array($data, ['ipv4', 'ipv6', 'cidr4', 'cidr6']))
+            )
+        );
     }
 
     /**
      * @param string $site
-     * @param iterable $array
-     * @return string
+     * @param array $array
+     * @return array
      */
-    private function render(string $site, iterable $array): string {
-        $response = '';
+    private function generateList(string $site, array $array): array {
+        $response = [];
         $listName = str_replace(' ', '', $site);
         foreach ($array as $item) {
-            $response .= 'add list=' . $listName . ' address=' . $item . ' comment=' . $listName . "\n";
+            $response[] = 'add list=' . $listName . ' address=' . $item . ' comment=' . $listName;
         }
         return $response;
     }
