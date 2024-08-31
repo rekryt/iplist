@@ -8,7 +8,7 @@ Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
 ## Key Features
 
 - **Domain Monitoring**: Collect and update IP addresses and CIDR zones for specified domains.
-- **Multi-Format Output**: Supports output in plain text, JSON format, and script format for RouterOS Mikrotik.
+- **Multi-Format Output**: Supports output in plain text, JSON format, script format for RouterOS Mikrotik, or comma separated values.
 - **Integration with External Data Sources**: Supports importing initial data from external URLs.
 - **Easy Deployment with Docker Compose**.
 - **Configuration through JSON files for managing domains and IPs**.
@@ -81,7 +81,8 @@ If needed, edit the `.env` file:
 |-----------------------|---------------|----------------------------------------------------------------|
 | COMPOSE_PROJECT_NAME  | iplist        | Name of the compose project                                    |
 | STORAGE_SAVE_INTERVAL | 120           | Cache save interval for whois (seconds)                        |
-| SYS_MEMORY_LIMIT      | 512M          | Memory limit. 1MB is sufficient for the initial configuration  |
+| SYS_DNS_RESOLVE_DELAY | 1000          | Delay between receiving dns records (milliseconds)             |
+| SYS_MEMORY_LIMIT      | 1024M         | Memory limit                                                   |
 | SYS_TIMEZONE          | Europe/Moscow | List of URLs to obtain initial CIDRv4 zones for IPv4 addresses |
 | DEBUG                 | true          | Determines the logging level                                   |
 
@@ -93,6 +94,7 @@ http://0.0.0.0:8080/?format=json&site=youtube.com&data=domains
 http://0.0.0.0:8080/?format=text&site=youtube.com&data=ip4
 http://0.0.0.0:8080/?format=mikrotik&data=cidr4
 http://0.0.0.0:8080/?format=mikrotik&site=youtube.com&data=cidr4
+http://0.0.0.0:8080/?format=comma&data=cidr4
 ```
 
 ## SSL Setup
