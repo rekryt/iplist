@@ -32,7 +32,7 @@ final class App {
      * @param ?Logger $logger
      */
     private function __construct(private ?Logger $logger = null) {
-        ini_set('memory_limit', getEnv('SYS_MEMORY_LIMIT') ?? '2048M');
+        ini_set('memory_limit', getEnv('SYS_MEMORY_LIMIT') ?? '1024M');
 
         if (!defined('PATH_ROOT')) {
             define('PATH_ROOT', dirname(__DIR__, 3));
