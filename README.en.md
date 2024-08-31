@@ -81,7 +81,7 @@ If needed, edit the `.env` file:
 |-----------------------|---------------|----------------------------------------------------------------|
 | COMPOSE_PROJECT_NAME  | iplist        | Name of the compose project                                    |
 | STORAGE_SAVE_INTERVAL | 120           | Cache save interval for whois (seconds)                        |
-| SYS_DNS_RESOLVE_DELAY | 1000          | Delay between receiving dns records (milliseconds)             |
+| SYS_DNS_RESOLVE_DELAY | 100           | Delay between receiving dns records (milliseconds)             |
 | SYS_MEMORY_LIMIT      | 1024M         | Memory limit                                                   |
 | SYS_TIMEZONE          | Europe/Moscow | List of URLs to obtain initial CIDRv4 zones for IPv4 addresses |
 | DEBUG                 | true          | Determines the logging level                                   |
