@@ -7,8 +7,9 @@ services:
             - ./.env
         volumes:
             - ./src/:/app/src/
-            - ./storage/:/app/storage/
             - ./config/:/app/config/
+            - ./storage/:/app/storage/
+            - ./public/:/app/public/
         ports:
             - '8080:8080'
         logging:

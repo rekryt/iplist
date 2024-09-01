@@ -11,7 +11,9 @@ use Amp\Http\Server\Driver\SocketClientFactory;
 use Amp\Http\Server\ErrorHandler;
 use Amp\Http\Server\HttpServer;
 use Amp\Http\Server\HttpServerStatus;
+use Amp\Http\Server\Router;
 use Amp\Http\Server\SocketHttpServer;
+use Amp\Http\Server\StaticContent\DocumentRoot;
 use Amp\Socket\BindContext;
 use Amp\Sync\LocalSemaphore;
 use Amp\Socket;
@@ -95,7 +97,11 @@ final class Server implements AppModuleInterface {
             //    new Socket\InternetAddress('[::]', $_ENV['HTTP_PORT'] ?? 8080),
             //    $this->bindContext
             //);
-            $this->httpServer->start(HTTPHandler::getInstance($this->logger)->getHandler(), $this->errorHandler);
+            $router = new Router($this->httpServer, $this->logger, $this->errorHandler);
+            $router->addRoute('GET', '/', HTTPHandler::getInstance($this->logger)->getHandler());
+            $router->setFallback(new DocumentRoot($this->httpServer, $this->errorHandler, PATH_ROOT . '/public'));
+
+            $this->httpServer->start($router, $this->errorHandler);
         } catch (Socket\SocketException $e) {
             $this->logger->warning($e->getMessage());
         } catch (Throwable $e) {

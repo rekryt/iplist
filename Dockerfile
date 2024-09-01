@@ -33,6 +33,7 @@ RUN apt-get clean
 COPY ./src/ /app/src/
 COPY ./config/ /app/config/
 COPY ./storage/ /app/storage/
+COPY ./public/ /app/storage/
 COPY ./composer.json /app/
 COPY ./index.php /app/
 
