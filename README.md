@@ -175,6 +175,7 @@ iplist_youtube_v4_cidr
 ## Настройка HomeProxy (sing-box)
 Включите "Routing mode" в "Only proxy mainland China":
 ![1](https://github.com/user-attachments/assets/21b45275-cdc3-472f-87d4-9222e76021f3)
+Подключитесь к роутеру по ssh и выполните следующие команды:
 ```shell
 # переименовываем старый скрипт обновления
 mv /etc/homeproxy/scripts/update_resources.sh /etc/homeproxy/scripts/update_resources.sh.origin
