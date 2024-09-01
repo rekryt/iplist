@@ -172,5 +172,33 @@ iplist_youtube_v4_cidr
 - А в разделе IP -> Firewall -> Address Lists должен появиться новый список (в примере с именем `youtube.com`)
 - ![4](https://github.com/user-attachments/assets/72d00414-252c-4ddb-84ed-80b09e247e39)
 
+## Настройка HomeProxy (sing-box)
+Включите "Routing mode" в "Only proxy mainland China":
+![1](https://github.com/user-attachments/assets/21b45275-cdc3-472f-87d4-9222e76021f3)
+```shell
+# переименовываем старый скрипт обновления
+mv /etc/homeproxy/scripts/update_resources.sh /etc/homeproxy/scripts/update_resources.sh.origin
+
+# загружаем новый скрипт
+wget https://iplist.opencck.org/scripts/homeproxy/update_resources.sh -O /etc/homeproxy/scripts/update_resources.sh
+
+# добавляем права на выполнение
+chmod +x /etc/homeproxy/scripts/update_resources.sh
+
+# вы захостили это решение? - тогда раскомментируйте в следующую строку и поменяйте "example.com" на ваш домен
+# sed -i 's/iplist.opencck.org/example.com/g' /etc/homeproxy/scripts/update_resources.sh
+```
+Откройте административную панель OpenWRT раздел "System" - "Startup" - "Local Startup".
+Добавьте перед "exit 0" строки, чтобы автоматически запускать скрипт обновления при старте, а также в 00:05:00 и 12:05:00
+```shell
+/etc/homeproxy/scripts/update_crond.sh
+
+echo "5 0,12 * * * /etc/homeproxy/scripts/update_crond.sh" > /etc/crontabs/root
+/etc/init.d/cron start
+/etc/init.d/cron enable
+```
+![2](https://github.com/user-attachments/assets/2369b32c-d43a-4837-97ce-c46a9dd79e5e)
+
+
 ### License
 The MIT License (MIT). Please see [LICENSE](./LICENSE) for more information.

@@ -164,5 +164,33 @@ iplist_youtube_v4_cidr
 - In IP -> Firewall -> Address Lists, a new list should appear (in this example, named `youtube.com`)
 - ![4](https://github.com/user-attachments/assets/72d00414-252c-4ddb-84ed-80b09e247e39)
 
+## Setting up HomeProxy (sing-box)
+Enable "Routing mode" in "Only proxy mainland China":
+![1](https://github.com/user-attachments/assets/21b45275-cdc3-472f-87d4-9222e76021f3)
+```shell
+# Rename the old update script
+mv /etc/homeproxy/scripts/update_resources.sh /etc/homeproxy/scripts/update_resources.sh.origin
+
+# Download the new script
+wget https://iplist.opencck.org/scripts/homeproxy/update_resources.sh -O /etc/homeproxy/scripts/update_resources.sh
+
+# Add execution permissions
+chmod +x /etc/homeproxy/scripts/update_resources.sh
+
+# Did you host this solution? - then uncomment the following line and replace "example.com" with your domain
+# sed -i 's/iplist.opencck.org/example.com/g' /etc/homeproxy/scripts/update_resources.sh
+```
+Open the administrative panel in OpenWRT, go to the "System" - "Startup" - "Local Startup" section.
+Add the following lines before "exit 0" to automatically run the update script at startup, as well as at 00:05:00 and 12:05:00
+```shell
+/etc/homeproxy/scripts/update_crond.sh
+
+echo "5 0,12 * * * /etc/homeproxy/scripts/update_crond.sh" > /etc/crontabs/root
+/etc/init.d/cron start
+/etc/init.d/cron enable
+```
+![2](https://github.com/user-attachments/assets/2369b32c-d43a-4837-97ce-c46a9dd79e5e)
+
+
 ### License
 The MIT License (MIT). Please see [LICENSE](./LICENSE) for more information.
