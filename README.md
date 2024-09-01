@@ -186,7 +186,7 @@ wget https://iplist.opencck.org/scripts/homeproxy/update_resources.sh -O /etc/ho
 # добавляем права на выполнение
 chmod +x /etc/homeproxy/scripts/update_resources.sh
 
-# вы захостили это решение? - тогда раскомментируйте в следующую строку и поменяйте "example.com" на ваш домен
+# вы захостили это решение? - тогда раскомментируйте следующую строку и поменяйте "example.com" на ваш домен
 # sed -i 's/iplist.opencck.org/example.com/g' /etc/homeproxy/scripts/update_resources.sh
 ```
 Откройте административную панель OpenWRT раздел "System" - "Startup" - "Local Startup".
