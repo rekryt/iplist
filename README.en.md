@@ -132,7 +132,7 @@ composer install
 php index.php
 ```
 
-## Настройка Mikrotik
+## Setting up Mikrotik
 - In the router's admin panel (or via winbox), navigate to System -> Scripts.
 - Create a new script by clicking "Add new" and give it a name, for example `iplist_youtube_v4_cidr`
 - In the `Source` field, enter the following code (replace `url` with your server's address, and the protocol in `mode` may differ):
@@ -148,7 +148,7 @@ php index.php
 :delay 10s
 :log info "New iplist_youtube_v4_cidr added successfully";
 ```
-- ![1](https://github.com/user-attachments/assets/5c88ea7a-7d5b-41de-8405-e1d2b13b96a2)
+- ![1](https://github.com/user-attachments/assets/9d8b1bdf-ea4b-4fdb-ba74-297a42d5a01b)
 - Save the script
 - Go to System -> Scheduler
 - Create a new task with a name of your choice, for example `iplist_youtube_v4_cidr`

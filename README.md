@@ -156,7 +156,7 @@ php index.php
 :delay 10s
 :log info "New iplist_youtube_v4_cidr added successfully";
 ```
-- ![1](https://github.com/user-attachments/assets/5c88ea7a-7d5b-41de-8405-e1d2b13b96a2)
+- ![1](https://github.com/user-attachments/assets/9d8b1bdf-ea4b-4fdb-ba74-297a42d5a01b)
 - Сохраните скрипт
 - Откройте раздел планировщика System -> Scheduler
 - Создайте новое задание с произвольным именем, например `iplist_youtube_v4_cidr`
