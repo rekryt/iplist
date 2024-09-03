@@ -192,6 +192,10 @@ echo "5 0,12 * * * /etc/homeproxy/scripts/update_crond.sh" > /etc/crontabs/root
 ```
 ![2](https://github.com/user-attachments/assets/2369b32c-d43a-4837-97ce-c46a9dd79e5e)
 
+## Setting up the Chrome extension - Proxy SwitchySharp
+You can install it [via the link](https://chromewebstore.google.com/detail/proxy-switchysharp/dpplabbmogkhghncfbfdeeokoefdjegm)
+![1](https://github.com/user-attachments/assets/10aaa2f6-5502-472b-97e0-0c4d4e38358d)
+More about the [Switchy RuleList](https://code.google.com/archive/p/switchy/wikis/RuleList.wiki)
 
 ### License
 The MIT License (MIT). Please see [LICENSE](./LICENSE) for more information.
