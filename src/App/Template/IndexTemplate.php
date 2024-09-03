@@ -614,6 +614,7 @@ use OpenCCK\App\Controller\TextController;
                         <option value="mikrotik">MikroTik</option>
                         <option value="text">Text</option>
                         <option value="comma">Comma</option>
+                        <option value="switchy">Switchy RuleList</option>
                     </select>
                 </label>
                 <label class="main-formItem">
