@@ -6,6 +6,7 @@ use Amp\Dns\DnsConfig;
 use Amp\Dns\DnsConfigLoader;
 
 use Amp\Dns\DnsRecord;
+use Amp\Dns\DnsResolver;
 use Amp\Dns\HostLoader;
 use Amp\Dns\Rfc1035StubDnsResolver;
 
@@ -13,8 +14,7 @@ use OpenCCK\Infrastructure\API\App;
 use Throwable;
 
 use function Amp\delay;
-use function Amp\Dns\dnsResolver;
-use function Amp\Dns\resolve;
+use function Amp\Dns\dnsResolver as dnsResolverFactory;
 
 class DNSHelper {
     private float $resolveDelay;
@@ -25,10 +25,10 @@ class DNSHelper {
 
     /**
      * @param array $dnsServers
-     * @return void
+     * @return DnsResolver
      */
-    private function setResolver(array $dnsServers): void {
-        dnsResolver(
+    private function getResolver(array $dnsServers): DnsResolver {
+        return dnsResolverFactory(
             new Rfc1035StubDnsResolver(
                 null,
                 new class ($dnsServers) implements DnsConfigLoader {
@@ -51,27 +51,26 @@ class DNSHelper {
         $ipv4 = [];
         $ipv6 = [];
         foreach ($this->dnsServers as $server) {
+            delay($this->resolveDelay);
+            $dnsResolver = $this->getResolver([$server]);
             try {
-                $this->setResolver([$server]);
                 $ipv4 = array_merge(
                     $ipv4,
-                    array_map(fn(DnsRecord $record) => $record->getValue(), resolve($domain, DnsRecord::A))
+                    array_map(fn(DnsRecord $record) => $record->getValue(), $dnsResolver->resolve($domain, DnsRecord::A))
                 );
             } catch (Throwable $e) {
                 App::getLogger()->error($e->getMessage(), [$server]);
             }
-            delay($this->resolveDelay);
 
+            delay($this->resolveDelay);
             try {
-                $this->setResolver([$server]);
                 $ipv6 = array_merge(
                     $ipv6,
-                    array_map(fn(DnsRecord $record) => $record->getValue(), resolve($domain, DnsRecord::AAAA))
+                    array_map(fn(DnsRecord $record) => $record->getValue(), $dnsResolver->resolve($domain, DnsRecord::AAAA))
                 );
             } catch (Throwable $e) {
                 App::getLogger()->error($e->getMessage(), [$server]);
             }
-            delay($this->resolveDelay);
         }
         App::getLogger()->debug('resolve: ' . $domain, [count($ipv4), count($ipv6)]);
         return [$ipv4, $ipv6];

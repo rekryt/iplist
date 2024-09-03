@@ -10,6 +10,8 @@ use OpenCCK\Infrastructure\API\App;
 
 use Revolt\EventLoop;
 use stdClass;
+use function Amp\async;
+use function Amp\Future\await;
 
 final class Site {
     private DNSHelper $dnsHelper;
@@ -47,10 +49,12 @@ final class Site {
     private function reload(): void {
         $ip4 = [];
         $ip6 = [];
-        foreach ($this->domains as $domain) {
-            [$ipv4results, $ipv6results] = $this->dnsHelper->resolve($domain);
-            $ip4 = array_merge($ip4, $ipv4results);
-            $ip6 = array_merge($ip6, $ipv6results);
+        foreach (array_chunk($this->domains, \OpenCCK\getEnv('SYS_DNS_RESOLVE_CHUNK_SIZE') ?? 10) as $chunk) {
+            $executions = array_map(fn(string $domain) => async(fn() => $this->dnsHelper->resolve($domain)), $chunk);
+            foreach (await($executions) as $result) {
+                $ip4 = array_merge($ip4, $result[0]);
+                $ip6 = array_merge($ip6, $result[1]);
+            }
         }
 
         $newIp4 = SiteFactory::normalize(array_diff($ip4, $this->ip4), true);
@@ -146,5 +150,26 @@ final class Site {
             PATH_ROOT . '/config/' . $this->name . '.json',
             json_encode($this->getConfig(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
         );
+    }
+
+    /**
+     * @param bool $wildcard
+     * @return array
+     */
+    public function getDomains(bool $wildcard = false): array {
+        if ($wildcard) {
+            $domains = [];
+            foreach ($this->domains as $domain) {
+                $parts = explode('.', $domain);
+                $wildcardDomain = array_slice($parts, -2);
+                if (in_array(implode('.', $wildcardDomain), SiteFactory::TWO_LEVEL_DOMAIN_ZONES)) {
+                    $wildcardDomain = array_slice($parts, -3);
+                }
+                $domains[] = implode('.', $wildcardDomain);
+            }
+            return SiteFactory::normalizeArray($domains);
+        }
+
+        return $this->domains;
     }
 }
