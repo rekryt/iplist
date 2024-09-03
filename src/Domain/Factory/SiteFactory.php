@@ -5,9 +5,20 @@ namespace OpenCCK\Domain\Factory;
 use OpenCCK\Domain\Entity\Site;
 use OpenCCK\Domain\Helper\IP4Helper;
 use OpenCCK\Domain\Helper\IP6Helper;
+use OpenCCK\Infrastructure\API\App;
 use stdClass;
 
 class SiteFactory {
+    // prettier-ignore
+    const TWO_LEVEL_DOMAIN_ZONES = [
+        "exnet.su","net.ru","org.ru","pp.ru","ru.net","com.ru",
+        "co.bw","co.ck","co.fk","co.id","co.il","co.in","co.ke","co.ls","co.mz","co.no","co.nz","co.th","co.tz","co.uk","co.uz","co.za","co.zm","co.zw",
+        "co.ae","co.at", "co.cr", "co.hu","co.jp", "co.kr", "co.ma", "co.ug", "co.ve",
+        "com.az","com.bh","com.bo","com.by","com.co","com.do","com.ec","com.ee","com.es","com.gr","com.hn","com.hr","com.jo","com.lv","com.ly","com.mk","com.mx","com.my","com.pe","com.ph","com.pk","com.pt","com.ro","com.tn",
+        "com.ai","com.ar","com.au","com.bd","com.bn","com.br","com.cn","com.cy","com.eg","com.et","com.fj","com.gh","com.gn","com.gt","com.gu","com.hk","com.jm","com.kh","com.kw","com.lb","com.lr","com.mt","com.mv","com.ng","com.ni","com.np","com.nr","com.om","com.pa","com.pl","com.py","com.qa","com.sa","com.sb","com.sg","com.sv","com.sy","com.tr","com.tw","com.ua","com.uy","com.ve","com.vi","com.vn","com.ye",
+        "in.ua","kiev.ua","me.uk","net.cn","org.cn","org.uk","radio.am","radio.fm","eu.com"
+    ];
+
     /**
      * @param string $name Name of portal
      * @param object $config Configuration of portal
@@ -27,30 +38,35 @@ class SiteFactory {
         if (isset($external)) {
             if (isset($external->domains)) {
                 foreach ($external->domains as $url) {
+                    App::getLogger()->debug('Loading external domains from ' . $url);
                     $domains = array_merge($domains, explode("\n", file_get_contents($url)));
                 }
             }
 
             if (isset($external->ip4)) {
                 foreach ($external->ip4 as $url) {
+                    App::getLogger()->debug('Loading external ip4 from ' . $url);
                     $ip4 = array_merge($ip4, explode("\n", file_get_contents($url)));
                 }
             }
 
             if (isset($external->ip6)) {
                 foreach ($external->ip6 as $url) {
+                    App::getLogger()->debug('Loading external ip6 from ' . $url);
                     $ip6 = array_merge($ip6, explode("\n", file_get_contents($url)));
                 }
             }
 
             if (isset($external->cidr4)) {
                 foreach ($external->cidr4 as $url) {
+                    App::getLogger()->debug('Loading external cidr4 from ' . $url);
                     $cidr4 = array_merge($cidr4, explode("\n", file_get_contents($url)));
                 }
             }
 
             if (isset($external->cidr6)) {
                 foreach ($external->cidr6 as $url) {
+                    App::getLogger()->debug('Loading external cidr6 from ' . $url);
                     $cidr6 = array_merge($cidr6, explode("\n", file_get_contents($url)));
                 }
             }

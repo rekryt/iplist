@@ -6,6 +6,7 @@ use Amp\ByteStream\BufferException;
 use Amp\Http\Server\Request;
 
 use OpenCCK\App\Service\IPListService;
+use OpenCCK\Domain\Entity\Site;
 use OpenCCK\Infrastructure\API\App;
 
 use Monolog\Logger;
@@ -32,4 +33,16 @@ abstract class AbstractIPListController extends AbstractController {
      * @return string
      */
     abstract public function getBody(): string;
+
+    /**
+     * @return array<string, Site>
+     */
+    protected function getSites(): array {
+        $wildcard = !!($this->request->getQueryParameter('wildcard') ?? '');
+        return array_map(static function (Site $siteEntity) use ($wildcard) {
+            $site = clone $siteEntity;
+            $site->domains = $siteEntity->getDomains($wildcard);
+            return $site;
+        }, $this->service->sites);
+    }
 }

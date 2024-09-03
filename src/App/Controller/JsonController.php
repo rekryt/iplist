@@ -16,9 +16,9 @@ class JsonController extends AbstractIPListController {
         $data = $this->request->getQueryParameter('data') ?? '';
 
         if (count($sites)) {
-            $items = array_filter($this->service->sites, fn(Site $siteEntity) => in_array($siteEntity->name, $sites));
+            $items = array_filter($this->getSites(), fn(Site $siteEntity) => in_array($siteEntity->name, $sites));
         } else {
-            $items = $this->service->sites;
+            $items = $this->getSites();
         }
         return json_encode($data == '' ? $items : array_map(fn(Site $siteEntity) => $siteEntity->$data, $items));
     }

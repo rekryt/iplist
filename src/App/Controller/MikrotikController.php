@@ -20,10 +20,10 @@ class MikrotikController extends AbstractIPListController {
         $response = [];
         if (count($sites)) {
             foreach ($sites as $site) {
-                $response = array_merge($response, $this->generateList($site, $this->service->sites[$site]->$data));
+                $response = array_merge($response, $this->generateList($site, $this->getSites()[$site]->$data));
             }
         } else {
-            foreach ($this->service->sites as $siteEntity) {
+            foreach ($this->getSites() as $siteEntity) {
                 $response = array_merge($response, $this->generateList($siteEntity->name, $siteEntity->$data));
             }
         }

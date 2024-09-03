@@ -601,6 +601,14 @@ use OpenCCK\App\Controller\TextController;
         }
         .main-formSelect {}
         .main-formSelect_site {}
+        .main-formItemCheckbox {
+            margin: 0 6px 0 0;
+        }
+        .main-formItemCheckboxLabel {
+            line-height: 1;
+            font-size: 14px;
+            font-weight: normal;
+        }
     </style>
 </head>
 <body>
@@ -638,6 +646,10 @@ use OpenCCK\App\Controller\TextController;
                         </select>
                     </span>
                     <span class="main-formItemComment">Don't choose sites if you want to get everything</span>
+                </label>
+                <label class="main-formItem main-formItem_wide">
+                    <input class="main-formItemCheckbox" type="checkbox" name="wildcard" value="1" />
+                    <span class="main-formItemCheckboxLabel">Only wildcard domains</span>
                 </label>
             </section>
             <section>
