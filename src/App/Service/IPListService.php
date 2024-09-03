@@ -8,6 +8,8 @@ use OpenCCK\Infrastructure\API\App;
 
 use Exception;
 use Monolog\Logger;
+use Revolt\EventLoop;
+use function Amp\delay;
 
 class IPListService {
     private static IPListService $_instance;
@@ -34,6 +36,13 @@ class IPListService {
                 $this->loadConfig($name, json_decode(file_get_contents($dir . $file)));
             }
         }
+
+        EventLoop::queue(function () {
+            foreach ($this->sites as $siteEntity) {
+                $siteEntity->reload();
+                delay(1);
+            }
+        });
     }
 
     /**

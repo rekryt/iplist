@@ -40,13 +40,15 @@ final class Site {
         public object $external = new stdClass()
     ) {
         $this->dnsHelper = new DNSHelper($dns);
-        EventLoop::delay(0, $this->reload(...));
     }
 
     /**
      * @return void
      */
-    private function reload(): void {
+    public function reload(): void {
+        $startTime = time();
+        App::getLogger()->notice('Reloading for ' . $this->name, ['started']);
+
         $ip4 = [];
         $ip6 = [];
         foreach (array_chunk($this->domains, \OpenCCK\getEnv('SYS_DNS_RESOLVE_CHUNK_SIZE') ?? 10) as $chunk) {
@@ -67,7 +69,7 @@ final class Site {
         $this->ip6 = SiteFactory::normalize(array_merge($this->ip6, $ip6), true);
 
         $this->saveConfig();
-        App::getLogger()->debug('Reloaded for ' . $this->name);
+        App::getLogger()->notice('Reloaded for ' . $this->name, ['finished', time() - $startTime]);
 
         EventLoop::delay($this->timeout, function () {
             $this->reloadExternal();
