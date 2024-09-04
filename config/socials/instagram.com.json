@@ -1,0 +1,79 @@
+{
+    "domains": [
+        "cdninstagram.com",
+        "graph.instagram.com",
+        "i.instagram.com",
+        "ig.me",
+        "instagram-p3-shv-01-arn2.fbcdn.net",
+        "instagram-p3-shv-01-frt3.fbcdn.net",
+        "instagram-p3-shv-01-frx5.fbcdn.net",
+        "instagram-p3-shv-01-hel3.fbcdn.com",
+        "instagram-p3-shv-01-hel3.fbcdn.net",
+        "instagram.c10r.instagram.com",
+        "instagram.com",
+        "instagram.fhel5-1.fna.fbcdn.net",
+        "instagram.frix7-1.fna.fbcdn.net",
+        "scontent-cdt1-1.cdninstagram.com",
+        "scontent-frt3-1.cdninstagram.com",
+        "scontent-frt3-2.cdninstagram.com",
+        "scontent-frx5-1.cdninstagram.com",
+        "scontent-frx5-2.cdninstagram.com",
+        "scontent-hel3-1.cdninstagram.com",
+        "scontent-iad3-2.cdninstagram.com",
+        "www.ig.me",
+        "www.instagram.com"
+    ],
+    "dns": [
+        "127.0.0.11:53",
+        "77.88.8.88:53",
+        "8.8.8.8:53",
+        "1.1.1.1:53"
+    ],
+    "timeout": 3600,
+    "ip4": [
+        "157.240.0.174",
+        "157.240.0.63",
+        "157.240.205.174",
+        "157.240.205.63",
+        "157.240.229.63",
+        "157.240.251.174",
+        "157.240.251.63",
+        "157.240.252.63",
+        "157.240.253.174",
+        "157.240.253.63",
+        "31.13.72.174",
+        "31.13.72.53",
+        "87.245.208.97"
+    ],
+    "ip6": [
+        "2a02:2d8:3:800:face:b00c:3333:a3f",
+        "2a03:2880:f203:1c2:face:b00c:0:43fe",
+        "2a03:2880:f20a:e5:face:b00c:0:4420",
+        "2a03:2880:f213:ca:face:b00c:0:43fe",
+        "2a03:2880:f213:e4:face:b00c:0:4420",
+        "2a03:2880:f276:1e9:face:b00c:0:4420",
+        "2a03:2880:f276:d2:face:b00c:0:43fe",
+        "2a03:2880:f276:e8:face:b00c:0:4420",
+        "2a03:2880:f277:1c6:face:b00c:0:43fe",
+        "2a03:2880:f277:1e8:face:b00c:0:4420",
+        "2a03:2880:f277:c0:face:b00c:0:43fe",
+        "2a03:2880:f277:e2:face:b00c:0:4420"
+    ],
+    "cidr4": [
+        "157.240.0.0/16",
+        "31.13.64.0/18",
+        "87.245.208.0/20",
+        "87.245.224.0/19"
+    ],
+    "cidr6": [
+        "2a02:2d8::/64",
+        "2a03:2880::/64"
+    ],
+    "external": {
+        "domains": [],
+        "ip4": [],
+        "ip6": [],
+        "cidr4": [],
+        "cidr6": []
+    }
+}

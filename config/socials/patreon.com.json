@@ -1,0 +1,54 @@
+{
+    "domains": [
+        "c1.patreon.com",
+        "c10.patreon.com",
+        "c11.patreon.com",
+        "c12.patreon.com",
+        "c13.patreon.com",
+        "c14.patreon.com",
+        "c15.patreon.com",
+        "c16.patreon.com",
+        "c17.patreon.com",
+        "c18.patreon.com",
+        "c19.patreon.com",
+        "c2.patreon.com",
+        "c20.patreon.com",
+        "c3.patreon.com",
+        "c4.patreon.com",
+        "c5.patreon.com",
+        "c6.patreon.com",
+        "c7.patreon.com",
+        "c8.patreon.com",
+        "c9.patreon.com",
+        "patreon.com",
+        "www.patreon.com"
+    ],
+    "dns": [
+        "127.0.0.11:53",
+        "77.88.8.88:53",
+        "8.8.8.8:53",
+        "1.1.1.1:53"
+    ],
+    "timeout": 3600,
+    "ip4": [
+        "104.16.24.14",
+        "104.16.25.14"
+    ],
+    "ip6": [
+        "2606:4700::6810:180e",
+        "2606:4700::6810:190e"
+    ],
+    "cidr4": [
+        "104.16.0.0/12"
+    ],
+    "cidr6": [
+        "2606:4700::/64"
+    ],
+    "external": {
+        "domains": [],
+        "ip4": [],
+        "ip6": [],
+        "cidr4": [],
+        "cidr6": []
+    }
+}

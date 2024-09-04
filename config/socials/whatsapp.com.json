@@ -1,0 +1,27 @@
+{
+    "domains": [
+        "web.whatsapp.com",
+        "whatsapp.com",
+        "www.whatsapp.com",
+        "whatsapp.net",
+        "www.whatsapp.net",
+        "whatsapp-cdn-shv-01-amt2.fbcdn.net",
+        "whatsapp-cdn-shv-01-any2.fbcdn.net",
+        "whatsapp-cdn-shv-01-arn2.fbcdn.net",
+        "whatsapp-cdn-shv-01-bru2.fbcdn.net",
+        "whatsapp-cdn-shv-01-hel3.fbcdn.net"
+    ],
+    "dns": ["127.0.0.11:53", "77.88.8.88:53", "8.8.8.8:53", "1.1.1.1:53"],
+    "timeout": 0,
+    "ip4": [],
+    "ip6": [],
+    "cidr4": [],
+    "cidr6": [],
+    "external": {
+        "domains": [],
+        "ip4": [],
+        "ip6": [],
+        "cidr4": [],
+        "cidr6": []
+    }
+}
