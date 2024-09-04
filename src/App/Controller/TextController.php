@@ -15,7 +15,7 @@ class TextController extends AbstractIPListController {
         $sites = SiteFactory::normalizeArray($this->request->getQueryParameters()['site'] ?? []);
         $data = $this->request->getQueryParameter('data') ?? '';
         if ($data == '') {
-            return "# Error: The 'data' GET parameter is required in the URL to access this page, but it cannot have the value 'All'";
+            return "# Error: The 'data' GET parameter is required in the URL to access this page";
         }
 
         $response = [];
@@ -29,9 +29,16 @@ class TextController extends AbstractIPListController {
             }
         }
 
-        return implode(
-            $this::DELIMITER,
+        return $this->render(
             SiteFactory::normalizeArray($response, in_array($data, ['ipv4', 'ipv6', 'cidr4', 'cidr6']))
         );
+    }
+
+    /**
+     * @param array $response
+     * @return string
+     */
+    protected function render(array $response): string {
+        return implode($this::DELIMITER, $response);
     }
 }

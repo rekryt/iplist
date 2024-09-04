@@ -14,7 +14,7 @@ class MikrotikController extends AbstractIPListController {
         $sites = SiteFactory::normalizeArray($this->request->getQueryParameters()['site'] ?? []);
         $data = $this->request->getQueryParameter('data') ?? '';
         if ($data == '') {
-            return "# Error: The 'data' GET parameter is required in the URL to access this page, but it cannot have the value 'All'";
+            return "# Error: The 'data' GET parameter is required in the URL to access this page";
         }
 
         $response = [];

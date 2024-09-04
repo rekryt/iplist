@@ -60,6 +60,10 @@ class IPListService {
      * @return void
      */
     private function loadConfig(string $name, object $config): void {
+        if (isset($this->sites[$name])) {
+            $this->logger->error(sprintf('Site "%s" already exists', $name));
+            return;
+        }
         $this->sites[$name] = SiteFactory::create($name, $config);
     }
 }

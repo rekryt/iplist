@@ -83,17 +83,17 @@ class SiteFactory {
 
     /**
      * @param array $array
-     * @param bool $excludeLocalIPs
+     * @param bool $isIpAddresses
      * @return array
      */
-    public static function normalize(array $array, bool $excludeLocalIPs = false): array {
+    public static function normalize(array $array, bool $isIpAddresses = false): array {
         return array_values(
             array_unique(
                 array_filter(
                     $array,
                     fn(string $item) => !str_starts_with($item, '#') &&
                         strlen($item) > 0 &&
-                        (!$excludeLocalIPs ||
+                        (!$isIpAddresses ||
                             (!str_starts_with($item, '10.') &&
                                 !str_starts_with($item, '172.16.') &&
                                 !str_starts_with($item, '192.168.') &&
@@ -105,11 +105,11 @@ class SiteFactory {
 
     /**
      * @param array $array
-     * @param bool $excludeLocalIPs
+     * @param bool $isIpAddresses
      * @return array
      */
-    public static function normalizeArray(array $array, bool $excludeLocalIPs = false): array {
+    public static function normalizeArray(array $array, bool $isIpAddresses = false): array {
         sort($array);
-        return SiteFactory::normalize($array, $excludeLocalIPs);
+        return SiteFactory::normalize($array, $isIpAddresses);
     }
 }

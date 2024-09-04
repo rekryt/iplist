@@ -619,10 +619,14 @@ use OpenCCK\App\Controller\TextController;
                     Format:
                     <select name="format" class="main-formSelect">
                         <option value="json">JSON</option>
-                        <option value="mikrotik">MikroTik</option>
                         <option value="text">Text</option>
                         <option value="comma">Comma</option>
-                        <option value="switchy">Switchy RuleList</option>
+                        <option value="mikrotik">MikroTik Script</option>
+                        <option value="switchy">SwitchyOmega RuleList</option>
+                        <option value="nfset">Dnsmasq nfset</option>
+                        <option value="ipset">Dnsmasq ipset</option>
+                        <option value="clashx">ClashX</option>
+                        <option value="kvas">Keenetic KVAS</option>
                     </select>
                 </label>
                 <label class="main-formItem">
