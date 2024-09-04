@@ -22,7 +22,7 @@ Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
 - whois, ipcalc (linux)
 
 # Форматы выгрузки
-| format   | description              |
+| формат   | описание                 |
 |----------|--------------------------|
 | json     | JSON формат              |
 | text     | Разделение новой строкой |
