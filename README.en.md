@@ -18,6 +18,19 @@ Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
 - **PHP 8.1+ (amphp, revolt)**
 - **whois, ipcalc (Linux utilities)**
 
+# Formats of Output
+| format   | description           |
+|----------|-----------------------|
+| json     | JSON format           |
+| text     | Newline-separated     |
+| comma    | Comma-separated       |
+| mikrotik | MikroTik Script       |
+| switchy  | SwitchyOmega RuleList |
+| nfset    | Dnsmasq nfset         |
+| ipset    | Dnsmasq ipset         |
+| clashx   | ClashX                |
+| kvas     | Keenetic KVAS         |
+
 ## Configuration
 
 Configuration files are stored in the `config` directory. Each JSON file represents a configuration for a specific portal, defining the domains to monitor and the sources of initial data for IP and CIDR.

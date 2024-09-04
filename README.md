@@ -1,4 +1,4 @@
-### IP Address Collection and Management Service for Mikrotik RouterOS Script, JSON or Text Format 
+### IP Address Collection and Management Service with multiple formats 
 For english readme: [README.en.md](README.en.md)
 
 Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
@@ -20,6 +20,19 @@ Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
 Используемые технологии
 - PHP 8.1+ (amphp, revolt)
 - whois, ipcalc (linux)
+
+# Форматы выгрузки
+| format   | description              |
+|----------|--------------------------|
+| json     | JSON формат              |
+| text     | Разделение новой строкой |
+| comma    | Разделение запятыми      |
+| mikrotik | MikroTik Script          |
+| switchy  | SwitchyOmega RuleList    |
+| nfset    | Dnsmasq nfset            |
+| ipset    | Dnsmasq ipset            |
+| clashx   | ClashX                   |
+| kvas     | Keenetic KVAS            |
 
 ## Настройки
 Конфигурационные файлы хранятся в директории `config`. Каждый JSON файл представляет собой конфигурацию для конкретного портала, задавая домены для мониторинга и источники начальных данных по IP и CIDR.
