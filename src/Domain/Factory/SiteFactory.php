@@ -21,11 +21,12 @@ class SiteFactory {
 
     /**
      * @param string $name Name of portal
+     * @param string $group Group of portal
      * @param object $config Configuration of portal
      * @return Site
      *
      */
-    static function create(string $name, object $config): Site {
+    static function create(string $name, string $group, object $config): Site {
         $domains = $config->domains ?? [];
         $dns = $config->dns ?? [];
         $timeout = $config->timeout ?? 1440 * 60;
@@ -75,10 +76,13 @@ class SiteFactory {
         $domains = self::normalize($domains);
         $ip4 = self::normalize($ip4, true);
         $ip6 = self::normalize($ip6, true);
-        $cidr4 = self::normalize(IP4Helper::processCIDR($ip4, self::normalize($cidr4)), true);
-        $cidr6 = self::normalize(IP6Helper::processCIDR($ip6, self::normalize($cidr6)), true);
 
-        return new Site($name, $domains, $dns, $timeout, $ip4, $ip6, $cidr4, $cidr6, $external);
+        if ($timeout) {
+            $cidr4 = self::normalize(IP4Helper::processCIDR($ip4, self::normalize($cidr4)), true);
+            $cidr6 = self::normalize(IP6Helper::processCIDR($ip6, self::normalize($cidr6)), true);
+        }
+
+        return new Site($name, $group, $domains, $dns, $timeout, $ip4, $ip6, $cidr4, $cidr6, $external);
     }
 
     /**

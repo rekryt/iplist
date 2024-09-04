@@ -1,6 +1,7 @@
 <?php
-use OpenCCK\App\Controller\TextController;
-/** @var TextController $this */
+
+use OpenCCK\App\Controller\MainController;
+/** @var MainController $this */
 ?>
 <!doctype html>
 <html lang="en">
@@ -600,7 +601,9 @@ use OpenCCK\App\Controller\TextController;
             text-align: center;
         }
         .main-formSelect {}
-        .main-formSelect_site {}
+        .main-formSelect_site {
+            min-height: 60vh;
+        }
         .main-formItemCheckbox {
             margin: 0 6px 0 0;
         }
@@ -644,8 +647,12 @@ use OpenCCK\App\Controller\TextController;
                     <span>
                         Site:
                         <select name="site" class="main-formSelect main-formSelect_site" multiple>
-                            <?php foreach ($this->service->sites as $site): ?>
-                                <option value="<?= $site->name ?>"><?= $site->name ?></option>
+                            <?php foreach ($this->groups as $group => $items): ?>
+                                <optgroup label="<?= $group ?>">
+                                    <?php foreach ($items as $site): ?>
+                                        <option value="<?= $site->name ?>"><?= $site->name ?></option>
+                                    <?php endforeach; ?>
+                                </optgroup>
                             <?php endforeach; ?>
                         </select>
                     </span>

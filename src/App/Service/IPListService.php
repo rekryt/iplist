@@ -10,6 +10,7 @@ use Exception;
 use Monolog\Logger;
 use Revolt\EventLoop;
 use function Amp\delay;
+use function OpenCCK\dbg;
 
 class IPListService {
     private static IPListService $_instance;
@@ -30,17 +31,27 @@ class IPListService {
         if (!is_dir($dir)) {
             throw new Exception('config directory not found');
         }
-        foreach (scandir($dir) as $file) {
-            if (str_ends_with($file, '.json')) {
-                $name = substr($file, 0, -5);
-                $this->loadConfig($name, json_decode(file_get_contents($dir . $file)));
+
+        foreach (scandir($dir) as $item) {
+            if (in_array($item, ['.', '..'])) {
+                continue;
+            }
+            $path = $dir . $item;
+            if (is_dir($path)) {
+                foreach (scandir($path) as $file) {
+                    if (is_file($path . '/' . $file)) {
+                        $this->loadConfig($path . '/' . $file);
+                    }
+                }
             }
         }
 
         EventLoop::queue(function () {
             foreach ($this->sites as $siteEntity) {
-                $siteEntity->reload();
-                delay(1);
+                if ($siteEntity->timeout) {
+                    $siteEntity->reload();
+                    delay(1);
+                }
             }
         });
     }
@@ -55,15 +66,24 @@ class IPListService {
     }
 
     /**
-     * @param string $name
-     * @param object $config
+     * @param string $path
      * @return void
      */
-    private function loadConfig(string $name, object $config): void {
-        if (isset($this->sites[$name])) {
-            $this->logger->error(sprintf('Site "%s" already exists', $name));
-            return;
+    private function loadConfig(string $path): void {
+        if (str_ends_with($path, '.json')) {
+            $parts = explode('/', $path);
+            $filename = array_pop($parts);
+            $name = substr($filename, 0, -5);
+            $config = json_decode(file_get_contents($path));
+            $group = array_pop($parts);
+
+            if (isset($this->sites[$name])) {
+                $this->logger->error(sprintf('Site config "%s" already exists', $name));
+                delay(5);
+                exit();
+            }
+
+            $this->sites[$name] = SiteFactory::create($name, $group, $config);
         }
-        $this->sites[$name] = SiteFactory::create($name, $config);
     }
 }

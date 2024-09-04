@@ -18,6 +18,7 @@ final class Site {
 
     /**
      * @param string $name Name of portal
+     * @param string $group Group of portal
      * @param array $domains List of portal domains
      * @param array $dns List of DNS servers for updating IP addresses
      * @param int $timeout Time interval between domain IP address updates (seconds)
@@ -30,6 +31,7 @@ final class Site {
      */
     public function __construct(
         public string $name,
+        public string $group,
         public array $domains = [],
         public array $dns = [],
         public int $timeout = 1440 * 60,
@@ -149,7 +151,7 @@ final class Site {
      */
     private function saveConfig(): void {
         file_put_contents(
-            PATH_ROOT . '/config/' . $this->name . '.json',
+            PATH_ROOT . '/config/' . $this->group . '/' . $this->name . '.json',
             json_encode($this->getConfig(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
         );
     }
