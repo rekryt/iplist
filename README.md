@@ -35,7 +35,7 @@ Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
 | kvas     | Keenetic KVAS            |
 
 ## Настройки
-Конфигурационные файлы хранятся в директории `config`. Каждый JSON файл представляет собой конфигурацию для конкретного портала, задавая домены для мониторинга и источники начальных данных по IP и CIDR.
+Конфигурационные файлы хранятся в `config/<группа>/<портал>.json`. Каждый JSON файл представляет собой конфигурацию для конкретного портала, задавая домены для мониторинга и источники начальных данных по IP и CIDR.
 ```json
 {
     "domains": [
@@ -188,7 +188,7 @@ iplist_youtube_v4_cidr
 
 ## Настройка HomeProxy (sing-box)
 Включите "Routing mode" в "Only proxy mainland China":
-![1](https://github.com/user-attachments/assets/21b45275-cdc3-472f-87d4-9222e76021f3)
+![1](https://github.com/user-attachments/assets/b0295368-b160-430d-8802-9b65db4e096f)
 Подключитесь к роутеру по ssh и выполните следующие команды:
 ```shell
 # переименовываем старый скрипт обновления

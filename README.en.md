@@ -33,7 +33,7 @@ Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
 
 ## Configuration
 
-Configuration files are stored in the `config` directory. Each JSON file represents a configuration for a specific portal, defining the domains to monitor and the sources of initial data for IP and CIDR.
+Configuration files are stored in the `config/<group>/<site>.json`. Each JSON file represents a configuration for a specific portal, defining the domains to monitor and the sources of initial data for IP and CIDR.
 
 ```json
 {
@@ -180,7 +180,7 @@ iplist_youtube_v4_cidr
 
 ## Setting up HomeProxy (sing-box)
 Enable "Routing mode" in "Only proxy mainland China":
-![1](https://github.com/user-attachments/assets/21b45275-cdc3-472f-87d4-9222e76021f3)
+![1](https://github.com/user-attachments/assets/b0295368-b160-430d-8802-9b65db4e096f)
 Connect to the router via SSH and execute the following commands:
 ```shell
 # Rename the old update script
