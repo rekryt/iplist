@@ -156,35 +156,32 @@ php index.php
 
 ## Настройка Mikrotik
 - В администраторской панели роутера (или через winbox) откройте раздел System -> Scripts
-- Создайте новый скрипт "Add new" с произвольным именем, например `iplist_youtube_v4_cidr`
+- Создайте новый скрипт "Add new" с произвольным именем, например `iplist_v4_cidr`
 - В поле `Source` введите следующий код (используйте `url` адрес вашего сервера, протокол в `mode` тоже может отличаться):
 ```
-/tool fetch url="https://iplist.opencck.org/?format=mikrotik&site=youtube.com&data=cidr4" mode=https dst-path=iplist_youtube_v4_cidr.rsc
+/tool fetch url="https://iplist.opencck.org/?format=mikrotik&data=cidr4" mode=https dst-path=iplist_v4_cidr.rsc
 :delay 5s
-:log info "Downloaded iplist_youtube_v4_cidr.rsc succesfully";
+:log info "Downloaded iplist_v4_cidr.rsc succesfully";
 
-/ip firewall address-list remove [find where comment="youtube.com"];
-:delay 5s
-
-/import file-name=iplist_youtube_v4_cidr.rsc
+/import file-name=iplist_v4_cidr.rsc
 :delay 10s
-:log info "New iplist_youtube_v4_cidr added successfully";
+:log info "New iplist_v4_cidr added successfully";
 ```
-- ![1](https://github.com/user-attachments/assets/9d8b1bdf-ea4b-4fdb-ba74-297a42d5a01b)
+- ![1](https://github.com/user-attachments/assets/6de7211b-7758-4498-985b-04c407dc3ca7)
 - Сохраните скрипт
 - Откройте раздел планировщика System -> Scheduler
-- Создайте новое задание с произвольным именем, например `iplist_youtube_v4_cidr`
+- Создайте новое задание с произвольным именем, например `iplist_v4_cidr`
 - В качестве `Start time` укажите время для старта задания (пример: `00:05:00`). Для `Interval` введите значение `1d 00:00:00`.
 - В поле `On event` введите имя скрипта
 ```
 iplist_youtube_v4_cidr
 ```
-- ![2](https://github.com/user-attachments/assets/1b364ddc-a4b7-4563-987c-3dd382eb082d)
+- ![2](https://github.com/user-attachments/assets/c3e7277a-5c0f-4413-885f-87efb13ac5cf)
 - Откройте скрипт в разделе System -> Scripts и запустите его нажатием на кнопку `Run Script`
-- В разделе Logs вы должны увидеть сообщение `New iplist_youtube_v4_cidr added successfully`
-- ![3](https://github.com/user-attachments/assets/4ef15415-60f5-4c70-9f18-c8bece797e3d)
+- В разделе Logs вы должны увидеть сообщение `New iplist_v4_cidr added successfully`
+- ![3](https://github.com/user-attachments/assets/6d631a64-68cf-46bc-82d9-d58332e4112c)
 - А в разделе IP -> Firewall -> Address Lists должен появиться новый список (в примере с именем `youtube.com`)
-- ![4](https://github.com/user-attachments/assets/72d00414-252c-4ddb-84ed-80b09e247e39)
+- ![4](https://github.com/user-attachments/assets/bb9ada57-60eb-40df-a031-7a0bc05bc4cb)
 
 ## Настройка HomeProxy (sing-box)
 Включите "Routing mode" в "Only proxy mainland China":
