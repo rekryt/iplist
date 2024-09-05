@@ -29,6 +29,8 @@ class MikrotikController extends AbstractIPListController {
 
             $response = array_merge($response, [
                 '/ip firewall address-list remove [find list="' . $groupName . '"];',
+                ':delay 5s',
+                '',
                 '/ip firewall address-list',
             ]);
             $items = [];
@@ -44,7 +46,7 @@ class MikrotikController extends AbstractIPListController {
             $items = SiteFactory::normalizeArray($items, in_array($data, ['ip4', 'ip6', 'cidr4', 'cidr6']));
             $items[count($items) - 1] = $items[count($items) - 1] . ';';
 
-            $response = array_merge($response, $items, ['']);
+            $response = array_merge($response, $items, ['', '']);
         }
 
         return implode("\n", $response);
