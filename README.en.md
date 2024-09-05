@@ -166,7 +166,7 @@ php index.php
 - Set the `Start time` for the task (e.g., `00:05:00`). For Interval, enter `1d 00:00:00`.
 - In the `On event` field, enter the script name
 ```
-iplist_youtube_v4_cidr
+iplist_v4_cidr
 ```
 - ![2](https://github.com/user-attachments/assets/c3e7277a-5c0f-4413-885f-87efb13ac5cf)
 - Open the script in System -> Scripts and run it by clicking the `Run Script` button

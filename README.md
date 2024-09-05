@@ -174,13 +174,13 @@ php index.php
 - В качестве `Start time` укажите время для старта задания (пример: `00:05:00`). Для `Interval` введите значение `1d 00:00:00`.
 - В поле `On event` введите имя скрипта
 ```
-iplist_youtube_v4_cidr
+iplist_v4_cidr
 ```
 - ![2](https://github.com/user-attachments/assets/c3e7277a-5c0f-4413-885f-87efb13ac5cf)
 - Откройте скрипт в разделе System -> Scripts и запустите его нажатием на кнопку `Run Script`
 - В разделе Logs вы должны увидеть сообщение `New iplist_v4_cidr added successfully`
 - ![3](https://github.com/user-attachments/assets/6d631a64-68cf-46bc-82d9-d58332e4112c)
-- А в разделе IP -> Firewall -> Address Lists должен появиться новый список (в примере с именем `youtube.com`)
+- А в разделе IP -> Firewall -> Address Lists должен появиться новый список (в примере с именем `youtube`)
 - ![4](https://github.com/user-attachments/assets/bb9ada57-60eb-40df-a031-7a0bc05bc4cb)
 
 ## Настройка HomeProxy (sing-box)
