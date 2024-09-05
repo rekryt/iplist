@@ -172,7 +172,7 @@ iplist_v4_cidr
 - Open the script in System -> Scripts and run it by clicking the `Run Script` button
 - In the Logs section, you should see the message `New iplist_v4_cidr added successfully`
 - ![3](https://github.com/user-attachments/assets/6d631a64-68cf-46bc-82d9-d58332e4112c)
-- In IP -> Firewall -> Address Lists, a new list should appear (in this example, named `youtube`)
+- In IP -> Firewall -> Address Lists, a new lists should appear (in this example, named `youtube`)
 - ![4](https://github.com/user-attachments/assets/bb9ada57-60eb-40df-a031-7a0bc05bc4cb)
 
 ## Setting up HomeProxy (sing-box)
