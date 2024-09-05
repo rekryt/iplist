@@ -27,8 +27,9 @@ class MikrotikController extends AbstractIPListController {
                 continue;
             }
 
+            $listName = $groupName . '_' . $data;
             $response = array_merge($response, [
-                '/ip firewall address-list remove [find list="' . $groupName . '"];',
+                '/ip firewall address-list remove [find list="' . $listName . '"];',
                 ':delay 5s',
                 '',
                 '/ip firewall address-list',
@@ -40,7 +41,7 @@ class MikrotikController extends AbstractIPListController {
                     continue;
                 }
                 $filteredItems = array_filter($siteEntity->$data, fn(string $row) => !in_array($row, $entries));
-                $items = array_merge($items, $this->generateList($siteEntity, $filteredItems));
+                $items = array_merge($items, $this->generateList($siteEntity, $listName, $filteredItems));
                 $entries = array_merge($entries, $filteredItems);
             }
             $items = SiteFactory::normalizeArray($items, in_array($data, ['ip4', 'ip6', 'cidr4', 'cidr6']));
@@ -54,13 +55,14 @@ class MikrotikController extends AbstractIPListController {
 
     /**
      * @param Site $siteEntity
+     * @param string $listName
      * @param array $array
      * @return array
      */
-    private function generateList(Site $siteEntity, array $array): array {
+    private function generateList(Site $siteEntity, string $listName, array $array): array {
         $items = [];
         foreach ($array as $item) {
-            $items[] = 'add list=' . $siteEntity->group . ' address=' . $item . ' comment=' . $siteEntity->name;
+            $items[] = 'add list=' . $listName . ' address=' . $item . ' comment=' . $siteEntity->name;
         }
         return $items;
     }
