@@ -32,11 +32,14 @@ class MikrotikController extends AbstractIPListController {
                 '/ip firewall address-list',
             ]);
             $items = [];
+            $entries = [];
             foreach ($groupSites as $siteName => $siteEntity) {
                 if (count($sites) && !in_array($siteName, $sites)) {
                     continue;
                 }
-                $items = array_merge($items, $this->generateList($siteEntity, $siteEntity->$data));
+                $filteredItems = array_filter($siteEntity->$data, fn(string $row) => !in_array($row, $entries));
+                $items = array_merge($items, $this->generateList($siteEntity, $filteredItems));
+                $entries = array_merge($entries, $filteredItems);
             }
             $items = SiteFactory::normalizeArray($items, in_array($data, ['ip4', 'ip6', 'cidr4', 'cidr6']));
             $items[count($items) - 1] = $items[count($items) - 1] . ';';
