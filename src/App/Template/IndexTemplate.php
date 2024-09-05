@@ -647,7 +647,7 @@ use OpenCCK\App\Controller\MainController;
                     <span>
                         Site:
                         <select name="site" class="main-formSelect main-formSelect_site" multiple>
-                            <?php foreach ($this->groups as $group => $items): ?>
+                            <?php foreach ($this->getGroups() as $group => $items): ?>
                                 <optgroup label="<?= $group ?>">
                                     <?php foreach ($items as $site): ?>
                                         <option value="<?= $site->name ?>"><?= $site->name ?></option>

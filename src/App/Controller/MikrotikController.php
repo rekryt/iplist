@@ -2,6 +2,7 @@
 
 namespace OpenCCK\App\Controller;
 
+use OpenCCK\Domain\Entity\Site;
 use OpenCCK\Domain\Factory\SiteFactory;
 
 class MikrotikController extends AbstractIPListController {
@@ -18,36 +19,44 @@ class MikrotikController extends AbstractIPListController {
         }
 
         $response = [];
-        if (count($sites)) {
-            foreach ($sites as $site) {
-                $response = array_merge($response, $this->generateList($site, $this->getSites()[$site]->$data));
+        foreach ($this->getGroups() as $groupName => $groupSites) {
+            if (count($sites)) {
+                $groupSites = array_filter($groupSites, fn(Site $siteEntity) => in_array($siteEntity->name, $sites));
             }
-        } else {
-            foreach ($this->getSites() as $siteEntity) {
-                $response = array_merge($response, $this->generateList($siteEntity->name, $siteEntity->$data));
+            if (!count($groupSites)) {
+                continue;
             }
+
+            $response = array_merge($response, [
+                '/ip firewall address-list remove [find list="' . $groupName . '"];',
+                '/ip firewall address-list',
+            ]);
+            $items = [];
+            foreach ($groupSites as $siteName => $siteEntity) {
+                if (count($sites) && !in_array($siteName, $sites)) {
+                    continue;
+                }
+                $items = array_merge($items, $this->generateList($siteEntity, $siteEntity->$data));
+            }
+            $items = SiteFactory::normalizeArray($items, in_array($data, ['ip4', 'ip6', 'cidr4', 'cidr6']));
+            $items[count($items) - 1] = $items[count($items) - 1] . ';';
+
+            $response = array_merge($response, $items, ['']);
         }
 
-        return implode(
-            "\n",
-            array_merge(
-                ['/ip firewall address-list'],
-                SiteFactory::normalizeArray($response, in_array($data, ['ipv4', 'ipv6', 'cidr4', 'cidr6']))
-            )
-        );
+        return implode("\n", $response);
     }
 
     /**
-     * @param string $site
+     * @param Site $siteEntity
      * @param array $array
      * @return array
      */
-    private function generateList(string $site, array $array): array {
-        $response = [];
-        $listName = str_replace(' ', '', $site);
+    private function generateList(Site $siteEntity, array $array): array {
+        $items = [];
         foreach ($array as $item) {
-            $response[] = 'add list=' . $listName . ' address=' . $item . ' comment=' . $listName;
+            $items[] = 'add list=' . $siteEntity->group . ' address=' . $item . ' comment=' . $siteEntity->name;
         }
-        return $response;
+        return $items;
     }
 }

@@ -7,20 +7,10 @@ use OpenCCK\Domain\Factory\SiteFactory;
 
 class MainController extends AbstractIPListController {
     /**
-     * @var array<string, array<string, Site>>
-     */
-    private array $groups = [];
-
-    /**
      * @return string
      */
     public function getBody(): string {
         $this->setHeaders(['content-type' => 'text/html; charset=utf-8']);
-
-        foreach ($this->service->sites as $siteEntity) {
-            $this->groups[$siteEntity->group][$siteEntity->name] = $siteEntity;
-        }
-
         return $this->renderTemplate('index');
     }
 

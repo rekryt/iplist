@@ -45,4 +45,15 @@ abstract class AbstractIPListController extends AbstractController {
             return $site;
         }, $this->service->sites);
     }
+
+    /**
+     * @return array<string, array<string, Site>>
+     */
+    protected function getGroups(): array {
+        $groups = [];
+        foreach ($this->service->sites as $siteEntity) {
+            $groups[$siteEntity->group][$siteEntity->name] = $siteEntity;
+        }
+        return $groups;
+    }
 }
