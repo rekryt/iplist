@@ -214,6 +214,7 @@ echo "5 0,12 * * * /etc/homeproxy/scripts/update_crond.sh" > /etc/crontabs/root
 ## Настройка дополнения для Chrome - Proxy SwitchySharp
 Установить можно [по ссылке](https://chromewebstore.google.com/detail/proxy-switchysharp/dpplabbmogkhghncfbfdeeokoefdjegm)
 ![1](https://github.com/user-attachments/assets/10aaa2f6-5502-472b-97e0-0c4d4e38358d)
+
 Подробнее о формате [Switchy RuleList](https://code.google.com/archive/p/switchy/wikis/RuleList.wiki)
 
 ### License
