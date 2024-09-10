@@ -84,7 +84,7 @@ Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
 
 ## Настройка и запуск под docker
 ```shell
-git clone git@github.com:rekryt/iplist.git
+git clone https://github.com/rekryt/iplist.git
 cd iplist
 cp .env.example .env
 ```

@@ -83,7 +83,7 @@ Configuration files are stored in the `config/<group>/<site>.json`. Each JSON fi
 
 ## Setting Up and Running in Docker
 ```shell
-git clone git@github.com:rekryt/iplist.git
+git clone https://github.com/rekryt/iplist.git
 cd iplist
 cp .env.example .env
 ```
