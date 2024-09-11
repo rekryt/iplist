@@ -12,7 +12,9 @@
         "www.rutracker.org",
         "www.rutracker.ru",
         "www.rutrk.org",
-        "www.t-ru.org"
+        "www.t-ru.org",
+        "rutracker.wiki",
+        "www.rutracker.wiki"
     ],
     "dns": [
         "127.0.0.11:53",
