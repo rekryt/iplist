@@ -49,6 +49,7 @@ class IPListService {
         EventLoop::queue(function () {
             foreach ($this->sites as $siteEntity) {
                 if ($siteEntity->timeout) {
+                    $siteEntity->preload();
                     $siteEntity->reload();
                     delay(1);
                 }

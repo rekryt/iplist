@@ -47,6 +47,25 @@ final class Site {
     /**
      * @return void
      */
+    public function preload(): void {
+        $startTime = time();
+        App::getLogger()->notice('Preloading for ' . $this->name, ['started']);
+        if ($this->timeout) {
+            $this->cidr4 = SiteFactory::normalize(
+                IP4Helper::processCIDR($this->ip4, SiteFactory::normalize($this->cidr4)),
+                true
+            );
+            $this->cidr6 = SiteFactory::normalize(
+                IP6Helper::processCIDR($this->ip6, SiteFactory::normalize($this->cidr6)),
+                true
+            );
+        }
+        App::getLogger()->notice('Preloaded for ' . $this->name, ['finished', time() - $startTime]);
+    }
+
+    /**
+     * @return void
+     */
     public function reload(): void {
         $startTime = time();
         App::getLogger()->notice('Reloading for ' . $this->name, ['started']);
