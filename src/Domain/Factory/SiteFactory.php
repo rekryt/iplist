@@ -93,7 +93,9 @@ class SiteFactory {
                     fn(string $item) => !str_starts_with($item, '#') &&
                         strlen($item) > 0 &&
                         (!$isIpAddresses ||
-                            (!str_starts_with($item, '10.') &&
+                            (!str_starts_with($item, '0.') &&
+                                !str_starts_with($item, '127.') &&
+                                !str_starts_with($item, '10.') &&
                                 !str_starts_with($item, '172.16.') &&
                                 !str_starts_with($item, '192.168.') &&
                                 !str_starts_with($item, 'fd')))
