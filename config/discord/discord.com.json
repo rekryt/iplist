@@ -1,8 +1,6 @@
 {
     "domains": [
         "1187013846746005515.discordsays.com",
-        "brazil11051.discord.media",
-        "bucharest8528.discord.media",
         "cdn.discordapp.com",
         "dis.gd",
         "discord-activities.com",
@@ -10,10 +8,8 @@
         "discord.com",
         "discord.design",
         "discord.dev",
-        "discord.gg",
         "discord.gift",
         "discord.gifts",
-        "discord.media",
         "discord.new",
         "discord.store",
         "discord.tools",
@@ -25,25 +21,11 @@
         "discordpartygames.com",
         "discordsays.com",
         "discordstatus.com",
-        "gateway-us-east1-d.discord.gg",
-        "gateway.discord.gg",
-        "hongkong11108.discord.media",
         "images-ext-1.discordapp.net",
         "images-ext-2.discordapp.net",
-        "india10043.discord.media",
-        "japan11101.discord.media",
-        "latency.discord.media",
         "media.discordapp.net",
-        "rotterdam9347.discord.media",
-        "russia5414.discord.media",
-        "singapore11036.discord.media",
-        "southafrica7392.discord.media",
         "status.discord.com",
-        "sydney11075.discord.media",
-        "us-central3466.discord.media",
-        "us-east6716.discord.media",
-        "us-south8917.discord.media",
-        "us-west3323.discord.media",
+        "updates.discord.com",
         "www.discord.com",
         "www.discordapp.com"
     ],
@@ -120,7 +102,11 @@
         "188.114.98.229",
         "188.114.99.229",
         "204.11.56.48",
-        "23.227.38.74"
+        "23.227.38.74",
+        "3.164.230.46",
+        "3.164.230.58",
+        "3.164.230.92",
+        "3.164.230.97"
     ],
     "ip6": [
         "2606:4700:3032::6815:59bb",
@@ -162,7 +148,8 @@
         "18.64.0.0/10",
         "188.114.96.0/22",
         "204.11.56.0/23",
-        "23.227.32.0/19"
+        "23.227.32.0/19",
+        "3.128.0.0/9"
     ],
     "cidr6": [
         "2606:4700::/64",

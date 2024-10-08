@@ -1,0 +1,54 @@
+{
+    "domains": [
+        "brazil11051.discord.media",
+        "bucharest8528.discord.media",
+        "discord.media",
+        "hongkong11108.discord.media",
+        "india10043.discord.media",
+        "japan11101.discord.media",
+        "latency.discord.media",
+        "rotterdam9347.discord.media",
+        "russia5414.discord.media",
+        "singapore11036.discord.media",
+        "southafrica7392.discord.media",
+        "sydney11075.discord.media",
+        "us-central3466.discord.media",
+        "us-east6716.discord.media",
+        "us-south8917.discord.media",
+        "us-west3323.discord.media"
+    ],
+    "dns": [
+        "127.0.0.11:53",
+        "77.88.8.88:53",
+        "8.8.8.8:53",
+        "1.1.1.1:53"
+    ],
+    "timeout": 86400,
+    "ip4": [
+        "162.159.128.235",
+        "162.159.129.235",
+        "162.159.130.235",
+        "162.159.137.234",
+        "162.159.138.234"
+    ],
+    "ip6": [
+        "2606:4700:7::a29f:80eb",
+        "2606:4700:7::a29f:81eb",
+        "2606:4700:7::a29f:82eb",
+        "2606:4700:7::a29f:89ea",
+        "2606:4700:7::a29f:8aea"
+    ],
+    "cidr4": [
+        "162.158.0.0/15"
+    ],
+    "cidr6": [
+        "2606:4700::/64"
+    ],
+    "external": {
+        "domains": [],
+        "ip4": [],
+        "ip6": [],
+        "cidr4": [],
+        "cidr6": []
+    }
+}
