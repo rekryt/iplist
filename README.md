@@ -33,6 +33,7 @@ Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
 | ipset    | Dnsmasq ipset            |
 | clashx   | ClashX                   |
 | kvas     | Keenetic KVAS            |
+| amnezia  | Amnezia filter list      |
 
 ## Настройки
 Конфигурационные файлы хранятся в `config/<группа>/<портал>.json`. Каждый JSON файл представляет собой конфигурацию для конкретного портала, задавая домены для мониторинга и источники начальных данных по IP и CIDR.

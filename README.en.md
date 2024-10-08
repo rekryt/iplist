@@ -30,6 +30,7 @@ Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
 | ipset    | Dnsmasq ipset         |
 | clashx   | ClashX                |
 | kvas     | Keenetic KVAS         |
+| amnezia  | Amnezia filter list   |
 
 ## Configuration
 

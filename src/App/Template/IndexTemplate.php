@@ -630,6 +630,7 @@ use OpenCCK\App\Controller\MainController;
                         <option value="ipset">Dnsmasq ipset</option>
                         <option value="clashx">ClashX</option>
                         <option value="kvas">Keenetic KVAS</option>
+                        <option value="amnezia">Amnezia</option>
                     </select>
                 </label>
                 <label class="main-formItem">
