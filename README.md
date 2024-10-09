@@ -33,6 +33,7 @@ Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
 | ipset    | Dnsmasq ipset            |
 | clashx   | ClashX                   |
 | kvas     | Keenetic KVAS            |
+| bat      | Keenetic Routes .bat     |
 | amnezia  | Amnezia filter list      |
 
 ## Настройки
