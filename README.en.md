@@ -100,6 +100,8 @@ If needed, edit the `.env` file:
 | SYS_DNS_RESOLVE_DELAY      | 100           | Delay between receiving dns records (milliseconds)             |
 | SYS_MEMORY_LIMIT           | 1024M         | Memory limit                                                   |
 | SYS_TIMEZONE               | Europe/Moscow | List of URLs to obtain initial CIDRv4 zones for IPv4 addresses |
+| HTTP_HOST                  | 0.0.0.0       | IP of network interface (default is all interfaces)            |
+| HTTP_PORT                  | 8080          | Server network port (default 8080)                             |
 | DEBUG                      | true          | Determines the logging level                                   |
 
 You can access the service in your browser via the HTTP protocol on port 8080:
