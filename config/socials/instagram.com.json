@@ -14,8 +14,12 @@
         "instagram-p3-shv-01-hel3.fbcdn.net",
         "instagram.c10r.instagram.com",
         "instagram.com",
+        "instagram.fbeg10-1.fna.fbcdn.net",
         "instagram.fhel5-1.fna.fbcdn.net",
         "instagram.frix7-1.fna.fbcdn.net",
+        "instagram.fsof11-1.fna.fbcdn.net",
+        "instagram.fsof8-1.fna.fbcdn.net",
+        "lookaside.facebook.com",
         "scontent-arn2-1.cdninstagram.com",
         "scontent-cdt1-1.cdninstagram.com",
         "scontent-frt3-1.cdninstagram.com",
@@ -24,6 +28,7 @@
         "scontent-frx5-2.cdninstagram.com",
         "scontent-hel3-1.cdninstagram.com",
         "scontent-iad3-2.cdninstagram.com",
+        "scontent.fbeg10-1.fna.fbcdn.net",
         "www.ig.me",
         "www.instagram.com",
         "z-p42-chat-e2ee-ig.facebook.com"
@@ -36,6 +41,8 @@
     ],
     "timeout": 3600,
     "ip4": [
+        "129.134.135.130",
+        "129.134.135.162",
         "157.240.0.1",
         "157.240.0.16",
         "157.240.0.174",
@@ -109,6 +116,8 @@
         "185.60.218.2",
         "185.60.218.24",
         "185.60.218.52",
+        "212.95.183.225",
+        "213.169.57.97",
         "31.13.69.174",
         "31.13.71.52",
         "31.13.72.174",
@@ -128,6 +137,8 @@
         "87.245.208.97"
     ],
     "ip6": [
+        "2a01:288:4000:43:face:b00c:3333:a3f",
+        "2a01:288:4000:4:face:b00c:3333:a3f",
         "2a02:2d8:3:800:face:b00c:3333:a3f",
         "2a03:2880:f007:3:face:b00c:0:1",
         "2a03:2880:f007:7:face:b00c:0:6206",
@@ -202,17 +213,24 @@
         "2a03:2880:f277:e8:face:b00c:0:6e2e",
         "2a03:2880:f32e:25:face:b00c:0:4420",
         "2a03:2880:f330:25:face:b00c:0:4420",
-        "2a03:2880:f33c:80:face:b00c:0:3"
+        "2a03:2880:f33c:80:face:b00c:0:3",
+        "2a03:2887:ff37:0:face:b00c:0:a7",
+        "2a03:2887:ff37:0:face:b00c:3333:a3f"
     ],
     "cidr4": [
+        "129.134.0.0/16",
         "157.240.0.0/16",
         "185.60.216.0/22",
+        "212.95.183.192/26",
+        "213.169.57.64/26",
         "31.13.64.0/18",
         "57.0.0.0/8",
         "87.245.208.0/20",
         "87.245.224.0/19"
     ],
     "cidr6": [
+        "2a01:288:4000:4::/64",
+        "2a01:288::/64",
         "2a02:2d8::/64",
         "2a03:2880::/64"
     ],
