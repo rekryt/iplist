@@ -15,7 +15,9 @@
         "discord.tools",
         "discordactivities.com",
         "discordapp.com",
+        "discordapp.io",
         "discordapp.net",
+        "discordapp.org",
         "discordcdn.com",
         "discordmerch.com",
         "discordpartygames.com",
@@ -23,8 +25,10 @@
         "discordstatus.com",
         "images-ext-1.discordapp.net",
         "images-ext-2.discordapp.net",
+        "images.discordapp.net",
         "media.discordapp.net",
         "status.discord.com",
+        "status.discordapp.com",
         "updates.discord.com",
         "www.discord.com",
         "www.discordapp.com"
@@ -132,7 +136,11 @@
         "3.164.230.46",
         "3.164.230.58",
         "3.164.230.92",
-        "3.164.230.97"
+        "3.164.230.97",
+        "69.162.80.54",
+        "69.162.80.61",
+        "95.211.219.65",
+        "95.211.219.66"
     ],
     "ip6": [
         "2606:4700:3032::6815:59bb",
@@ -180,7 +188,9 @@
         "188.114.96.0/22",
         "204.11.56.0/23",
         "23.227.32.0/19",
-        "3.128.0.0/9"
+        "3.128.0.0/9",
+        "69.162.64.0/18",
+        "95.211.216.0/22"
     ],
     "cidr6": [
         "2606:4700::/64",
