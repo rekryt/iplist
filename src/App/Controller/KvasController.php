@@ -15,7 +15,7 @@ class KvasController extends TextController {
     protected function render(array $response): string {
         $data = $this->request->getQueryParameter('data') ?? '';
         $handlers = [
-            'domains' => fn(string $row) => 'kvas add ' . $row,
+            'domains' => fn(string $row) => 'kvas add ' . $row . ' Y',
             'ip4' => fn(string $row) => 'kvas add ' . $row . '/32',
             'ip6' => fn(string $row) => 'kvas add ' . $row . '/128',
             'cidr4' => fn(string $row) => 'kvas add ' . $row,
