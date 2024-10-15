@@ -15,11 +15,11 @@ class KvasController extends TextController {
     protected function render(array $response): string {
         $data = $this->request->getQueryParameter('data') ?? '';
         $handlers = [
-            'domains' => fn(string $row) => '*' . $row,
-            'ip4' => fn(string $row) => $row . '/32',
-            'ip6' => fn(string $row) => $row . '/128',
-            'cidr4' => fn(string $row) => $row,
-            'cidr6' => fn(string $row) => $row,
+            'domains' => fn(string $row) => 'kvas add *' . $row,
+            'ip4' => fn(string $row) => 'kvas add ' . $row . '/32',
+            'ip6' => fn(string $row) => 'kvas add ' . $row . '/128',
+            'cidr4' => fn(string $row) => 'kvas add ' . $row,
+            'cidr6' => fn(string $row) => 'kvas add ' . $row,
         ];
         return implode($this::DELIMITER, array_map($handlers[$data] ?? fn(string $row) => $row, $response));
     }
