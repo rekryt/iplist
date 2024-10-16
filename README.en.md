@@ -6,12 +6,11 @@ Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
 ![iplist](https://github.com/user-attachments/assets/2e363fd8-1df7-4554-bf9e-98f58c13df96)
 
 ## Key Features
-
-- **Domain Monitoring**: Collect and update IP addresses and CIDR zones for specified domains.
-- **Multi-Format Output**: Supports output in plain text, JSON format, script format for RouterOS Mikrotik, or comma separated values.
-- **Integration with External Data Sources**: Supports importing initial data from external URLs.
-- **Easy Deployment with Docker Compose**.
-- **Configuration through JSON files for managing domains and IPs**.
+- Collection and automatic update of IP addresses and CIDR zones for domains.
+- Support for outputting data in various formats (JSON, lst, MikroTik, OpenWRT, ipset, etc.).
+- Integration with external data sources (support for importing initial data from external URLs).
+- Easy deployment using Docker Compose.
+- Configuration through JSON files for domain management.
 
 ## Technologies Used
 
