@@ -8,7 +8,7 @@ Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
 # Сервис сбора IP-адресов и CIDR зон
 Данный сервис предназначен для сбора и обновления IP-адресов (IPv4 и IPv6), а также их CIDR зон для указанных доменов.
 Это асинхронный PHP веб-сервер на основе [AMPHP](https://amphp.org/) и Linux-утилит `whois` и `ipcalc`.
-Сервис предоставляет интерфейсы для получения списков зон ip адресов указанных доменов (IPv4 адресов, IPv6 адресов, а также CIDRv4 и CIDRv6 зон) в различных форматах, включая текстовый, JSON и формате скрипта для добавления в "Address List" на роутерах Mikrotik (RouterOS).
+Сервис предоставляет интерфейсы для получения списков зон ip адресов указанных доменов (IPv4 адресов, IPv6 адресов, а также CIDRv4 и CIDRv6 зон) в различных форматах, включая текстовый, JSON, форматы скриптов для добавления в "Address List" на роутерах Mikrotik (RouterOS), Keenetic KVAS\BAT, SwitchyOmega, Amnezia и др.
 
 Основные возможности
 - Мониторинг доменов: Сбор и обновление IP-адресов и CIDR зон для указанных доменов.
@@ -76,13 +76,13 @@ Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
 | cidr6    | string[] | Начальный список CIDRv6 зон ipv6 адресов                                                                                                                                                                             |
 | external | object   | Списки URL для получения начальных данных от сторонних источников                                                                                                                                                    |
 
-| свойство | тип      | описание                                                   |
-|----------|----------|------------------------------------------------------------|
-| domains  | string[] | Список URL для получения доменов портала                   |
-| ip4      | string[] | Список URL для получения начальных ipv4 адресов            |
-| ip6      | string[] | Список URL для получения начальных ipv6 адресов            |
-| cidr4    | string[] | Список URL для получения начальных CIDRv4 зон ipv4 адресов |
-| cidr6    | string[] | Список URL для получения начальных CIDRv6 зон ipv6 адресов |
+| свойство | тип      | описание                                            |
+|----------|----------|-----------------------------------------------------|
+| domains  | string[] | Список URL для пополнения доменов портала           |
+| ip4      | string[] | Список URL для пополнения ipv4 адресов              |
+| ip6      | string[] | Список URL для пополнения ipv6 адресов              |
+| cidr4    | string[] | Список URL для пополнения CIDRv4 зон ipv4 адресов   |
+| cidr6    | string[] | Список URL для пополнения CIDRv6 зон ipv6 адресов   |
 
 ## Настройка и запуск под docker
 ```shell
@@ -207,11 +207,13 @@ chmod +x /etc/homeproxy/scripts/update_resources.sh
 Откройте административную панель OpenWRT раздел "System" - "Startup" - "Local Startup".
 Добавьте перед "exit 0" строки, чтобы автоматически запускать скрипт обновления при старте, а также в 00:05:00 и 12:05:00
 ```shell
+sleep 15
+
 /etc/homeproxy/scripts/update_crond.sh
 
 echo "5 0,12 * * * /etc/homeproxy/scripts/update_crond.sh" > /etc/crontabs/root
-/etc/init.d/cron start
 /etc/init.d/cron enable
+/etc/init.d/cron start
 ```
 ![2](https://github.com/user-attachments/assets/2369b32c-d43a-4837-97ce-c46a9dd79e5e)
 

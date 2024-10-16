@@ -1,5 +1,5 @@
 # IP Address Collection and Management Service
-This service is designed for collecting and updating IP addresses (IPv4 and IPv6) and their CIDR zones for specified domains. It is implemented as a web server using asynchronous PHP 8.1+ with the AMPHP library and integrates with Linux utilities like `whois` and `ipcalc`. The service provides interfaces for retrieving lists of domains, IPv4 addresses, IPv6 addresses, as well as CIDRv4 and CIDRv6 zones in various formats, including plain text, JSON, and scripts for adding to "Address List" on Mikrotik routers (RouterOS).
+This service is designed for collecting and updating IP addresses (IPv4 and IPv6) and their CIDR zones for specified domains. It is implemented as a web server using asynchronous PHP 8.1+ with the AMPHP library and integrates with Linux utilities like `whois` and `ipcalc`. The service provides interfaces for retrieving lists of domains, IPv4 addresses, IPv6 addresses, as well as CIDRv4 and CIDRv6 zones in various formats, including plain text, JSON, and scripts for adding to "Address List" on Mikrotik routers (RouterOS), Keenetic KVAS\BAT, SwitchyOmega, Amnezia and more.
 
 Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
 
@@ -75,13 +75,13 @@ Configuration files are stored in the `config/<group>/<site>.json`. Each JSON fi
 | cidr6    | string[] | Initial list of CIDRv6 zones of IPv6 addresses               |
 | external | object   | Lists of URLs to retrieve initial data from external sources |
 
-| property | type     | description                                                     |
-|----------|----------|-----------------------------------------------------------------|
-| domains  | string[] | List of URLs to retrieve portal domains                         |
-| ip4      | string[] | List of URLs to retrieve initial IPv4 addresses                 |
-| ip6      | string[] | List of URLs to retrieve initial IPv6 addresses                 |
-| cidr4    | string[] | List of URLs to retrieve initial CIDRv4 zones of IPv4 addresses |
-| cidr6    | string[] | List of URLs to retrieve initial CIDRv6 zones of IPv6 addresses |
+| property | type     | description                                                  |
+|----------|----------|--------------------------------------------------------------|
+| domains  | string[] | List of URLs for replenishing portal domains                 |
+| ip4      | string[] | List of URLs for replenishing ipv4 addresses                 |
+| ip6      | string[] | List of URLs for replenishing IPv6 addresses                 |
+| cidr4    | string[] | List of URLs for replenishing CIDRv4 zones of IPv4 addresses |
+| cidr6    | string[] | List of URLs for replenishing CIDRv6 zones of IPv6 addresses |
 
 ## Setting Up and Running in Docker
 ```shell
@@ -199,11 +199,13 @@ chmod +x /etc/homeproxy/scripts/update_resources.sh
 Open the administrative panel in OpenWRT, go to the "System" - "Startup" - "Local Startup" section.
 Add the following lines before "exit 0" to automatically run the update script at startup, as well as at 00:05:00 and 12:05:00
 ```shell
+sleep 15
+
 /etc/homeproxy/scripts/update_crond.sh
 
 echo "5 0,12 * * * /etc/homeproxy/scripts/update_crond.sh" > /etc/crontabs/root
-/etc/init.d/cron start
 /etc/init.d/cron enable
+/etc/init.d/cron start
 ```
 ![2](https://github.com/user-attachments/assets/2369b32c-d43a-4837-97ce-c46a9dd79e5e)
 
