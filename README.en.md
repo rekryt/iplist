@@ -63,16 +63,16 @@ Configuration files are stored in the `config/<group>/<site>.json`. Each JSON fi
   }
 }
 ```
-| property | type     | description                                                  |
-|----------|----------|--------------------------------------------------------------|
-| domains  | string[] | List of portal domains                                       |
-| dns      | string[] | List of DNS servers for updating IP addresses                |
-| timeout  | int      | Time interval between domain IP address updates (seconds)    |
-| ip4      | string[] | Initial list of IPv4 addresses                               |
-| ip6      | string[] | Initial list of IPv6 addresses                               |
-| cidr4    | string[] | Initial list of CIDRv4 zones of IPv4 addresses               |
-| cidr6    | string[] | Initial list of CIDRv6 zones of IPv6 addresses               |
-| external | object   | Lists of URLs to retrieve initial data from external sources |
+| property | type     | description                                               |
+|----------|----------|-----------------------------------------------------------|
+| domains  | string[] | List of portal domains                                    |
+| dns      | string[] | List of DNS servers for updating IP addresses             |
+| timeout  | int      | Time interval between domain IP address updates (seconds) |
+| ip4      | string[] | Initial list of IPv4 addresses                            |
+| ip6      | string[] | Initial list of IPv6 addresses                            |
+| cidr4    | string[] | Initial list of CIDRv4 zones of IPv4 addresses            |
+| cidr6    | string[] | Initial list of CIDRv6 zones of IPv6 addresses            |
+| external | object   | Lists of URLs to retrieve data from external sources      |
 
 | property | type     | description                                                  |
 |----------|----------|--------------------------------------------------------------|
