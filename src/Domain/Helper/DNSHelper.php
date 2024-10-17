@@ -61,8 +61,10 @@ class DNSHelper {
                         $dnsResolver->resolve($domain, DnsRecord::A)
                     )
                 );
-            } catch (Throwable $e) {
-                App::getLogger()->error($e->getMessage(), [$server]);
+            }  catch (Throwable $e) {
+                if (!str_starts_with($e->getMessage(), 'Giving up resolution')) {
+                    App::getLogger()->error($e->getMessage(), [$server]);
+                }
             }
 
             delay($this->resolveDelay);
