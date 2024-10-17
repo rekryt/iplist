@@ -56,7 +56,10 @@ class DNSHelper {
             try {
                 $ipv4 = array_merge(
                     $ipv4,
-                    array_map(fn(DnsRecord $record) => $record->getValue(), $dnsResolver->resolve($domain, DnsRecord::A))
+                    array_map(
+                        fn(DnsRecord $record) => $record->getValue(),
+                        $dnsResolver->resolve($domain, DnsRecord::A)
+                    )
                 );
             } catch (Throwable $e) {
                 App::getLogger()->error($e->getMessage(), [$server]);
@@ -66,7 +69,10 @@ class DNSHelper {
             try {
                 $ipv6 = array_merge(
                     $ipv6,
-                    array_map(fn(DnsRecord $record) => $record->getValue(), $dnsResolver->resolve($domain, DnsRecord::AAAA))
+                    array_map(
+                        fn(DnsRecord $record) => $record->getValue(),
+                        $dnsResolver->resolve($domain, DnsRecord::AAAA)
+                    )
                 );
             } catch (Throwable $e) {
                 if (!str_starts_with($e->getMessage(), 'Giving up resolution')) {
