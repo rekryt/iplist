@@ -69,7 +69,9 @@ class DNSHelper {
                     array_map(fn(DnsRecord $record) => $record->getValue(), $dnsResolver->resolve($domain, DnsRecord::AAAA))
                 );
             } catch (Throwable $e) {
-                App::getLogger()->error($e->getMessage(), [$server]);
+                if (!str_starts_with($e->getMessage(), 'Giving up resolution')) {
+                    App::getLogger()->error($e->getMessage(), [$server]);
+                }
             }
         }
         App::getLogger()->debug('resolve: ' . $domain, [count($ipv4), count($ipv6)]);
