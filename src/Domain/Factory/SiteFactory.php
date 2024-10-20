@@ -98,7 +98,8 @@ class SiteFactory {
                                 !str_starts_with($item, '10.') &&
                                 !str_starts_with($item, '172.16.') &&
                                 !str_starts_with($item, '192.168.') &&
-                                !str_starts_with($item, 'fd')))
+                                !str_starts_with($item, 'fd') &&
+                                !str_ends_with($item, '.0')))
                 )
             )
         );
