@@ -97,6 +97,8 @@ cp .env.example .env
 |----------------------------|-----------------------|------------------------------------------------------------|
 | COMPOSE_PROJECT_NAME       | iplist                | Имя compose проекта                                        |
 | STORAGE_SAVE_INTERVAL      | 120                   | Период сохранения кеша whois (секунды)                     |
+| SYS_DNS_RESOLVE_IP4        | true                  | Получать ipv4 адреса                                       |
+| SYS_DNS_RESOLVE_IP6        | true                  | Получать ipv6 адреса                                       |
 | SYS_DNS_RESOLVE_CHUNK_SIZE | 10                    | Размер чанка для получения dns записей                     |
 | SYS_DNS_RESOLVE_DELAY      | 100                   | Задержка между получением dns записей (миллисекунды)       |
 | SYS_MEMORY_LIMIT           | 1024M                 | Предельное кол-во памяти.                                  |

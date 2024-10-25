@@ -12,9 +12,12 @@ use Revolt\EventLoop;
 use stdClass;
 use function Amp\async;
 use function Amp\Future\await;
+use function OpenCCK\getEnv;
 
 final class Site {
     private DNSHelper $dnsHelper;
+    private bool $isUseIpv6;
+    private bool $isUseIpv4;
 
     /**
      * @param string $name Name of portal
@@ -42,6 +45,8 @@ final class Site {
         public object $external = new stdClass()
     ) {
         $this->dnsHelper = new DNSHelper($dns);
+        $this->isUseIpv4 = (getEnv('SYS_DNS_RESOLVE_IP4') ?? 'true') == 'true';
+        $this->isUseIpv6 = (getEnv('SYS_DNS_RESOLVE_IP6') ?? 'true') == 'true';
     }
 
     /**
@@ -51,14 +56,19 @@ final class Site {
         $startTime = time();
         App::getLogger()->notice('Preloading for ' . $this->name, ['started']);
         if ($this->timeout) {
-            $this->cidr4 = SiteFactory::normalize(
-                IP4Helper::processCIDR($this->ip4, SiteFactory::normalize($this->cidr4)),
-                true
-            );
-            $this->cidr6 = SiteFactory::normalize(
-                IP6Helper::processCIDR($this->ip6, SiteFactory::normalize($this->cidr6)),
-                true
-            );
+            if ($this->isUseIpv4) {
+                $this->cidr4 = SiteFactory::normalize(
+                    IP4Helper::processCIDR($this->ip4, SiteFactory::normalize($this->cidr4)),
+                    true
+                );
+            }
+
+            if ($this->isUseIpv6) {
+                $this->cidr6 = SiteFactory::normalize(
+                    IP6Helper::processCIDR($this->ip6, SiteFactory::normalize($this->cidr6)),
+                    true
+                );
+            }
         }
         App::getLogger()->notice('Preloaded for ' . $this->name, ['finished', time() - $startTime]);
     }
@@ -80,14 +90,19 @@ final class Site {
             }
         }
 
-        $newIp4 = SiteFactory::normalize(array_diff($ip4, $this->ip4), true);
-        $this->cidr4 = SiteFactory::normalize(IP4Helper::processCIDR($newIp4, $this->cidr4), true);
+        if ($this->isUseIpv4) {
+            $newIp4 = SiteFactory::normalize(array_diff($ip4, $this->ip4), true);
+            $this->cidr4 = SiteFactory::normalize(IP4Helper::processCIDR($newIp4, $this->cidr4), true);
 
-        $newIp6 = SiteFactory::normalize(array_diff($ip6, $this->ip6), true);
-        $this->cidr6 = SiteFactory::normalize(IP6Helper::processCIDR($newIp6, $this->cidr6), true);
+            $this->ip4 = SiteFactory::normalize(array_merge($this->ip4, $ip4), true);
+        }
 
-        $this->ip4 = SiteFactory::normalize(array_merge($this->ip4, $ip4), true);
-        $this->ip6 = SiteFactory::normalize(array_merge($this->ip6, $ip6), true);
+        if ($this->isUseIpv6) {
+            $newIp6 = SiteFactory::normalize(array_diff($ip6, $this->ip6), true);
+            $this->cidr6 = SiteFactory::normalize(IP6Helper::processCIDR($newIp6, $this->cidr6), true);
+
+            $this->ip6 = SiteFactory::normalize(array_merge($this->ip6, $ip6), true);
+        }
 
         $this->saveConfig();
         App::getLogger()->notice('Reloaded for ' . $this->name, ['finished', time() - $startTime]);
@@ -110,7 +125,7 @@ final class Site {
             }
         }
 
-        if (isset($this->external->ip4)) {
+        if (isset($this->external->ip4) && $this->isUseIpv4) {
             foreach ($this->external->ip4 as $url) {
                 $this->ip4 = SiteFactory::normalize(
                     array_merge($this->ip4, explode("\n", file_get_contents($url))),
@@ -119,7 +134,7 @@ final class Site {
             }
         }
 
-        if (isset($this->external->ip6)) {
+        if (isset($this->external->ip6) && $this->isUseIpv6) {
             foreach ($this->external->ip6 as $url) {
                 $this->ip6 = SiteFactory::normalize(
                     array_merge($this->ip6, explode("\n", file_get_contents($url))),
@@ -128,7 +143,7 @@ final class Site {
             }
         }
 
-        if (isset($this->external->cidr4)) {
+        if (isset($this->external->cidr4) && $this->isUseIpv4) {
             foreach ($this->external->cidr4 as $url) {
                 $this->cidr4 = SiteFactory::normalize(
                     array_merge($this->cidr4, explode("\n", file_get_contents($url))),
@@ -137,7 +152,7 @@ final class Site {
             }
         }
 
-        if (isset($this->external->cidr6)) {
+        if (isset($this->external->cidr6) && $this->isUseIpv6) {
             foreach ($this->external->cidr6 as $url) {
                 $this->cidr6 = SiteFactory::normalize(
                     array_merge($this->cidr6, explode("\n", file_get_contents($url))),

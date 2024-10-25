@@ -3,10 +3,10 @@
 namespace OpenCCK\Domain\Factory;
 
 use OpenCCK\Domain\Entity\Site;
-use OpenCCK\Domain\Helper\IP4Helper;
-use OpenCCK\Domain\Helper\IP6Helper;
 use OpenCCK\Infrastructure\API\App;
 use stdClass;
+
+use function \OpenCCK\getEnv;
 
 class SiteFactory {
     // prettier-ignore
@@ -35,6 +35,8 @@ class SiteFactory {
         $cidr4 = $config->cidr4 ?? [];
         $cidr6 = $config->cidr6 ?? [];
         $external = $config->external ?? new stdClass();
+        $isUseIpv4 = (getEnv('SYS_DNS_RESOLVE_IP4') ?? 'true') == 'true';
+        $isUseIpv6 = (getEnv('SYS_DNS_RESOLVE_IP6') ?? 'true') == 'true';
 
         if (isset($external)) {
             if (isset($external->domains)) {
@@ -44,28 +46,28 @@ class SiteFactory {
                 }
             }
 
-            if (isset($external->ip4)) {
+            if (isset($external->ip4) && $isUseIpv4) {
                 foreach ($external->ip4 as $url) {
                     App::getLogger()->debug('Loading external ip4 from ' . $url);
                     $ip4 = array_merge($ip4, explode("\n", file_get_contents($url)));
                 }
             }
 
-            if (isset($external->ip6)) {
+            if (isset($external->ip6) && $isUseIpv6) {
                 foreach ($external->ip6 as $url) {
                     App::getLogger()->debug('Loading external ip6 from ' . $url);
                     $ip6 = array_merge($ip6, explode("\n", file_get_contents($url)));
                 }
             }
 
-            if (isset($external->cidr4)) {
+            if (isset($external->cidr4) && $isUseIpv4) {
                 foreach ($external->cidr4 as $url) {
                     App::getLogger()->debug('Loading external cidr4 from ' . $url);
                     $cidr4 = array_merge($cidr4, explode("\n", file_get_contents($url)));
                 }
             }
 
-            if (isset($external->cidr6)) {
+            if (isset($external->cidr6) && $isUseIpv6) {
                 foreach ($external->cidr6 as $url) {
                     App::getLogger()->debug('Loading external cidr6 from ' . $url);
                     $cidr6 = array_merge($cidr6, explode("\n", file_get_contents($url)));

@@ -91,17 +91,19 @@ cp .env.example .env
 
 If needed, edit the `.env` file:
 
-| property                   | default value | description                                                    |
-|----------------------------|---------------|----------------------------------------------------------------|
-| COMPOSE_PROJECT_NAME       | iplist        | Name of the compose project                                    |
-| STORAGE_SAVE_INTERVAL      | 120           | Cache save interval for whois (seconds)                        |
-| SYS_DNS_RESOLVE_CHUNK_SIZE | 10            | Chunk size for retrieving DNS records                          |
-| SYS_DNS_RESOLVE_DELAY      | 100           | Delay between receiving dns records (milliseconds)             |
-| SYS_MEMORY_LIMIT           | 1024M         | Memory limit                                                   |
-| SYS_TIMEZONE               | Europe/Moscow | List of URLs to obtain initial CIDRv4 zones for IPv4 addresses |
-| HTTP_HOST                  | 0.0.0.0       | IP of network interface (default is all interfaces)            |
-| HTTP_PORT                  | 8080          | Server network port (default 8080)                             |
-| DEBUG                      | true          | Determines the logging level                                   |
+| property                   | default value | description                                                     |
+|----------------------------|---------------|-----------------------------------------------------------------|
+| COMPOSE_PROJECT_NAME       | iplist        | Name of the compose project                                     |
+| STORAGE_SAVE_INTERVAL      | 120           | Cache save interval for whois (seconds)                         |
+| SYS_DNS_RESOLVE_IP4        | true          | Resolve IPv4 addresses                                          |
+| SYS_DNS_RESOLVE_IP6        | true          | Resolve IPv6 addresses                                          |
+| SYS_DNS_RESOLVE_CHUNK_SIZE | 10            | Chunk size for retrieving DNS records                           |
+| SYS_DNS_RESOLVE_DELAY      | 100           | Delay between receiving dns records (milliseconds)              |
+| SYS_MEMORY_LIMIT           | 1024M         | Memory limit                                                    |
+| SYS_TIMEZONE               | Europe/Moscow | List of URLs to obtain initial CIDRv4 zones for IPv4 addresses  |
+| HTTP_HOST                  | 0.0.0.0       | IP of network interface (default is all interfaces)             |
+| HTTP_PORT                  | 8080          | Server network port (default 8080)                              |
+| DEBUG                      | true          | Determines the logging level                                    |
 
 You can access the service in your browser via the HTTP protocol on port 8080:
 ```
