@@ -78,6 +78,8 @@ class SiteFactory {
         $domains = self::normalize($domains);
         $ip4 = self::normalize($ip4, true);
         $ip6 = self::normalize($ip6, true);
+        $cidr4 = self::normalize($cidr4, true);
+        $cidr6 = self::normalize($cidr6, true);
 
         return new Site($name, $group, $domains, $dns, $timeout, $ip4, $ip6, $cidr4, $cidr6, $external);
     }
