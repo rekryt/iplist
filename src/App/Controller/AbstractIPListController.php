@@ -27,6 +27,12 @@ abstract class AbstractIPListController extends AbstractController {
 
         $this->logger = App::getLogger();
         $this->service = IPListService::getInstance();
+
+        $isFileSave = !!($this->request->getQueryParameter('filesave') ?? '');
+        if ($isFileSave) {
+            $ext = in_array($this->request->getQueryParameter('format'), ['json', 'amnezia']) ? 'json' : 'txt';
+            $this->setHeaders(['content-disposition' => 'attachment; filename="ip-list.' . $ext . '"']);
+        }
     }
 
     /**

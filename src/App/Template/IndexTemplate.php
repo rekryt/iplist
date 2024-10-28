@@ -591,6 +591,7 @@ use OpenCCK\App\Controller\MainController;
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
+            margin-bottom: 10px;
         }
         .main-formItemComment {
             flex: 0 0 100%;
@@ -611,6 +612,7 @@ use OpenCCK\App\Controller\MainController;
             line-height: 1;
             font-size: 14px;
             font-weight: normal;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -663,6 +665,10 @@ use OpenCCK\App\Controller\MainController;
                 <label class="main-formItem main-formItem_wide">
                     <input class="main-formItemCheckbox" type="checkbox" name="wildcard" value="1" />
                     <span class="main-formItemCheckboxLabel">Only wildcard domains</span>
+                </label>
+                <label class="main-formItem main-formItem_wide">
+                    <input class="main-formItemCheckbox" type="checkbox" name="filesave" value="1" />
+                    <span class="main-formItemCheckboxLabel">Save as file</span>
                 </label>
             </section>
             <section>

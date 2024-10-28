@@ -29,7 +29,7 @@ abstract class AbstractController implements ControllerInterface {
     abstract public function getBody(): string;
 
     public function setHeaders(array $headers): AbstractController {
-        $this->headers = $headers;
+        $this->headers = array_merge($this->headers ?? [], $headers);
         return $this;
     }
 
