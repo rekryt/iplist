@@ -30,13 +30,26 @@ class IP6Helper {
 
                 $search = shell_exec(
                     implode(' | ', [
-                        'whois -a ' . $ip,
-                        'grep inet6num',
+                        'whois ' . $ip,
+                        'grep CIDR',
                         'grep -v "/0"',
                         'head -n 1',
                         "awk '{print $2}'",
+                        "grep -oE '^([0-9a-fA-F]{1,4}:){1,7}(:|[0-9a-fA-F]{1,4})(:[0-9a-fA-F]{1,4}){0,6}/[0-9]+$'",
                     ])
                 );
+
+                if (!$search) {
+                    $search = shell_exec(
+                        implode(' | ', [
+                            'whois -a ' . $ip,
+                            'grep inet6num',
+                            'grep -v "/0"',
+                            'head -n 1',
+                            "awk '{print $2}'",
+                        ])
+                    );
+                }
 
                 if (!$search) {
                     $search = shell_exec(
