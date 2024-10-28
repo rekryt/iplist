@@ -29,6 +29,9 @@ class AmneziaController extends AbstractIPListController {
         }
         $response = SiteFactory::normalizeArray($response, in_array($data, ['ipv4', 'ipv6', 'cidr4', 'cidr6']));
 
-        return json_encode(array_map(fn(string $item) => ['hostname' => $item, 'ip' => ''], $response));
+        return json_encode(
+            array_map(fn(string $item) => ['hostname' => $item, 'ip' => ''], $response),
+            JSON_PRETTY_PRINT
+        );
     }
 }
