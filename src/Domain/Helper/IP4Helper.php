@@ -16,15 +16,18 @@ class IP4Helper {
                 continue;
             }
             async(function () use ($ip, $i, $count, &$results) {
+                if (self::isInRange($ip, $results)) {
+                    return;
+                }
+
                 if (CIDRStorage::getInstance()->has($ip)) {
                     $searchArray = CIDRStorage::getInstance()->get($ip);
                     $results = array_merge($results, self::trimCIDRs($searchArray));
 
-                    App::getLogger()->debug($ip . ' -> ' . json_encode($searchArray), [$i + 1 . '/' . $count]);
-                    return;
-                }
-
-                if (self::isInRange($ip, $results)) {
+                    App::getLogger()->debug($ip . ' -> ' . json_encode($searchArray), [
+                        $i + 1 . '/' . $count,
+                        'from cache',
+                    ]);
                     return;
                 }
 
@@ -72,7 +75,7 @@ class IP4Helper {
                     CIDRStorage::getInstance()->set($ip, $searchArray);
                     $results = array_merge($results, self::trimCIDRs($searchArray));
 
-                    App::getLogger()->debug($ip . ' -> ' . json_encode($searchArray), [$i + 1 . '/' . $count]);
+                    App::getLogger()->debug($ip . ' -> ' . json_encode($searchArray), [$i + 1 . '/' . $count, 'found']);
                 } else {
                     App::getLogger()->error($ip . ' -> CIDR not found', [$i + 1 . '/' . $count]);
                 }
