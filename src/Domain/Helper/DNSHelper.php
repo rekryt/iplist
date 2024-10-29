@@ -23,7 +23,7 @@ class DNSHelper {
     private bool $isUseIpv6;
 
     public function __construct(private array $dnsServers = []) {
-        $this->resolveDelay = (\OpenCCK\getEnv('SYS_DNS_RESOLVE_DELAY') ?? 500) / 1000;
+        $this->resolveDelay = (getEnv('SYS_DNS_RESOLVE_DELAY') ?? 500) / 1000;
         $this->isUseIpv4 = (getEnv('SYS_DNS_RESOLVE_IP4') ?? 'true') == 'true';
         $this->isUseIpv6 = (getEnv('SYS_DNS_RESOLVE_IP6') ?? 'true') == 'true';
     }
