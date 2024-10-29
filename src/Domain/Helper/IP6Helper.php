@@ -94,7 +94,7 @@ class IP6Helper {
             foreach (explode(' ', $search) as $cidr) {
                 if (str_contains($cidr, '/')) {
                     [$address, $prefix] = explode('/', trim($cidr));
-                    $subnets[] = $address . '/' . max($prefix, 64);
+                    $subnets[] = $address . '/' . min($prefix, 64);
                 }
             }
         }
