@@ -145,15 +145,15 @@ final class Site {
 
         if (isset($this->external->cidr4) && $this->isUseIpv4) {
             foreach ($this->external->cidr4 as $url) {
-                $this->cidr4 = SiteFactory::normalize(
-                    array_merge($this->cidr4, explode("\n", file_get_contents($url))),
-                    true
+                $this->cidr4 = IP4Helper::minimizeSubnets(
+                    SiteFactory::normalize(array_merge($this->cidr4, explode("\n", file_get_contents($url))), true)
                 );
             }
         }
 
         if (isset($this->external->cidr6) && $this->isUseIpv6) {
             foreach ($this->external->cidr6 as $url) {
+                // todo IP6Helper::minimizeSubnets
                 $this->cidr6 = SiteFactory::normalize(
                     array_merge($this->cidr6, explode("\n", file_get_contents($url))),
                     true

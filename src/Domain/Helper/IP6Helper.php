@@ -22,7 +22,7 @@ class IP6Helper {
 
                 if (CIDRStorage::getInstance()->has($ip)) {
                     $searchArray = CIDRStorage::getInstance()->get($ip);
-                    $results = array_merge($results, self::trimCIDRs($searchArray));
+                    $results = array_merge($results, $searchArray);
 
                     App::getLogger()->debug($ip . ' -> ' . json_encode($searchArray), [
                         $i + 1 . '/' . $count,
@@ -72,8 +72,12 @@ class IP6Helper {
                         explode(' ', strtr($search, '  ', '')),
                         fn(string $cidr) => strlen($cidr) > 0
                     );
+                    $searchArray = array_values(
+                        array_filter(self::trimCIDRs($searchArray), fn($cidr) => self::isInCIDR($ip, $cidr))
+                    );
+
                     CIDRStorage::getInstance()->set($ip, $searchArray);
-                    $results = array_merge($results, self::trimCIDRs($searchArray));
+                    $results = array_merge($results, $searchArray);
 
                     App::getLogger()->debug($ip . ' -> ' . json_encode($searchArray), [$i + 1 . '/' . $count, 'found']);
                 } else {
@@ -160,30 +164,38 @@ class IP6Helper {
         return $result;
     }
 
-    public static function isInRange(string $ip, array $cidrs): bool {
+    public static function isInCidr(string $ip, string $cidr): bool {
         $ip = inet_pton($ip);
 
+        [$subnet, $mask] = explode('/', $cidr);
+        $subnet = inet_pton($subnet);
+
+        $mask = intval($mask);
+        $binaryMask = str_repeat('f', $mask >> 2);
+        switch ($mask % 4) {
+            case 1:
+                $binaryMask .= '8';
+                break;
+            case 2:
+                $binaryMask .= 'c';
+                break;
+            case 3:
+                $binaryMask .= 'e';
+                break;
+        }
+        $binaryMask = str_pad($binaryMask, 32, '0');
+        $mask = pack('H*', $binaryMask);
+
+        if (($ip & $mask) === ($subnet & $mask)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    public static function isInRange(string $ip, array $cidrs): bool {
         foreach ($cidrs as $cidr) {
-            [$subnet, $mask] = explode('/', $cidr);
-            $subnet = inet_pton($subnet);
-
-            $mask = intval($mask);
-            $binaryMask = str_repeat('f', $mask >> 2);
-            switch ($mask % 4) {
-                case 1:
-                    $binaryMask .= '8';
-                    break;
-                case 2:
-                    $binaryMask .= 'c';
-                    break;
-                case 3:
-                    $binaryMask .= 'e';
-                    break;
-            }
-            $binaryMask = str_pad($binaryMask, 32, '0');
-            $mask = pack('H*', $binaryMask);
-
-            if (($ip & $mask) === ($subnet & $mask)) {
+            if (self::isInCIDR($ip, $cidr)) {
                 return true;
             }
         }

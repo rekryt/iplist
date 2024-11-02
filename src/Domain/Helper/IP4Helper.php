@@ -22,7 +22,7 @@ class IP4Helper {
 
                 if (CIDRStorage::getInstance()->has($ip)) {
                     $searchArray = CIDRStorage::getInstance()->get($ip);
-                    $results = array_merge($results, self::trimCIDRs($searchArray));
+                    $results = array_merge($results, $searchArray);
 
                     App::getLogger()->debug($ip . ' -> ' . json_encode($searchArray), [
                         $i + 1 . '/' . $count,
@@ -72,8 +72,12 @@ class IP4Helper {
                         explode(' ', strtr($search, '  ', '')),
                         fn(string $cidr) => strlen($cidr) > 0
                     );
+                    $searchArray = array_values(
+                        array_filter(self::trimCIDRs($searchArray), fn($cidr) => self::isInCIDR($ip, $cidr))
+                    );
+
                     CIDRStorage::getInstance()->set($ip, $searchArray);
-                    $results = array_merge($results, self::trimCIDRs($searchArray));
+                    $results = array_merge($results, $searchArray);
 
                     App::getLogger()->debug($ip . ' -> ' . json_encode($searchArray), [$i + 1 . '/' . $count, 'found']);
                 } else {
@@ -135,10 +139,17 @@ class IP4Helper {
         return $result;
     }
 
+    public static function isInCIDR(string $ip, string $cidr): bool {
+        [$subnet, $mask] = explode('/', $cidr);
+        if ((ip2long($ip) & ~((1 << 32 - $mask) - 1)) === ip2long($subnet)) {
+            return true;
+        }
+        return false;
+    }
+
     public static function isInRange(string $ip, array $cidrs): bool {
         foreach ($cidrs as $cidr) {
-            [$subnet, $mask] = explode('/', $cidr);
-            if ((ip2long($ip) & ~((1 << 32 - $mask) - 1)) === ip2long($subnet)) {
+            if (self::isInCIDR($ip, $cidr)) {
                 return true;
             }
         }
