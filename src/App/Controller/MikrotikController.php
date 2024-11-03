@@ -14,6 +14,7 @@ class MikrotikController extends AbstractIPListController {
 
         $sites = SiteFactory::normalizeArray($this->request->getQueryParameters()['site'] ?? []);
         $data = $this->request->getQueryParameter('data') ?? '';
+        $append = $this->request->getQueryParameter('append') ?? '';
         if ($data == '') {
             return "# Error: The 'data' GET parameter is required in the URL to access this page";
         }
@@ -41,7 +42,10 @@ class MikrotikController extends AbstractIPListController {
                     continue;
                 }
                 $filteredItems = array_filter($siteEntity->$data, fn(string $row) => !in_array($row, $entries));
-                $items = array_merge($items, $this->generateList($siteEntity, $listName, $filteredItems));
+                $items = array_merge(
+                    $items,
+                    $this->generateList($siteEntity, $listName, $filteredItems, $append ? ' ' . $append : '')
+                );
                 $entries = array_merge($entries, $filteredItems);
             }
             $items = SiteFactory::normalizeArray($items, in_array($data, ['ip4', 'ip6', 'cidr4', 'cidr6']));
@@ -59,10 +63,10 @@ class MikrotikController extends AbstractIPListController {
      * @param array $array
      * @return array
      */
-    private function generateList(Site $siteEntity, string $listName, array $array): array {
+    private function generateList(Site $siteEntity, string $listName, array $array, string $append = ''): array {
         $items = [];
         foreach ($array as $item) {
-            $items[] = 'add list=' . $listName . ' address=' . $item . ' comment=' . $siteEntity->name;
+            $items[] = 'add list=' . $listName . ' address=' . $item . ' comment=' . $siteEntity->name . $append;
         }
         return $items;
     }
