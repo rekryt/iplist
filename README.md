@@ -165,7 +165,7 @@ php index.php
 - Создайте новый скрипт "Add new" с произвольным именем, например `iplist_v4_cidr`
 - В поле `Source` введите следующий код (используйте `url` адрес вашего сервера, протокол в `mode` тоже может отличаться):
 ```
-/tool fetch url="https://iplist.opencck.org/?format=mikrotik&data=cidr4" mode=https dst-path=iplist_v4_cidr.rsc
+/tool fetch url="https://iplist.opencck.org/?format=mikrotik&data=cidr4&append=timeout%3D1d" mode=https dst-path=iplist_v4_cidr.rsc
 :delay 5s
 :log info "Downloaded iplist_v4_cidr.rsc succesfully";
 
