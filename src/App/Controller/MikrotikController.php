@@ -61,6 +61,7 @@ class MikrotikController extends AbstractIPListController {
      * @param Site $siteEntity
      * @param string $listName
      * @param array $array
+     * @param string $append
      * @return array
      */
     private function generateList(Site $siteEntity, string $listName, array $array, string $append = ''): array {
