@@ -44,35 +44,35 @@ class SiteFactory {
             if (isset($external->domains)) {
                 foreach ($external->domains as $url) {
                     App::getLogger()->debug('Loading external domains from ' . $url);
-                    $domains = array_merge($domains, explode("\n", file_get_contents($url)));
+                    $domains = array_merge($domains, self::trimArray(explode("\n", file_get_contents($url))));
                 }
             }
 
             if (isset($external->ip4) && $isUseIpv4) {
                 foreach ($external->ip4 as $url) {
                     App::getLogger()->debug('Loading external ip4 from ' . $url);
-                    $ip4 = array_merge($ip4, explode("\n", file_get_contents($url)));
+                    $ip4 = array_merge($ip4, self::trimArray(explode("\n", file_get_contents($url))));
                 }
             }
 
             if (isset($external->ip6) && $isUseIpv6) {
                 foreach ($external->ip6 as $url) {
                     App::getLogger()->debug('Loading external ip6 from ' . $url);
-                    $ip6 = array_merge($ip6, explode("\n", file_get_contents($url)));
+                    $ip6 = array_merge($ip6, self::trimArray(explode("\n", file_get_contents($url))));
                 }
             }
 
             if (isset($external->cidr4) && $isUseIpv4) {
                 foreach ($external->cidr4 as $url) {
                     App::getLogger()->debug('Loading external cidr4 from ' . $url);
-                    $cidr4 = array_merge($cidr4, explode("\n", file_get_contents($url)));
+                    $cidr4 = array_merge($cidr4, self::trimArray(explode("\n", file_get_contents($url))));
                 }
             }
 
             if (isset($external->cidr6) && $isUseIpv6) {
                 foreach ($external->cidr6 as $url) {
                     App::getLogger()->debug('Loading external cidr6 from ' . $url);
-                    $cidr6 = array_merge($cidr6, explode("\n", file_get_contents($url)));
+                    $cidr6 = array_merge($cidr6, self::trimArray(explode("\n", file_get_contents($url))));
                 }
             }
         }
@@ -119,5 +119,13 @@ class SiteFactory {
     public static function normalizeArray(array $array, bool $isIpAddresses = false): array {
         sort($array);
         return SiteFactory::normalize($array, $isIpAddresses);
+    }
+
+    /**
+     * @param array $array
+     * @return array
+     */
+    public static function trimArray(array $array): array {
+        return array_map(trim(...), $array);
     }
 }

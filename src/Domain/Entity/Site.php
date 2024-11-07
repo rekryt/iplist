@@ -120,7 +120,7 @@ final class Site {
         if (isset($this->external->domains)) {
             foreach ($this->external->domains as $url) {
                 $this->domains = SiteFactory::normalize(
-                    array_merge($this->domains, explode("\n", file_get_contents($url)))
+                    array_merge($this->domains, SiteFactory::trimArray(explode("\n", file_get_contents($url))))
                 );
             }
         }
@@ -128,7 +128,7 @@ final class Site {
         if (isset($this->external->ip4) && $this->isUseIpv4) {
             foreach ($this->external->ip4 as $url) {
                 $this->ip4 = SiteFactory::normalize(
-                    array_merge($this->ip4, explode("\n", file_get_contents($url))),
+                    array_merge($this->ip4, SiteFactory::trimArray(explode("\n", file_get_contents($url)))),
                     true
                 );
             }
@@ -137,7 +137,7 @@ final class Site {
         if (isset($this->external->ip6) && $this->isUseIpv6) {
             foreach ($this->external->ip6 as $url) {
                 $this->ip6 = SiteFactory::normalize(
-                    array_merge($this->ip6, explode("\n", file_get_contents($url))),
+                    array_merge($this->ip6, SiteFactory::trimArray(explode("\n", file_get_contents($url)))),
                     true
                 );
             }
@@ -146,7 +146,10 @@ final class Site {
         if (isset($this->external->cidr4) && $this->isUseIpv4) {
             foreach ($this->external->cidr4 as $url) {
                 $this->cidr4 = IP4Helper::minimizeSubnets(
-                    SiteFactory::normalize(array_merge($this->cidr4, explode("\n", file_get_contents($url))), true)
+                    SiteFactory::normalize(
+                        array_merge($this->cidr4, SiteFactory::trimArray(explode("\n", file_get_contents($url)))),
+                        true
+                    )
                 );
             }
         }
@@ -155,7 +158,7 @@ final class Site {
             foreach ($this->external->cidr6 as $url) {
                 // todo IP6Helper::minimizeSubnets
                 $this->cidr6 = SiteFactory::normalize(
-                    array_merge($this->cidr6, explode("\n", file_get_contents($url))),
+                    array_merge($this->cidr6, SiteFactory::trimArray(explode("\n", file_get_contents($url)))),
                     true
                 );
             }
