@@ -154,13 +154,13 @@ php index.php
 ## Custom Output Format
 To export data according to a specified template, use format=custom and template=template, where the template can include patterns such as:
 
-| свойство   | описание                               |
-|------------|----------------------------------------|
-| group      | Group name                             |
-| site       | Site name                              |
-| data       | Selected data                          |
-| shortmask  | Subnet mask (short) (for IP and CIDR)  |
-| mask       | Subnet mask (full) (for IP and CIDR)   |
+| свойство    | описание                              |
+|-------------|---------------------------------------|
+| {group}     | Group name                            |
+| {site}      | Site name                             |
+| {data}      | Selected data                         |
+| {shortmask} | Subnet mask (short) (for IP and CIDR) |
+| {mask}      | Subnet mask (full) (for IP and CIDR)  |
 
 Examples:
 ```
