@@ -201,4 +201,24 @@ class IP6Helper {
         }
         return false;
     }
+
+    /**
+     * преобразование короткой маски IPv6 в полную
+     * @param string $mask
+     * @return string
+     */
+    public static function formatShortIpMask(string $mask): string {
+        if ($mask === '') {
+            $mask = '128';
+        }
+
+        $binaryMask = str_repeat('1', (int) $mask) . str_repeat('0', 128 - $mask);
+        $hextets = [];
+
+        for ($i = 0; $i < 8; $i++) {
+            $hextets[] = dechex(bindec(substr($binaryMask, $i * 16, 16)));
+        }
+
+        return implode(':', $hextets);
+    }
 }

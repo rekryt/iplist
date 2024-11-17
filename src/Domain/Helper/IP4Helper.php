@@ -155,4 +155,23 @@ class IP4Helper {
         }
         return false;
     }
+
+    /**
+     * преобразование короткой маски IPv4 в полную
+     * @param string $mask
+     * @return string
+     */
+    public static function formatShortIpMask(string $mask): string {
+        if ($mask == '') {
+            $mask = '32';
+        }
+        $binaryMask = str_repeat('1', (int) $mask) . str_repeat('0', 32 - $mask);
+        $octets = [];
+
+        for ($i = 0; $i < 4; $i++) {
+            $octets[] = bindec(substr($binaryMask, $i * 8, 8));
+        }
+
+        return implode('.', $octets);
+    }
 }

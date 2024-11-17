@@ -151,6 +151,29 @@ composer install
 php index.php
 ```
 
+## Custom Output Format
+To export data according to a specified template, use format=custom and template=template, where the template can include patterns such as:
+
+| свойство   | описание                               |
+|------------|----------------------------------------|
+| group      | Group name                             |
+| site       | Site name                              |
+| data       | Selected data                          |
+| shortmask  | Subnet mask (short) (for IP and CIDR)  |
+| mask       | Subnet mask (full) (for IP and CIDR)   |
+
+Examples:
+```
+Wildcard domains for Twitter DNS static add on MikroTik for forward-to=localhost:
+https://iplist.opencck.org/?format=custom&data=domains&site=x.com&wildcard=1&template=%2Fip%20dns%20static%20add%20name%3D%7Bdata%7D%20type%3DFWD%20address-list%3D%7Bgroup%7D_%7Bsite%7D%20match-subdomain%3Dyes%20forward-to%3Dlocalhost
+
+Wildcard domains in custom format:
+https://iplist.opencck.org/?format=custom&data=domains&wildcard=1&template=data%3A%20%7Bdata%7D%20group%3A%20%7Bgroup%7D%20site%3A%20%7Bsite%7D
+
+Subnet mask in custom format:
+https://iplist.opencck.org/?format=custom&data=cidr4&template=data%3A%20%7Bdata%7D%20group%3A%20%7Bgroup%7D%20site%3A%20%7Bsite%7D%20shortmask%3A%20%7Bshortmask%7D%20mask%3A%20%7Bmask%7D
+```
+
 ## Setting up Mikrotik
 - In the router's admin panel (or via winbox), navigate to System -> Scripts.
 - Create a new script by clicking "Add new" and give it a name, for example `iplist_v4_cidr`

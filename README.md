@@ -160,6 +160,29 @@ composer install
 php index.php
 ```
 
+## Кастомный формат вывода
+Для получения выгрузки данных по заданному шаблону используется format=custom и template=шаблон, где шаблон может содержать такие паттерны как:
+
+| свойство   | описание                                 |
+|------------|------------------------------------------|
+| group      | Имя группы                               |
+| site       | Имя сайта                                |
+| data       | Выбранные данные                         |
+| shortmask  | Маска подсети (короткая) (для ip и cidr) |
+| mask       | Маска подсети (полная)  (для ip и cidr)  |
+
+Примеры:
+```
+Wildcard домены twitter для dns static add под mikrotik для forward-to=localhost:
+https://iplist.opencck.org/?format=custom&data=domains&site=x.com&wildcard=1&template=%2Fip%20dns%20static%20add%20name%3D%7Bdata%7D%20type%3DFWD%20address-list%3D%7Bgroup%7D_%7Bsite%7D%20match-subdomain%3Dyes%20forward-to%3Dlocalhost
+
+Wildcard домены в кастомном формате:
+https://iplist.opencck.org/?format=custom&data=domains&wildcard=1&template=data%3A%20%7Bdata%7D%20group%3A%20%7Bgroup%7D%20site%3A%20%7Bsite%7D
+
+Маска подсети в кастомном формате:
+https://iplist.opencck.org/?format=custom&data=cidr4&template=data%3A%20%7Bdata%7D%20group%3A%20%7Bgroup%7D%20site%3A%20%7Bsite%7D%20shortmask%3A%20%7Bshortmask%7D%20mask%3A%20%7Bmask%7D
+```
+
 ## Настройка Mikrotik
 - В администраторской панели роутера (или через winbox) откройте раздел System -> Scripts
 - Создайте новый скрипт "Add new" с произвольным именем, например `iplist_v4_cidr`
