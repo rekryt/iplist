@@ -3,7 +3,7 @@ For english readme: [README.en.md](README.en.md)
 
 Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
 
-![iplist](https://github.com/user-attachments/assets/2e363fd8-1df7-4554-bf9e-98f58c13df96)
+![iplist](https://github.com/user-attachments/assets/e004bc06-3646-4eec-acce-9c6799a3661a)
 
 # Сервис сбора IP-адресов и CIDR зон
 Данный сервис предназначен для сбора и обновления IP-адресов (IPv4 и IPv6), а также их CIDR зон для указанных доменов.

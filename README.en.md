@@ -3,7 +3,7 @@ This service is designed for collecting and updating IP addresses (IPv4 and IPv6
 
 Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
 
-![iplist](https://github.com/user-attachments/assets/2e363fd8-1df7-4554-bf9e-98f58c13df96)
+![iplist](https://github.com/user-attachments/assets/e004bc06-3646-4eec-acce-9c6799a3661a)
 
 ## Key Features
 - Collection and automatic update of IP addresses and CIDR zones for domains.
