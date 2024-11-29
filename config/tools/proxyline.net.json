@@ -1,0 +1,50 @@
+{
+    "domains": [
+        "bot.proxyline.net",
+        "dev.proxyline.net",
+        "logserver.proxyline.net",
+        "panel.proxyline.net",
+        "panel2.proxyline.net",
+        "proxydb.proxyline.net",
+        "proxydbtest.proxyline.net",
+        "proxyline.net",
+        "services.proxyline.net",
+        "static.proxyline.net",
+        "www.bot.proxyline.net",
+        "www.dev.proxyline.net",
+        "www.proxyline.net"
+    ],
+    "dns": [
+        "127.0.0.11:53",
+        "77.88.8.88:53",
+        "8.8.8.8:53",
+        "1.1.1.1:53"
+    ],
+    "timeout": 3600,
+    "ip4": [
+        "134.209.203.230",
+        "164.90.195.46",
+        "165.22.192.113",
+        "167.172.171.13",
+        "192.124.249.153",
+        "192.124.249.61",
+        "5.2.79.208",
+        "92.205.135.16"
+    ],
+    "ip6": [],
+    "cidr4": [
+        "134.209.0.0/16",
+        "164.90.128.0/17",
+        "165.22.0.0/16",
+        "167.172.0.0/16",
+        "192.124.249.0/24"
+    ],
+    "cidr6": [],
+    "external": {
+        "domains": [],
+        "ip4": [],
+        "ip6": [],
+        "cidr4": [],
+        "cidr6": []
+    }
+}
