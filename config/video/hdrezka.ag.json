@@ -28,6 +28,7 @@
         "hammer.stream.voidboost.cc",
         "hdrezka.ac",
         "hdrezka.ag",
+        "hdrezka.cm",
         "hydrus.stream.voidboost.cc",
         "jointinum.stream.voidboost.cc",
         "jupiter.stream.voidboost.cc",
@@ -96,6 +97,7 @@
         "web02.stream.voidboost.cc",
         "www.hdrezka.ac",
         "www.hdrezka.ag",
+        "www.hdrezka.cm",
         "www.rezka.ag",
         "www.serv01001.xyz",
         "www.stream.voidboost.cc"
@@ -199,6 +201,7 @@
         "5.45.78.55",
         "82.221.104.145",
         "82.221.104.146",
+        "82.221.105.19",
         "85.217.222.70"
     ],
     "ip6": [],
@@ -223,6 +226,7 @@
         "45.10.216.0/23",
         "5.45.76.0/22",
         "82.221.104.144/29",
+        "82.221.105.0/24",
         "85.217.222.0/24"
     ],
     "cidr6": [],
