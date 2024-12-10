@@ -10,7 +10,6 @@
         "kodik.info",
         "kodikapi.com",
         "kodikdb.com",
-        "ls.player-cname-domain.com",
         "osmium.cloud.kodik-storage.com",
         "protactinium.cloud.kodik-storage.com",
         "pulse.cloud.kodik-cdn.com",
@@ -43,8 +42,7 @@
         "185.190.189.239",
         "190.115.16.16",
         "212.124.96.15",
-        "5.45.64.58",
-        "5.45.72.101"
+        "5.45.64.58"
     ],
     "ip6": [],
     "cidr4": [
