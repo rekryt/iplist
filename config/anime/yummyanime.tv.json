@@ -1,0 +1,30 @@
+{
+    "domains": [
+        "yummyanime.tv",
+        "www.yummyanime.tv",
+        "555-173-403gv.video-ik-ok-ii.xyz",
+        "bf3-204-206gv.video-ik-ok-ii.xyz",
+        "ce1-048-404gv.video-ik-ok-ii.xyz",
+        "ec3-9e8-200gv.video-ik-ok-ii.xyz"
+    ],
+    "dns": [
+        "127.0.0.11:53",
+        "77.88.8.88:53",
+        "8.8.8.8:53",
+        "1.1.1.1:53"
+    ],
+    "timeout": 3600,
+    "ip4": [
+    ],
+    "ip6": [],
+    "cidr4": [
+    ],
+    "cidr6": [],
+    "external": {
+        "domains": [],
+        "ip4": [],
+        "ip6": [],
+        "cidr4": [],
+        "cidr6": []
+    }
+}
