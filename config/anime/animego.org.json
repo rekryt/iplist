@@ -1,8 +1,8 @@
 {
     "domains": [
         "animego.org",
-        "www.animego.org",
-        "wss.animego.org"
+        "wss.animego.org",
+        "www.animego.org"
     ],
     "dns": [
         "127.0.0.11:53",
@@ -12,9 +12,13 @@
     ],
     "timeout": 3600,
     "ip4": [
+        "185.178.208.183",
+        "49.13.90.58"
     ],
     "ip6": [],
     "cidr4": [
+        "185.178.208.0/22",
+        "49.13.80.0/20"
     ],
     "cidr6": [],
     "external": {
