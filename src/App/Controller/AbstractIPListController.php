@@ -45,11 +45,27 @@ abstract class AbstractIPListController extends AbstractController {
      */
     protected function getSites(): array {
         $wildcard = !!($this->request->getQueryParameter('wildcard') ?? '');
-        return array_map(static function (Site $siteEntity) use ($wildcard) {
+        $exclude = [
+            'group' => $this->request->getQueryParameterArray('exclude[group]') ?? [],
+            'site' => $this->request->getQueryParameterArray('exclude[site]') ?? [],
+            'domain' => $this->request->getQueryParameterArray('exclude[domain]') ?? [],
+            'ip4' => $this->request->getQueryParameterArray('exclude[ip4]') ?? [],
+            'cidr4' => $this->request->getQueryParameterArray('exclude[cidr4]') ?? [],
+            'ip6' => $this->request->getQueryParameterArray('exclude[ip6]') ?? [],
+            'cidr6' => $this->request->getQueryParameterArray('exclude[cidr6]') ?? [],
+        ];
+        return array_map(static function (Site $siteEntity) use ($wildcard, $exclude) {
             $site = clone $siteEntity;
-            $site->domains = $siteEntity->getDomains($wildcard);
+            $site->domains = array_values(array_filter($siteEntity->getDomains($wildcard), fn(string $domain) => !in_array($domain, $exclude['domain'])));
+            $site->ip4 = array_values(array_filter($site->ip4, fn(string $ip) => !in_array($ip, $exclude['ip4'])));
+            $site->cidr4 = array_values(array_filter($site->cidr4, fn(string $ip) => !in_array($ip, $exclude['cidr4'])));
+            $site->ip6 = array_values(array_filter($site->ip6, fn(string $ip) => !in_array($ip, $exclude['ip6'])));
+            $site->cidr6 = array_values(array_filter($site->cidr6, fn(string $ip) => !in_array($ip, $exclude['cidr6'])));
+
             return $site;
-        }, $this->service->sites);
+        }, array_filter($this->service->sites, fn (Site $siteEntity) =>
+             !in_array($siteEntity->name, $exclude['site']) && !in_array($siteEntity->group, $exclude['group'])
+        ));
     }
 
     /**
