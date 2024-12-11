@@ -116,6 +116,22 @@ http://0.0.0.0:8080/?format=mikrotik&site=youtube.com&data=cidr4
 http://0.0.0.0:8080/?format=comma&data=cidr4
 ```
 
+| GET Parameter   | Description                | Example                                       |
+|-----------------|----------------------------|-----------------------------------------------|
+| format          | Data export format         | ?format=text                                  |
+| data            | Data for export            | ?data=cidr4                                   |
+| site            | Portal for data export     | ?site=youtube.com                             |
+| group           | Group for data export      | ?group=youtube                                |
+| exclude[ip4]    | Exclude IPv4 addresses     | ?exclude[ip4]=1.1.1.1&exclude[ip4]=2.2.2.2    | 
+| exclude[ip6]    | Exclude IPv6 addresses     | ?exclude[ip6]=2a06:98c1:3121::a               |
+| exclude[cidr4]  | Exclude CIDRv4 zones       | ?exclude[cidr4]=1.1.1.0/24                    |
+| exclude[cidr6]  | Exclude CIDRv6 zones       | ?exclude[cidr6]=2a06:98c1::/32                |
+| exclude[group]  | Exclude groups             | ?exclude[group]=youtube&exclude[group]=casino |
+| exclude[site]   | Exclude portals            | ?exclude[site]=youtube.com                    |
+| exclude[domain] | Exclude domains            | ?exclude[domain]=youtube.com                  |
+| wildcard        | Keep only wildcard domains | ?wildcard=1                                   |
+| filesave        | Save as a file             | ?filesave=1                                   |
+
 ## SSL Setup
 - Install and configure a reverse proxy, for example, [NginxProxyManager](https://nginxproxymanager.com/guide/#quick-setup).
 - Create a Docker virtual network:
