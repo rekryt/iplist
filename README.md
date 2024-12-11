@@ -122,21 +122,22 @@ http://0.0.0.0:8080/?format=mikrotik&site=youtube.com&data=cidr4
 http://0.0.0.0:8080/?format=comma&data=cidr4
 ```
 
-| get параметр     | описание                         | пример                                        |
-|------------------|----------------------------------|-----------------------------------------------|
-| format           | Формат выгрузки данных           | ?format=text                                  |
-| data             | Данные для выгрузки              | ?data=cidr4                                   |
-| site             | Портал для выгрузки данных       | ?site=youtube.com                             |
-| group            | Группа для выгрузки данных       | ?group=youtube                                |
-| exclude[ip4]     | Исключить ipv4 адреса            | ?exclude[ip4]=1.1.1.1&exclude[ip4]=2.2.2.2    | 
-| exclude[ip6]     | Исключить ipv6 адреса            | ?exclude[ip6]=2a06:98c1:3121::a               |
-| exclude[cidr4]   | Исключить CIDRv4 зоны            | ?exclude[cidr4]=1.1.1.0/24                    |
-| exclude[cidr6]   | Исключить CIDRv6 зоны            | ?exclude[cidr6]=2a06:98c1::/32                |
-| exclude[group]   | Исключить группы                 | ?exclude[group]=youtube&exclude[group]=casino |
-| exclude[site]    | Исключить порталы                | ?exclude[site]=youtube.com                    |
-| exclude[domain]  | Исключить домены                 | ?exclude[domain]=youtube.com                  |
-| wildcard         | Оставлять только wildcard домены | ?wildcard=1                                   |
-| filesave         | Сохранять как файл               | ?filesave=1                                   |
+| get параметр     | описание                         | пример                                                                                                                                                                                                                                  |
+|------------------|----------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| format           | Формат выгрузки данных           | ?format=text                                                                                                                                                                                                                            |
+| data             | Данные для выгрузки              | ?data=cidr4                                                                                                                                                                                                                             |
+| site             | Портал для выгрузки данных       | ?site=youtube.com                                                                                                                                                                                                                       |
+| group            | Группа для выгрузки данных       | ?group=youtube                                                                                                                                                                                                                          |
+| exclude[ip4]     | Исключить ipv4 адреса            | ?exclude[ip4]=1.1.1.1&exclude[ip4]=2.2.2.2                                                                                                                                                                                              | 
+| exclude[ip6]     | Исключить ipv6 адреса            | ?exclude[ip6]=2a06:98c1:3121::a                                                                                                                                                                                                         |
+| exclude[cidr4]   | Исключить CIDRv4 зоны            | ?exclude[cidr4]=1.1.1.0/24                                                                                                                                                                                                              |
+| exclude[cidr6]   | Исключить CIDRv6 зоны            | ?exclude[cidr6]=2a06:98c1::/32                                                                                                                                                                                                          |
+| exclude[group]   | Исключить группы                 | ?exclude[group]=youtube&exclude[group]=casino                                                                                                                                                                                           |
+| exclude[site]    | Исключить порталы                | ?exclude[site]=youtube.com                                                                                                                                                                                                              |
+| exclude[domain]  | Исключить домены                 | ?exclude[domain]=youtube.com                                                                                                                                                                                                            |
+| wildcard         | Оставлять только wildcard домены | ?wildcard=1                                                                                                                                                                                                                             |
+| filesave         | Сохранять как файл               | ?filesave=1                                                                                                                                                                                                                             |
+| template         | Шаблон выгрузки                  | ?format=custom&template=[подробнее](https://github.com/rekryt/iplist?tab=readme-ov-file#%D0%BA%D0%B0%D1%81%D1%82%D0%BE%D0%BC%D0%BD%D1%8B%D0%B9-%D1%84%D0%BE%D1%80%D0%BC%D0%B0%D1%82-%D0%B2%D1%8B%D0%B2%D0%BE%D0%B4%D0%B0)               |
 
 ## Настройка SSL
 Для настройки SSL сертификата вам понадобится домен настроенный на ваш сервер.
