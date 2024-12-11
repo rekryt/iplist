@@ -54,17 +54,32 @@ abstract class AbstractIPListController extends AbstractController {
             'ip6' => $this->request->getQueryParameterArray('exclude[ip6]') ?? [],
             'cidr6' => $this->request->getQueryParameterArray('exclude[cidr6]') ?? [],
         ];
+        $group = $this->request->getQueryParameterArray('group') ?? [];
         return array_map(static function (Site $siteEntity) use ($wildcard, $exclude) {
             $site = clone $siteEntity;
-            $site->domains = array_values(array_filter($siteEntity->getDomains($wildcard), fn(string $domain) => !in_array($domain, $exclude['domain'])));
+            $site->domains = array_values(
+                array_filter(
+                    $siteEntity->getDomains($wildcard),
+                    fn(string $domain) => !in_array($domain, $exclude['domain'])
+                )
+            );
             $site->ip4 = array_values(array_filter($site->ip4, fn(string $ip) => !in_array($ip, $exclude['ip4'])));
-            $site->cidr4 = array_values(array_filter($site->cidr4, fn(string $ip) => !in_array($ip, $exclude['cidr4'])));
+            $site->cidr4 = array_values(
+                array_filter($site->cidr4, fn(string $ip) => !in_array($ip, $exclude['cidr4']))
+            );
             $site->ip6 = array_values(array_filter($site->ip6, fn(string $ip) => !in_array($ip, $exclude['ip6'])));
-            $site->cidr6 = array_values(array_filter($site->cidr6, fn(string $ip) => !in_array($ip, $exclude['cidr6'])));
+            $site->cidr6 = array_values(
+                array_filter($site->cidr6, fn(string $ip) => !in_array($ip, $exclude['cidr6']))
+            );
 
             return $site;
-        }, array_filter($this->service->sites, fn (Site $siteEntity) =>
-             !in_array($siteEntity->name, $exclude['site']) && !in_array($siteEntity->group, $exclude['group'])
+        }, array_filter(
+            array_filter(
+                $this->service->sites,
+                fn(Site $siteEntity) => !in_array($siteEntity->name, $exclude['site']) &&
+                    !in_array($siteEntity->group, $exclude['group'])
+            ),
+            fn(Site $siteEntity) => count($group) === 0 || in_array($siteEntity->group, $group)
         ));
     }
 
