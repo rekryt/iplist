@@ -572,6 +572,7 @@ use OpenCCK\App\Controller\MainController;
     <style>
         .main {
             display: flex;
+            flex-wrap: wrap;
             justify-content: center;
             font-size: 18px;
             line-height: 1.2;
@@ -614,10 +615,19 @@ use OpenCCK\App\Controller\MainController;
             font-weight: normal;
             cursor: pointer;
         }
+        .github {
+            flex: 0 0 100%;
+            display: flex;
+            justify-content: center;
+            padding-bottom: 16px;
+        }
     </style>
 </head>
 <body>
     <main class="main">
+        <div class="github">
+            <iframe src="https://ghbtns.com/github-btn.html?user=rekryt&amp;repo=iplist&amp;type=star&amp;count=true&amp;size=large" frameborder="0" scrolling="0" width="170" height="30" title="GitHub"></iframe>
+        </div>
         <form action="" method="get" class="main-form">
             <section class="main-section">
                 <label class="main-formItem">
