@@ -644,6 +644,7 @@ use OpenCCK\App\Controller\MainController;
                         <option value="kvas">Keenetic KVAS</option>
                         <option value="bat">Keenetic Routes (.bat)</option>
                         <option value="amnezia">Amnezia</option>
+                        <option value="pac">Proxy auto configuration (PAC)</option>
                     </select>
                 </label>
                 <label class="main-formItem">
