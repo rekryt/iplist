@@ -18,19 +18,20 @@ Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
 - **whois, ipcalc (Linux utilities)**
 
 # Formats of Output
-| format   | description           |
-|----------|-----------------------|
-| json     | JSON format           |
-| text     | Newline-separated     |
-| comma    | Comma-separated       |
-| mikrotik | MikroTik Script       |
-| switchy  | SwitchyOmega RuleList |
-| nfset    | Dnsmasq nfset         |
-| ipset    | Dnsmasq ipset         |
-| clashx   | ClashX                |
-| kvas     | Keenetic KVAS         |
-| bat      | Keenetic Routes .bat  |
-| amnezia  | Amnezia filter list   |
+| format   | description                   |
+|----------|-------------------------------|
+| json     | JSON format                   |
+| text     | Newline-separated             |
+| comma    | Comma-separated               |
+| mikrotik | MikroTik Script               |
+| switchy  | SwitchyOmega RuleList         |
+| nfset    | Dnsmasq nfset                 |
+| ipset    | Dnsmasq ipset                 |
+| clashx   | ClashX                        |
+| kvas     | Keenetic KVAS                 |
+| bat      | Keenetic Routes .bat          |
+| amnezia  | Amnezia filter list           |
+| pac      | Proxy Auto-Configuration file |
 
 ## Configuration
 

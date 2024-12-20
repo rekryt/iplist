@@ -22,19 +22,20 @@ Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
 - whois, ipcalc (linux)
 
 # Форматы выгрузки
-| формат   | описание                 |
-|----------|--------------------------|
-| json     | JSON формат              |
-| text     | Разделение новой строкой |
-| comma    | Разделение запятыми      |
-| mikrotik | MikroTik Script          |
-| switchy  | SwitchyOmega RuleList    |
-| nfset    | Dnsmasq nfset            |
-| ipset    | Dnsmasq ipset            |
-| clashx   | ClashX                   |
-| kvas     | Keenetic KVAS            |
-| bat      | Keenetic Routes .bat     |
-| amnezia  | Amnezia filter list      |
+| формат   | описание                      |
+|----------|-------------------------------|
+| json     | JSON формат                   |
+| text     | Разделение новой строкой      |
+| comma    | Разделение запятыми           |
+| mikrotik | MikroTik Script               |
+| switchy  | SwitchyOmega RuleList         |
+| nfset    | Dnsmasq nfset                 |
+| ipset    | Dnsmasq ipset                 |
+| clashx   | ClashX                        |
+| kvas     | Keenetic KVAS                 |
+| bat      | Keenetic Routes .bat          |
+| amnezia  | Amnezia filter list           |
+| pac      | Proxy Auto-Configuration file |
 
 ## Настройки
 Конфигурационные файлы хранятся в `config/<группа>/<портал>.json`. Каждый JSON файл представляет собой конфигурацию для конкретного портала, задавая домены для мониторинга и источники начальных данных по IP и CIDR.
