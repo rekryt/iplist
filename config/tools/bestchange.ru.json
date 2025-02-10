@@ -1,0 +1,36 @@
+{
+    "domains": [
+        "api.bestchange.net",
+        "api.bestchange.ru",
+        "bestchange.net",
+        "bestchange.ru",
+        "www.bestchange.net",
+        "www.bestchange.ru"
+    ],
+    "dns": [
+        "127.0.0.11:53",
+        "77.88.8.88:53",
+        "8.8.8.8:53",
+        "1.1.1.1:53"
+    ],
+    "timeout": 3600,
+    "ip4": [
+        "162.19.86.111",
+        "188.124.37.146",
+        "54.37.161.241"
+    ],
+    "ip6": [],
+    "cidr4": [
+        "162.19.0.0/16",
+        "188.124.37.0/24",
+        "54.36.0.0/15"
+    ],
+    "cidr6": [],
+    "external": {
+        "domains": [],
+        "ip4": [],
+        "ip6": [],
+        "cidr4": [],
+        "cidr6": []
+    }
+}
