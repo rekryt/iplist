@@ -252,7 +252,7 @@ sed -i '/sed -i/s/^/\t#/; /\/etc\/init.d\/cron restart >/s/^/\t#/' /etc/init.d/h
 ```
 Откройте административную панель OpenWRT раздел "System" - "Sсheduled Tasks".
 Добавьте строку, чтобы автоматически запускать скрипт обновления при старте, а также в 00:05:00 и 12:05:00
-```shell
+```
 5 0,12 * * * /etc/homeproxy/scripts/update_crond.sh
 ```
 ![2](https://github.com/user-attachments/assets/2369b32c-d43a-4837-97ce-c46a9dd79e5e)
