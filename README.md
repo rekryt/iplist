@@ -244,19 +244,16 @@ wget https://iplist.opencck.org/scripts/homeproxy/update_resources.sh -O /etc/ho
 # добавляем права на выполнение
 chmod +x /etc/homeproxy/scripts/update_resources.sh
 
+# отменяем стирание cron после перезапуска homeproxy
+sed -i '/sed -i/s/^/\t#/; /\/etc\/init.d\/cron restart >/s/^/\t#/' /etc/init.d/homeproxy
+
 # вы захостили это решение? - тогда раскомментируйте следующую строку и поменяйте "example.com" на ваш домен
 # sed -i 's/iplist.opencck.org/example.com/g' /etc/homeproxy/scripts/update_resources.sh
 ```
-Откройте административную панель OpenWRT раздел "System" - "Startup" - "Local Startup".
-Добавьте перед "exit 0" строки, чтобы автоматически запускать скрипт обновления при старте, а также в 00:05:00 и 12:05:00
+Откройте административную панель OpenWRT раздел "System" - "Sсheduled Tasks".
+Добавьте строку, чтобы автоматически запускать скрипт обновления при старте, а также в 00:05:00 и 12:05:00
 ```shell
-sleep 15
-
-/etc/homeproxy/scripts/update_crond.sh
-
-echo "5 0,12 * * * /etc/homeproxy/scripts/update_crond.sh" > /etc/crontabs/root
-/etc/init.d/cron enable
-/etc/init.d/cron start
+5 0,12 * * * /etc/homeproxy/scripts/update_crond.sh
 ```
 ![2](https://github.com/user-attachments/assets/2369b32c-d43a-4837-97ce-c46a9dd79e5e)
 
