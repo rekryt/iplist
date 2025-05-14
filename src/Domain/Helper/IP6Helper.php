@@ -101,7 +101,7 @@ class IP6Helper {
             foreach (explode(' ', $search) as $cidr) {
                 if (str_contains($cidr, '/')) {
                     [$address, $prefix] = explode('/', trim($cidr));
-                    $subnets[] = $address . '/' . min($prefix, 64);
+                    $subnets[] = $address . '/' . min($prefix, \OpenCCK\getEnv('SYS_IP6_SUBNET_PREFIX_CAP') ?? 64);
                 }
             }
         }

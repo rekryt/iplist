@@ -102,6 +102,7 @@ cp .env.example .env
 | SYS_DNS_RESOLVE_IP6        | true                  | Получать ipv6 адреса                                       |
 | SYS_DNS_RESOLVE_CHUNK_SIZE | 10                    | Размер чанка для получения dns записей                     |
 | SYS_DNS_RESOLVE_DELAY      | 100                   | Задержка между получением dns записей (миллисекунды)       |
+| SYS_IP6_SUBNET_PREFIX_CAP  | 64                    | Максимально допустимая длина префикса IPv6-подсети         |
 | SYS_MEMORY_LIMIT           | 1024M                 | Предельное кол-во памяти.                                  |
 | SYS_TIMEZONE               | Europe/Moscow         | Список URL для получения начальных CIDRv4 зон ipv4 адресов |
 | HTTP_HOST                  | 0.0.0.0               | IP сетевого интерфейса (по умолчанию все интерфейсы)       |
