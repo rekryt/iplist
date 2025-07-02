@@ -9,7 +9,9 @@
     "require": {
         "opencck/server": "v1.0.0",
         "amphp/dns": "^2.2",
-        "vlucas/phpdotenv": "^5.5"
+        "vlucas/phpdotenv": "^5.5",
+        "amphp/file": "^3.1",
+        "ext-fileinfo": "*"
     },
     "autoload": {
         "files": [

@@ -23,7 +23,8 @@ abstract class AbstractController implements ControllerInterface {
      * @return Response
      */
     public function __invoke(): Response {
-        return new Response(status: $this->httpStatus, headers: $this->headers, body: $this->getBody());
+        $body = $this->getBody();
+        return new Response(status: $this->httpStatus, headers: $this->headers, body: $body);
     }
 
     abstract public function getBody(): string;

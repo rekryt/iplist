@@ -21,11 +21,11 @@ class TextController extends AbstractIPListController {
         $response = [];
         if (count($sites)) {
             foreach ($sites as $site) {
-                $response = array_merge($response, $this->getSites()[$site]->$data);
+                $response = array_merge($response, $this->getSites()[$site]->$data ?? []);
             }
         } else {
             foreach ($this->getSites() as $siteEntity) {
-                $response = array_merge($response, $siteEntity->$data);
+                $response = array_merge($response, $siteEntity->$data ?? []);
             }
         }
 

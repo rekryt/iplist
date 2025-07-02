@@ -10,6 +10,7 @@ use Amp\Http\Server\Response;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
+use function OpenCCK\dbg;
 use function OpenCCK\getEnv;
 
 final class HTTPHandler extends Handler implements HTTPHandlerInterface {

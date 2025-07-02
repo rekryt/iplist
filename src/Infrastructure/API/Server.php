@@ -98,7 +98,9 @@ final class Server implements AppModuleInterface {
             //    $this->bindContext
             //);
             $router = new Router($this->httpServer, $this->logger, $this->errorHandler);
-            $router->addRoute('GET', '/', HTTPHandler::getInstance($this->logger)->getHandler());
+            $httpHandler = HTTPHandler::getInstance($this->logger)->getHandler();
+            $router->addRoute('GET', '/', $httpHandler);
+            $router->addRoute('GET', '/{name:.+}', $httpHandler);
             $router->setFallback(new DocumentRoot($this->httpServer, $this->errorHandler, PATH_ROOT . '/public'));
 
             $this->httpServer->start($router, $this->errorHandler);
