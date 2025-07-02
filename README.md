@@ -21,6 +21,8 @@ Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
 - PHP 8.1+ (amphp, revolt)
 - whois, ipcalc (linux)
 
+![Image](https://github.com/user-attachments/assets/3579c35b-3d81-4a40-94d8-15a0807b44c6)
+
 # Форматы выгрузки
 | формат   | описание                      |
 |----------|-------------------------------|
