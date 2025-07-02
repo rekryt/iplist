@@ -95,6 +95,9 @@ export default defineNuxtConfig({
         output: {
             publicDir: path.join(__dirname, '../public/'),
         },
+        prerender: {
+            ignore: ['/index'],
+        }
     },
 
     compatibilityDate: '2025-06-28',

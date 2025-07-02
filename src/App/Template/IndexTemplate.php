@@ -628,7 +628,7 @@ use OpenCCK\App\Controller\MainController;
         <div class="github">
             <iframe src="https://ghbtns.com/github-btn.html?user=rekryt&amp;repo=iplist&amp;type=star&amp;count=true&amp;size=large" frameborder="0" scrolling="0" width="170" height="30" title="GitHub"></iframe>
         </div>
-        <form action="" method="get" class="main-form">
+        <form action="/" method="get" class="main-form">
             <section class="main-section">
                 <label class="main-formItem">
                     Format:

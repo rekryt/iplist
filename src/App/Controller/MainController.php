@@ -16,8 +16,12 @@ class MainController extends AbstractIPListController {
     public function getBody(): string {
         $url = parse_url($this->request->getUri());
         $path = str_replace('..', '', $url['path']);
-        $path = PATH_ROOT . '/public/' . $path;
 
+        if ($path === '/index') {
+            return $this->renderTemplate('index');
+        }
+
+        $path = PATH_ROOT . '/public/' . $path;
         foreach ([$path, $path . 'index.html', $path . '.html', $path . '/index.html'] as $filePath) {
             if (isFile($filePath)) {
                 return $this->output($filePath);

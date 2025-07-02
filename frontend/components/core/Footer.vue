@@ -2,7 +2,10 @@
 const { t } = useI18n({
     useScope: 'local',
 });
-const links = computed(() => [{ name: t('issue'), Link: 'https://github.com/rekryt/iplist/issues' }]);
+const links = computed(() => [
+    { name: t('issue'), Link: 'https://github.com/rekryt/iplist/issues' },
+    { name: t('lightVersion'), Link: '/index' },
+]);
 </script>
 <template>
     <v-footer id="core-footer">
@@ -24,13 +27,16 @@ const links = computed(() => [{ name: t('issue'), Link: 'https://github.com/rekr
 <i18n lang="json">
 {
     "en": {
-        "issue": "Issue"
+        "issue": "Issue",
+        "lightVersion": "Light version"
     },
     "ru": {
-        "issue": "Задать вопрос"
+        "issue": "Задать вопрос",
+        "lightVersion": "Лёгкая версия"
     },
     "cn": {
-        "issue": "提交问题"
+        "issue": "提交问题",
+        "lightVersion": "轻量版"
     }
 }
 </i18n>
