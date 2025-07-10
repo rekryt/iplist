@@ -42,28 +42,50 @@ const setSelectGroup = (item: { label: string; items: { label: string; value: st
         });
     }
 };
+const search = ref('');
+const itemsList = computed(() => {
+    return props.items
+        .map((item) => ({
+            ...item,
+            items: item.items.filter((i) => !search.value || search.value === '' || i.label.includes(search.value)),
+        }))
+        .filter((item) => !search.value || search.value === '' || item.items.length > 0);
+});
 </script>
 <i18n lang="json">
 {
     "en": {
         "cleanSelection": "Clear selection",
         "collapseAll": "Collapse all",
-        "expandAll": "Expand all"
+        "expandAll": "Expand all",
+        "search": "Search"
     },
     "ru": {
         "cleanSelection": "Очистить выбор",
         "collapseAll": "Свернуть всё",
-        "expandAll": "Развернуть всё"
+        "expandAll": "Развернуть всё",
+        "search": "Поиск"
     },
     "cn": {
         "cleanSelection": "清除选择",
         "collapseAll": "全部折叠",
-        "expandAll": "全部展开"
+        "expandAll": "全部展开",
+        "search": "搜索"
     }
 }
 </i18n>
 <template>
-    <v-row class="px-2 mb-1" justify="end">
+    <v-row align="center" class="px-2 mb-1">
+        <v-col cols="12" sm="6">
+            <v-text-field
+                v-model="search"
+                :label="t('search')"
+                variant="underlined"
+                clearable
+                hide-details
+            ></v-text-field>
+        </v-col>
+        <v-spacer></v-spacer>
         <v-col v-if="selected.length > 0" cols="auto">
             <v-btn @click="selected.splice(0)">{{ t('cleanSelection') }}</v-btn>
         </v-col>
@@ -75,7 +97,7 @@ const setSelectGroup = (item: { label: string; items: { label: string; value: st
         </v-col>
     </v-row>
     <v-expansion-panels v-model="panel" class="select px-2" multiple>
-        <v-expansion-panel v-for="(group, index) in items" :key="index" class="select" elevation="10">
+        <v-expansion-panel v-for="(group, index) in itemsList" :key="index" class="select" elevation="10">
             <v-expansion-panel-title class="select-title">
                 <v-checkbox
                     class="select-checkbox"
