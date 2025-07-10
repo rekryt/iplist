@@ -332,7 +332,7 @@ const submit = () => {
                             <v-tab value="groups">{{ t('groups') }}</v-tab>
                             <v-tab value="exclude">{{ t('exclude') }}</v-tab>
                         </v-tabs>
-                        <v-card-text>
+                        <v-card-text class="px-0">
                             <v-tabs-window v-model="tab">
                                 <v-tabs-window-item class="pt-2" value="portals">
                                     <base-form-portals
@@ -470,6 +470,6 @@ const submit = () => {
 </template>
 <style lang="scss">
 .baseForm {
-    max-width: 580px;
+    max-width: 920px;
 }
 </style>

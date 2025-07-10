@@ -36,7 +36,7 @@
                         Star
                     </github-button>
                 </v-col>
-                <v-col>
+                <v-col cols="auto">
                     <v-select
                         v-model="locale"
                         :items="localesList"

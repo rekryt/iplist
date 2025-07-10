@@ -84,9 +84,20 @@ export default defineNuxtConfig({
         },
     },
 
+    runtimeConfig: {
+        public: {
+            API_BASE_URL: process.env.API_BASE_URL ?? 'https://iplist.opencck.org/',
+        },
+    },
+
     nitro: {
         devProxy: {
             '/api': {
+                target: process.env.API_BASE_URL ?? 'https://iplist.opencck.org/',
+                hostRewrite: process.env.API_BASE_URL ?? 'https://iplist.opencck.org/',
+                changeOrigin: true,
+            },
+            '/favicon': {
                 target: process.env.API_BASE_URL ?? 'https://iplist.opencck.org/',
                 hostRewrite: process.env.API_BASE_URL ?? 'https://iplist.opencck.org/',
                 changeOrigin: true,
@@ -97,7 +108,7 @@ export default defineNuxtConfig({
         },
         prerender: {
             ignore: ['/index'],
-        }
+        },
     },
 
     compatibilityDate: '2025-06-28',
