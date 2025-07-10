@@ -1,0 +1,455 @@
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Optimizely -->
+<script type="text/javascript">
+    window.optimizely = window.optimizely || [];
+
+    function checkConsent() {
+        var hasAnalyticsConsent = false;
+
+        // Find the cookiehub cookie
+        var cookieMatch = document.cookie.match(/cookiehub=([^;]+)/);
+        var cookiehubValue = cookieMatch ? cookieMatch[1] : null;
+
+        if (cookiehubValue) {
+            try {
+                // Decode base64 and parse JSON
+                var jsonString = atob(cookiehubValue);
+                var consentData = JSON.parse(jsonString);
+
+                /*
+                 * Category to purpose mapping for reference:
+                 * Category 1: necessary
+                 * Category 2: preferences
+                 * Category 3: analytics
+                 * Category 4: marketing
+                 * Category 5: uncategorized
+                 */
+
+                // Check for analytics consent (category 3)
+               if (consentData.allAllowed === true ||
+                    (Array.isArray(consentData.categories) && consentData.categories.indexOf(3) !== -1)) {
+                    hasAnalyticsConsent = true;
+                }
+
+            } catch (error) {
+                console.error('Error processing cookiehub consent:', error);
+            }
+        }
+
+        // Set Optimizely based on consent status
+        if (hasAnalyticsConsent) {
+            window.optimizely.push({type: "sendEvents"});
+            clearInterval(pollInterval);
+        } else {
+            window.optimizely.push({type: "holdEvents"});
+        }
+    }
+
+    // Set up polling (will stop after consent is granted)
+    var pollInterval = setInterval(checkConsent, 500);
+
+    // Check consent initially
+    checkConsent();
+</script>
+
+<script src="https://resources.jetbrains.com/storage/optly/26613100737.js">
+    // www.jetbrains.com
+</script>
+<!-- End Optimizely --><!-- Error reporting -->
+<script>(function(){
+  window.reportError = function(msg, file, line, col, err, isUnhandledRejection){};
+  var prevOnError = window.onerror;
+  var onError = function(msg, file, line, col, err) {
+    reportError(msg, file, line, col, err, false);
+    prevOnError && prevOnError.apply(window, arguments);
+    return false;
+  };
+  window.onerror = onError;
+  // Setup reporting for unhandled Promise rejection errors
+  window.addEventListener("unhandledrejection", function(e) {
+    if (!e.reason) return;
+    var l = getSrcLocation(e.reason);
+    reportError(e.reason.message, l.file, l.line, l.col, e.reason, true);
+  });
+  // Setup reporting for console.error and console.warn calls
+  patchConsole('error');
+  patchConsole('warn');
+  // Utility functions
+  function patchConsole(fnName) {
+    var fn = console[fnName];
+    console[fnName] = function() {
+      fn.apply(console, arguments);
+      var l; try {
+        throw new Error('_');
+      } catch (err) {
+        l = getSrcLocation(err, 1);
+      }
+      var msg = 'console.' + fnName + ': ' + Array.prototype.join.call(arguments, ' ');
+      reportError(msg, l.file, l.line, l.col, undefined, false);
+    };
+  }
+  function getSrcLocation(err, sd) {
+    var s = err && err.stack;
+    var l = s && s.split("\n")[1 + (sd|0)];
+    var r = l && (/^\s*at [^(]*\((.*?):(\d+)(:\d+)?\)$/.exec(l) || /^\s*at (.*?):(\d+)(:\d+)?$/.exec(l));
+    return r ? {file: r[1], line: r[2], col: r[3]} : {};
+  }
+})();</script>
+<!-- Error reporting --><!-- Google Tag Manager -->
+<script>(function() {
+  // Initialize Tag Manager queue
+  window.dataLayer = window.dataLayer || [];
+  window.gtmLoaded = false;
+  // Setup reporting for errors that occurred before Tag Manager initialized
+  var prevReportError = window.reportError;
+  var reportError = function(msg, file, line, col, err, isUnhandledRejection) {
+    if (!window.gtmLoaded || isUnhandledRejection) {
+      // Reproduce the behavior of the Tag Manager error handler
+      window.dataLayer.push(makeEvt(msg, file, line));
+    }
+    prevReportError && prevReportError.apply(window, arguments);
+  };
+  window.reportError = reportError;
+  // Utility functions
+  function makeEvt(msg, file, line) {
+    return {
+      event: "gtm.pageError", "gtm.errorMessage": msg,
+      "gtm.errorUrl": file, "gtm.errorLineNumber": line
+    };
+  }
+})();</script>
+<script>(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+  new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+  j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+  'https://www.googletagmanager.com/gtm.js?id='+i+dl;j.addEventListener(
+    'load', function(){window.gtmLoaded=true});f.parentNode.insertBefore(j,f);
+})(window,document,'script','dataLayer','GTM-5P98');</script>
+<!-- End Google Tag Manager -->
+<title>Grazie: AI writing companion for people in tech</title>
+
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, maximum-scale=1">
+
+
+<link rel="icon" href="/favicon.ico?r=1234" type="image/x-icon"><!-- 48×48 -->
+<link rel="icon" href="/icon.svg?r=1234" type="image/svg+xml" sizes="any">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png?r=1234" sizes="180x180"><!-- 180×180 -->
+<link rel="icon" href="/icon-512.png?r=1234" type="image/png" sizes="512x512">
+<link rel="manifest" href="/site.webmanifest" crossorigin="use-credentials">
+
+<meta name="apple-mobile-web-app-title" content="JetBrains">
+<meta name="application-name" content="JetBrains">
+<meta name="msapplication-TileColor" content="#000000">
+<meta name="theme-color" content="#000000">
+<link rel="canonical" href="https://www.jetbrains.com/grazie/"/><!-- .434-->
+<meta name="description" class="local" content="Streamline non-coding tasks by integrating generative AI into your JetBrains IDEs, browser, and other tools.">
+<meta name="image" content="https://resources.jetbrains.com/storage/products/grazie/img/meta/preview.png" class="local" />
+
+<!-- Schema.org markup -->
+<meta itemprop="name" class="local" content="Grazie: AI writing companion for people in tech">
+<meta itemprop="description" class="local" content="Streamline non-coding tasks by integrating generative AI into your JetBrains IDEs, browser, and other tools.">
+<meta itemprop="image" class="local" content="https://resources.jetbrains.com/storage/products/grazie/img/meta/preview.png">
+<!-- End Schema.org markup -->
+
+<!-- Twitter Card data -->
+<meta name="twitter:card" class="local" content="summary_large_image">
+<meta name="twitter:site" class="local" content="@grazie">
+<meta name="twitter:title" class="local" content="Grazie: AI writing companion for people in tech">
+<meta name="twitter:description" class="local" content="Streamline non-coding tasks by integrating generative AI into your JetBrains IDEs, browser, and other tools.">
+<meta name="twitter:creator" class="local" content="@grazie">
+<meta name="twitter:image:src" class="local" content="https://resources.jetbrains.com/storage/products/grazie/img/meta/preview.png">
+<!-- End Twitter Card data -->
+
+
+    <link rel="alternate" hreflang="x-default" href="https://www.jetbrains.com/grazie/" />
+
+                        <link rel="alternate" hreflang="en" href="https://www.jetbrains.com/grazie/" />
+                                                            <link rel="alternate" hreflang="en-CN" href="https://www.jetbrains.com.cn/en-us/grazie/" />
+                                                                        <link rel="alternate" hreflang="de" href="https://www.jetbrains.com/de-de/grazie/" />
+                                                                                                    <link rel="alternate" hreflang="es" href="https://www.jetbrains.com/es-es/grazie/" />
+                                                                                                    <link rel="alternate" hreflang="fr" href="https://www.jetbrains.com/fr-fr/grazie/" />
+                                                                                                    <link rel="alternate" hreflang="ja" href="https://www.jetbrains.com/ja-jp/grazie/" />
+                                                                                                    <link rel="alternate" hreflang="ko" href="https://www.jetbrains.com/ko-kr/grazie/" />
+                                                                                                    <link rel="alternate" hreflang="ru" href="https://www.jetbrains.com/ru-ru/grazie/" />
+                                                                                                    <link rel="alternate" hreflang="zh-Hans" href="https://www.jetbrains.com/zh-cn/grazie/" />
+                                            <link rel="alternate" hreflang="zh-CN" href="https://www.jetbrains.com.cn/grazie/" />
+                                                                                        <link rel="alternate" hreflang="pt-BR" href="https://www.jetbrains.com/pt-br/grazie/" />
+                                                                                
+
+
+<link rel="preconnect" href="https://resources.jetbrains.com" crossorigin>
+
+
+<script>
+    default_site_language = 'en-us';
+    var current_lang = 'en-us';
+                var i18n_info = {"current_lang": "en-us", "languages": [{"canonical": "en", "code": "en-us", "label": "English", "page_translated": true, "url": "/grazie/"}, {"canonical": "de", "code": "de-de", "label": "Deutsch", "page_translated": true, "url": "/de-de/grazie/"}, {"canonical": "es", "code": "es-es", "label": "Espa\u00f1ol", "page_translated": true, "url": "/es-es/grazie/"}, {"canonical": "fr", "code": "fr-fr", "label": "Fran\u00e7ais", "page_translated": true, "url": "/fr-fr/grazie/"}, {"canonical": "ja", "code": "ja-jp", "label": "\u65e5\u672c\u8a9e", "page_translated": true, "url": "/ja-jp/grazie/"}, {"canonical": "ko", "code": "ko-kr", "label": "\ud55c\uad6d\uc5b4", "page_translated": true, "url": "/ko-kr/grazie/"}, {"canonical": "ru", "code": "ru-ru", "label": "\u0420\u0443\u0441\u0441\u043a\u0438\u0439", "page_translated": true, "url": "/ru-ru/grazie/"}, {"canonical": "zh-Hans", "code": "zh-cn", "label": "\u7b80\u4f53\u4e2d\u6587", "page_translated": true, "url": "/zh-cn/grazie/"}, {"canonical": "pt-BR", "code": "pt-br", "label": "Portugu\u00eas do Brasil", "page_translated": true, "url": "/pt-br/grazie/"}]};
+            var navigationMenu = {"primary": {"items": [{"title": "AI", "id": "ai", "banners": [{"isActive": false, "title": "JetBrains AI", "description": "Customize your workflow with AI built for you", "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/ai/ai.svg", "actionLabel": "Learn more", "url": "/ai/", "isUrlShouldBeLocalized": true, "bgColor": "#510EB2", "bgGradient": "linear-gradient(223deg, #3B74EE 9.79%, #510EB2 54.42%)", "cleaned_url": "/ai/"}], "submenu": {"columns": [{"title": "AI TOOLS & SERVICES", "layout": "4 4 4", "subColumns": [{"items": [{"isActive": false, "title": "JetBrains AI", "url": "/ai/", "isUrlShouldBeLocalized": true, "description": "JetBrains' AI ecosystem for software development", "cleaned_url": "/ai/"}, {"isActive": false, "title": "AI in IDEs", "url": "/ai-ides/", "isUrlShouldBeLocalized": true, "description": "All JetBrains AI features \u2012 right in your IDE", "cleaned_url": "/ai-ides/"}]}, {"items": [{"isActive": false, "title": "AI Enterprise", "url": "/ide-services/ai-enterprise/", "isUrlShouldBeLocalized": true, "description": "Fine-grained control over AI tools for businesses", "cleaned_url": "/ide-services/ai-enterprise/"}, {"isActive": false, "title": "AI Assistant", "url": "/ai-assistant/", "isUrlShouldBeLocalized": true, "description": "Intelligent coding assistance built into your workflow", "cleaned_url": "/ai-assistant/"}]}, {"items": [{"isActive": false, "title": "Junie", "url": "/junie/", "isUrlShouldBeLocalized": true, "description": "Smart coding agent in your IDE", "cleaned_url": "/junie/"}, {"isActive": false, "title": "AI Blog", "url": "https://blog.jetbrains.com/ai/", "description": "Our latest AI news and product updates", "cleaned_url": "https://blog.jetbrains.com/ai/"}]}]}]}, "priority": 0}, {"title": "Developer Tools", "id": "developer-tools", "banners": [{"isActive": false, "title": "DataGrip", "description": "Many databases, one tool", "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/datagrip/datagrip.svg", "actionLabel": "Learn more", "url": "/datagrip/", "isUrlShouldBeLocalized": true, "bgColor": "#4E009B", "bgGradient": "linear-gradient(243deg, #25D18D -1.01%, #6A72DF 39.63%, #4E009B 98.44%)", "cleaned_url": "/datagrip/"}, {"isActive": false, "title": "Junie by JetBrains", "description": "Your smart coding agent for JetBrains IDEs", "logoSrc": "/img/banners-menu-main/junie.svg", "actionLabel": "Learn more", "url": "/junie/", "isUrlShouldBeLocalized": true, "bgColor": "#2D2D2D", "bgGradient": "linear-gradient(222deg, #2D2D2D 9.59%, #232323 54.35%)", "bgImageSrc": "/img/banners-menu-main/junie-vertical.png", "horizontalBgImageSrc": "/img/banners-menu-main/junie-horizontal.png", "cleaned_url": "/junie/"}], "suggestions": [{"isActive": false, "url": "/products/", "isUrlShouldBeLocalized": true, "title": "Not sure which tool is best for you?", "description": "Whichever technologies you use, there's a JetBrains tool to match", "actionLabel": "Find your tool", "cleaned_url": "/products/"}], "submenu": {"layout": "auto-fill inline inline inline", "columns": [{"title": "JETBRAINS IDEs", "mobileLayout": "forceTwoColumns", "subColumns": [{"items": [{"isActive": false, "title": "All IDEs", "url": "/ides/", "isUrlShouldBeLocalized": true, "cleaned_url": "/ides/"}, {"isActive": false, "title": "CLion", "url": "/clion/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/clion/clion.svg", "cleaned_url": "/clion/"}, {"isActive": false, "title": "DataGrip", "url": "/datagrip/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/datagrip/datagrip.svg", "cleaned_url": "/datagrip/"}, {"isActive": false, "title": "DataSpell", "url": "/dataspell/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/dataspell/dataspell.svg", "cleaned_url": "/dataspell/"}, {"isActive": false, "title": "Fleet", "url": "/fleet/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/fleet/fleet.svg", "cleaned_url": "/fleet/"}, {"isActive": false, "title": "GoLand", "url": "/go/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/goland/goland.svg", "cleaned_url": "/go/"}]}, {"items": [{"isActive": false, "title": "IntelliJ&nbsp;IDEA", "url": "/idea/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/intellij-idea/intellij-idea.svg", "cleaned_url": "/idea/"}, {"isActive": false, "title": "PhpStorm", "url": "/phpstorm/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/phpstorm/phpstorm.svg", "cleaned_url": "/phpstorm/"}, {"isActive": false, "title": "PyCharm", "url": "/pycharm/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/pycharm/pycharm.svg", "cleaned_url": "/pycharm/"}, {"isActive": false, "title": "Rider", "url": "/rider/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/rider/rider.svg", "cleaned_url": "/rider/"}, {"isActive": false, "title": "RubyMine", "url": "/ruby/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/rubymine/rubymine.svg", "cleaned_url": "/ruby/"}, {"isActive": false, "title": "RustRover", "url": "/rust/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/rustrover/rustrover.svg", "cleaned_url": "/rust/"}, {"isActive": false, "title": "WebStorm", "url": "/webstorm/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/webstorm/webstorm.svg", "cleaned_url": "/webstorm/"}]}]}, {"title": "PLUGINS & SERVICES", "mobileLayout": "forceTwoColumns", "items": [{"isActive": false, "title": "All Plugins", "url": "https://plugins.jetbrains.com/", "cleaned_url": "https://plugins.jetbrains.com/"}, {"isActive": false, "title": "AI in IDEs", "url": "/ai-ides/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/ai/ai.svg", "cleaned_url": "/ai-ides/"}, {"isActive": false, "title": "IDE Themes", "url": "https://plugins.jetbrains.com/search?tags=Theme", "cleaned_url": "https://plugins.jetbrains.com/search?tags=Theme"}, {"isActive": false, "title": "Big Data Tools", "url": "https://plugins.jetbrains.com/plugin/12494-big-data-tools", "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/big-data-tools/big-data-tools.svg", "cleaned_url": "https://plugins.jetbrains.com/plugin/12494-big-data-tools"}, {"isActive": false, "title": "Code With Me", "url": "/code-with-me/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/code-with-me/code-with-me.svg", "cleaned_url": "/code-with-me/"}, {"isActive": false, "title": "RiderFlow", "url": "/riderflow/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/riderflow/riderflow.svg", "cleaned_url": "/riderflow/"}, {"isActive": false, "title": "Scala", "url": "https://plugins.jetbrains.com/plugin/1347-scala", "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/scala/scala.svg", "cleaned_url": "https://plugins.jetbrains.com/plugin/1347-scala"}, {"isActive": false, "title": "Toolbox App", "url": "/toolbox-app/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/toolbox/toolbox.svg", "cleaned_url": "/toolbox-app/"}, {"isActive": true, "title": "Grazie", "url": "/grazie/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/grazie/grazie.svg", "cleaned_url": "/grazie/"}, {"isActive": false, "title": "Junie", "url": "/junie/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/products/junie/img/junie.svg", "cleaned_url": "/junie/"}]}, {"title": ".NET & VISUAL STUDIO", "hasSeparator": true, "items": [{"isActive": false, "title": "Rider", "url": "/rider/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/rider/rider.svg", "cleaned_url": "/rider/"}, {"isActive": false, "title": "ReSharper", "url": "/resharper/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/resharper/resharper.svg", "cleaned_url": "/resharper/"}, {"isActive": false, "title": "ReSharper C++", "url": "/resharper-cpp/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/resharper-cpp/resharper-cpp.svg", "cleaned_url": "/resharper-cpp/"}, {"isActive": false, "title": "dotCover", "url": "/dotcover/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/dotcover/dotcover.svg", "cleaned_url": "/dotcover/"}, {"isActive": false, "title": "dotMemory", "url": "/dotmemory/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/dotmemory/dotmemory.svg", "cleaned_url": "/dotmemory/"}, {"isActive": false, "title": "dotPeek", "url": "/decompiler/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/dotpeek/dotpeek.svg", "cleaned_url": "/decompiler/"}, {"isActive": false, "title": "dotTrace", "url": "/profiler/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/dottrace/dottrace.svg", "cleaned_url": "/profiler/"}, {"isActive": false, "title": ".NET Tools Plugins", "url": "https://plugins.jetbrains.com/search?isFeaturedSearch=true&products=resharper&products=rider", "cleaned_url": "https://plugins.jetbrains.com/search?isFeaturedSearch=true&products=resharper&products=rider"}]}, {"title": "LANGUAGES & FRAMEWORKS", "hasSeparator": true, "items": [{"isActive": false, "title": "Kotlin", "url": "https://kotlinlang.org/", "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/kotlin/kotlin.svg", "cleaned_url": "https://kotlinlang.org/"}, {"isActive": false, "title": "Ktor", "url": "https://ktor.io/", "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/ktor/ktor.svg", "cleaned_url": "https://ktor.io/"}, {"isActive": false, "title": "Exposed", "url": "/exposed/", "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/products/exposed/img/exposed.svg", "cleaned_url": "/exposed/"}, {"isActive": false, "title": "MPS", "url": "/mps/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/mps/mps.svg", "cleaned_url": "/mps/"}, {"isActive": false, "title": "Compose Multiplatform", "url": "/compose-multiplatform/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/compose-multiplatform/compose-multiplatform.svg", "cleaned_url": "/compose-multiplatform/"}]}]}, "priority": 3}, {"title": "Team Tools", "id": "team-tools", "banners": [{"isActive": false, "title": "Datalore", "description": "A collaborative data science platform. Available online and on-premises", "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/datalore/datalore.svg", "actionLabel": "Learn more", "url": "/datalore/", "isUrlShouldBeLocalized": true, "bgColor": "#005CD1", "bgGradient": "linear-gradient(120.81deg, #003396 11.31%, #009CF4 95.37%)", "cleaned_url": "/datalore/"}, {"isActive": false, "title": "YouTrack", "description": "Powerful project management for all your teams", "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/youtrack/youtrack.svg", "actionLabel": "Learn more", "url": "/youtrack/", "isUrlShouldBeLocalized": true, "bgColor": "#6B57FF", "bgGradient": "linear-gradient(313deg, #D919D0 10.26%, #BC003C 91.89%)", "cleaned_url": "/youtrack/"}], "submenu": {"layout": "8 4", "columns": [{"title": "IN-CLOUD AND ON-PREMISES SOLUTIONS", "subColumns": [{"items": [{"isActive": false, "title": "Datalore", "url": "/datalore/", "isUrlShouldBeLocalized": true, "description": "A collaborative data science platform", "cleaned_url": "/datalore/"}, {"isActive": false, "title": "TeamCity", "url": "/teamcity/", "isUrlShouldBeLocalized": true, "description": "Powerful Continuous Integration out of the box", "cleaned_url": "/teamcity/"}, {"isActive": false, "title": "CodeCanvas", "url": "/codecanvas/", "isUrlShouldBeLocalized": true, "description": "Cloud development environments for your infrastructure", "cleaned_url": "/codecanvas/"}]}, {"items": [{"isActive": false, "title": "YouTrack", "url": "/youtrack/", "isUrlShouldBeLocalized": true, "description": "Powerful project management for all your teams", "cleaned_url": "/youtrack/"}, {"isActive": false, "title": "Qodana", "url": "/qodana/", "isUrlShouldBeLocalized": true, "description": "The code quality platform for teams", "cleaned_url": "/qodana/"}]}]}, {"title": "EXTENSIONS", "hasSeparator": true, "items": [{"isActive": false, "title": "TeamCity Plugins", "url": "https://plugins.jetbrains.com/teamcity/", "cleaned_url": "https://plugins.jetbrains.com/teamcity/"}, {"isActive": false, "title": "YouTrack Extensions", "url": "https://plugins.jetbrains.com/youtrack/", "cleaned_url": "https://plugins.jetbrains.com/youtrack/"}, {"isActive": false, "title": "JetBrains Hub", "url": "/hub/", "isUrlShouldBeLocalized": true, "cleaned_url": "/hub/"}]}]}, "priority": 2}, {"title": "Education", "id": "education", "banners": [{"isActive": false, "title": "JetBrains Academy", "description": "Jump-start your career with essential developer skills", "actionLabel": "Discover more", "url": "/academy/", "isUrlShouldBeLocalized": true, "logoSrc": "${RESOURCES_URL_PLACEHOLDER}/storage/logos/web/jetbrains-academy/jetbrains-academy.svg", "bgColor": "#B01DF6", "bgGradient": "linear-gradient(335.07deg, #636CEA 0%, #834CEF 40.63%, #771F89 100%)", "cleaned_url": "/academy/"}], "submenu": {"columns": [{"title": "LEARN", "layout": "11 11 11", "subColumns": [{"items": [{"isActive": false, "title": "Course catalog", "url": "https://academy.jetbrains.com/", "isUrlShouldBeLocalized": false, "description": "130+ courses to learn programming, AI, data science, and more", "cleaned_url": "https://academy.jetbrains.com/"}, {"isActive": false, "title": "University programs", "url": "/education/university-programs/", "isUrlShouldBeLocalized": true, "description": "Study in Europe with JetBrains scholarships", "cleaned_url": "/education/university-programs/"}, {"isActive": false, "title": "Internships", "url": "/careers/internships/", "isUrlShouldBeLocalized": true, "description": "Apply now to join our team", "cleaned_url": "/careers/internships/"}, {"isActive": false, "title": "For teams", "url": "/academy/organizations/", "isUrlShouldBeLocalized": true, "description": "Project-based learning to upskill your team", "cleaned_url": "/academy/organizations/"}]}]}, {"title": "TEACH", "layout": "11 11 11", "subColumns": [{"items": [{"isActive": false, "title": "Teaching with JetBrains IDEs", "url": "/academy/teaching/", "isUrlShouldBeLocalized": true, "description": "Create courses for the next generation of developers", "cleaned_url": "/academy/teaching/"}, {"isActive": false, "title": "Kotlin for education", "url": "https://kotlinlang.org/education/", "isUrlShouldBeLocalized": true, "description": "Teach computer science with Kotlin", "cleaned_url": "https://kotlinlang.org/education/"}]}]}, {"title": "FREE LICENSES", "layout": "11 11 11", "hasSeparator": true, "items": [{"isActive": false, "title": "For students", "url": "/academy/student-pack/", "isUrlShouldBeLocalized": true, "cleaned_url": "/academy/student-pack/"}, {"isActive": false, "title": "For teachers", "url": "/academy/teacher-pack/#individuals", "isUrlShouldBeLocalized": true, "cleaned_url": "/academy/teacher-pack/#individuals"}, {"isActive": false, "title": "For educational institutions", "url": "/academy/teacher-pack/#classrooms", "isUrlShouldBeLocalized": true, "cleaned_url": "/academy/teacher-pack/#classrooms"}, {"isActive": false, "title": "For bootcamps and courses", "url": "/academy/bootcamps/", "isUrlShouldBeLocalized": true, "cleaned_url": "/academy/bootcamps/"}]}, {"title": "COMMUNITY", "layout": "11 11 11", "hasSeparator": true, "items": [{"isActive": false, "title": "ICPC collaboration", "url": "/icpc/", "isUrlShouldBeLocalized": true, "description": "Events, news, and offers", "cleaned_url": "/icpc/"}]}]}, "priority": 1}, {"title": "Solutions", "id": "solutions", "banners": [{"isActive": false, "title": "Developer Tools for Your Business", "description": "Professional tools for productive development", "actionLabel": "Learn more", "url": "/business/", "isUrlShouldBeLocalized": true, "logoSrc": "/img/banners-menu-main/containers.svg", "bgColor": "#6B57FF", "bgGradient": "linear-gradient(246.1deg, rgb(0 224 214) 1.67%, rgb(126 27 253) 92.48%)", "cleaned_url": "/business/"}, {"isActive": false, "title": "Remote Development", "description": "Connect to remote dev environments from anywhere in seconds", "actionLabel": "Discover more", "url": "/remote-development/", "isUrlShouldBeLocalized": true, "bgColor": "#2DF388", "bgGradient": "linear-gradient(240.88deg, #2DF388 0%, #05BF87 37.75%, #027474 98.39%)", "cleaned_url": "/remote-development/"}], "submenu": {"layout": "8 4", "columns": [{"title": "BY INDUSTRY & TECHNOLOGY", "layout": "6 6", "subColumns": [{"items": [{"isActive": false, "title": "Remote Development", "url": "/remote-development/", "isUrlShouldBeLocalized": true, "description": "Tools for remote development for you and your team", "cleaned_url": "/remote-development/"}, {"isActive": false, "title": "Game Development", "url": "/gamedev/", "isUrlShouldBeLocalized": true, "description": "Tools for game development for any platform", "cleaned_url": "/gamedev/"}, {"isActive": false, "title": "DevOps", "url": "/devops/", "isUrlShouldBeLocalized": true, "description": "Tools and integrations for any infrastructure", "cleaned_url": "/devops/"}, {"isActive": false, "title": "Multiplatform Development", "url": "/kotlin-multiplatform/", "isUrlShouldBeLocalized": true, "description": "Flexible cross-platform development with Kotlin", "cleaned_url": "/kotlin-multiplatform/"}, {"isActive": false, "title": "JetBrains Kotlin Ecosystem", "url": "/kotlin-ecosystem/", "isUrlShouldBeLocalized": true, "description": "Unified tech stack to build for your target platforms", "cleaned_url": "/kotlin-ecosystem/"}]}, {"items": [{"isActive": false, "title": "JetBrains AI Solutions", "url": "/ai/", "isUrlShouldBeLocalized": true, "description": " AI-powered developer tooling", "cleaned_url": "/ai/"}, {"isActive": false, "title": "C++ Tools", "url": "/cpp/", "isUrlShouldBeLocalized": true, "description": "Tools for C/C++ development for any platform", "cleaned_url": "/cpp/"}, {"isActive": false, "title": "Data Tools", "url": "/data-tools/", "isUrlShouldBeLocalized": true, "description": "Tools for Big Data and Data Science", "cleaned_url": "/data-tools/"}, {"isActive": false, "title": "JetBrains IDE Services", "url": "/ide-services/", "isUrlShouldBeLocalized": true, "description": "Developer productivity at the scale of an organization", "cleaned_url": "/ide-services/"}]}]}, {"title": "RECOMMENDED", "hasSeparator": true, "items": [{"isActive": false, "title": "JetBrains Tools for Business", "url": "/business/", "isUrlShouldBeLocalized": true, "cleaned_url": "/business/"}, {"isActive": false, "title": "All Products Pack", "url": "/all/", "isUrlShouldBeLocalized": true, "cleaned_url": "/all/"}, {"isActive": false, "title": ".NET Tools", "url": "/dotnet/", "isUrlShouldBeLocalized": true, "cleaned_url": "/dotnet/"}, {"isActive": false, "title": "All JetBrains Products", "url": "/products/", "isUrlShouldBeLocalized": true, "cleaned_url": "/products/"}, {"isActive": false, "title": "JetBrains Marketplace", "url": "https://plugins.jetbrains.com/", "cleaned_url": "https://plugins.jetbrains.com/"}, {"isActive": false, "title": "The JetBrains Guide", "url": "/guide/", "cleaned_url": "/guide/"}]}]}, "priority": 0}, {"title": "Support", "id": "support", "banners": [{"isActive": false, "title": "Download and Install", "actionLabel": "Download and Install", "url": "/products/", "isUrlShouldBeLocalized": true, "logoSrc": "/img/banners-menu-main/download.svg", "bgColor": "#6B57FF", "bgGradient": "linear-gradient(294.91deg, #FF318C -50.1%, #6B57FF 97.43%)", "cleaned_url": "/products/"}, {"isActive": false, "title": "Contact us", "actionLabel": "Contact us", "url": "/company/contacts/", "isUrlShouldBeLocalized": true, "logoSrc": "/img/banners-menu-main/message.svg", "bgColor": "#21D789", "bgGradient": "linear-gradient(283.8deg, #087CFA 5.73%, #21D789 100%)", "cleaned_url": "/company/contacts/"}], "submenu": {"columns": [{"title": "PRODUCT & TECHNICAL SUPPORT", "layout": "12", "subColumns": [{"items": [{"isActive": false, "title": "Support Center", "url": "/support/", "isUrlShouldBeLocalized": true, "cleaned_url": "/support/"}, {"isActive": false, "title": "Product-Specific Information", "url": "/business/documents/", "isUrlShouldBeLocalized": true, "cleaned_url": "/business/documents/"}, {"isActive": false, "title": "Product Documentation", "url": "/help/", "isUrlShouldBeLocalized": true, "cleaned_url": "/help/"}, {"isActive": false, "title": "The JetBrains Guide", "url": "/guide/", "cleaned_url": "/guide/"}, {"isActive": false, "title": "Livestreams", "url": "/company/livestreams/", "isUrlShouldBeLocalized": true, "cleaned_url": "/company/livestreams/"}, {"isActive": false, "title": "Newsletters", "url": "/resources/newsletters/", "isUrlShouldBeLocalized": true, "cleaned_url": "/resources/newsletters/"}, {"isActive": false, "title": "Early Access", "url": "/resources/eap/", "isUrlShouldBeLocalized": true, "cleaned_url": "/resources/eap/"}, {"isActive": false, "title": "Blog", "url": "https://blog.jetbrains.com/", "isUrlShouldBeLocalized": true, "cleaned_url": "https://blog.jetbrains.com/"}]}]}, {"title": "FREQUENT TASKS", "hasSeparator": true, "items": [{"isActive": false, "title": "Manage your account", "url": "https://account.jetbrains.com/profile-details", "cleaned_url": "https://account.jetbrains.com/profile-details"}, {"isActive": false, "title": "Manage your licenses", "url": "https://account.jetbrains.com/licenses", "cleaned_url": "https://account.jetbrains.com/licenses"}, {"isActive": false, "title": "Contact Sales", "url": "/support/sales/", "isUrlShouldBeLocalized": true, "cleaned_url": "/support/sales/"}, {"isActive": false, "title": "Licensing FAQ", "url": "https://sales.jetbrains.com", "isUrlShouldBeLocalized": true, "cleaned_url": "https://sales.jetbrains.com"}]}]}, "priority": 2}, {"title": "Store", "id": "store", "banners": [{"isActive": false, "title": "All Products Pack", "description": "Get all JetBrains desktop tools including 10&nbsp;IDEs,<br />2&nbsp;profilers, and 3&nbsp;extensions", "actionLabel": "Learn more", "url": "/all/", "isUrlShouldBeLocalized": true, "logoSrc": "/img/banners-menu-main/sale.svg", "bgColor": "#FF318C", "bgGradient": "linear-gradient(293.2deg, rgb(253 13 122) 13.45%, rgb(252 100 67) 73.57%, rgb(248 158 7) 100%)", "cleaned_url": "/all/"}], "submenu": {"columns": [{"title": "DEVELOPER TOOLS", "layout": "12 12 12", "subColumns": [{"items": [{"isActive": false, "title": "For Individual Use", "url": "/store/#personal", "isUrlShouldBeLocalized": true, "cleaned_url": "/store/#personal"}, {"isActive": false, "title": "For Teams and Organizations", "url": "/store/#commercial", "isUrlShouldBeLocalized": true, "cleaned_url": "/store/#commercial"}, {"isActive": false, "title": "Special offers & programs", "url": "/store/#discounts", "isUrlShouldBeLocalized": true, "cleaned_url": "/store/#discounts"}]}, {"title": "SERVICES & PLUGINS", "items": [{"isActive": false, "title": "JetBrains AI", "url": "/ai-ides/buy/", "isUrlShouldBeLocalized": true, "cleaned_url": "/ai-ides/buy/"}, {"isActive": false, "title": "Marketplace", "url": "/store/plugins/", "isUrlShouldBeLocalized": true, "cleaned_url": "/store/plugins/"}]}, {"title": "LEARNING TOOLS", "items": [{"isActive": false, "title": "JetBrains Academy", "url": "/academy/buy/", "isUrlShouldBeLocalized": true, "cleaned_url": "/academy/buy/"}]}]}, {"title": "TEAM TOOLS", "layout": "12 12 12", "subColumns": [{"items": [{"isActive": false, "title": "TeamCity", "url": "/store/teamware#teamcity-store-section", "isUrlShouldBeLocalized": true, "cleaned_url": "/store/teamware#teamcity-store-section"}, {"isActive": false, "title": "YouTrack", "url": "/store/teamware#youtrack-store-section", "isUrlShouldBeLocalized": true, "cleaned_url": "/store/teamware#youtrack-store-section"}, {"isActive": false, "title": "Datalore", "url": "/datalore/", "isUrlShouldBeLocalized": true, "cleaned_url": "/datalore/"}, {"isActive": false, "title": "Qodana", "url": "/qodana/buy/", "isUrlShouldBeLocalized": true, "cleaned_url": "/qodana/buy/"}, {"isActive": false, "title": "CodeCanvas", "url": "/codecanvas/", "isUrlShouldBeLocalized": true, "cleaned_url": "/codecanvas/"}]}, {"title": "COLLABORATIVE DEVELOPMENT", "items": [{"isActive": false, "title": "Code With Me", "url": "/code-with-me/buy/", "isUrlShouldBeLocalized": true, "cleaned_url": "/code-with-me/buy/"}]}]}, {"title": "SALES SUPPORT", "hasSeparator": true, "items": [{"isActive": false, "title": "Contact Sales", "url": "/support/sales/", "isUrlShouldBeLocalized": true, "cleaned_url": "/support/sales/"}, {"isActive": false, "title": "Purchase Terms", "url": "/legal/docs/store/terms/", "isUrlShouldBeLocalized": true, "cleaned_url": "/legal/docs/store/terms/"}, {"isActive": false, "title": "FAQ", "url": "https://sales.jetbrains.com/", "isUrlShouldBeLocalized": true, "cleaned_url": "https://sales.jetbrains.com/"}, {"isActive": false, "title": "Partners and Resellers", "url": "/company/partners/", "isUrlShouldBeLocalized": true, "cleaned_url": "/company/partners/"}]}]}, "priority": 3}, {"isActive": false, "id": "login", "title": "Login", "url": "https://account.jetbrains.com/", "isMobileOnly": true, "cleaned_url": "https://account.jetbrains.com/"}]}, "secondary": {"isActive": true, "id": "product_grazie", "url": "/grazie/", "title": "Grazie", "isThemeDark": true, "items": [{"isActive": false, "title": "Blog", "url": "https://blog.jetbrains.com/grazie/", "cleaned_url": "https://blog.jetbrains.com/grazie/"}, {"isActive": false, "title": "Documentation", "url": "/help/grazie-browser-extension/about-grazie.html", "cleaned_url": "/help/grazie-browser-extension/about-grazie.html"}, {"isActive": false, "title": "Download", "url": "/grazie/#products", "type": "button", "isButtonItem": true, "cleaned_url": "/grazie/#products"}], "cleaned_url": "/grazie/"}};
+    
+    var is_layout_adaptive = false;
+        is_layout_adaptive = true;
+    
+    var disable_language_picker = false;
+    
+    var localized_domains = [{"defaultLanguage": "en", "domain": "blog.jetbrains.com", "locales": {"de-de": "de", "en-us": "en", "es-es": "es", "fr-fr": "fr", "ja-jp": "ja", "ko-kr": "ko", "pt-br": "pt-br", "ru-ru": "ru", "zh-cn": "zh-hans"}, "pathsLocalization": false, "suffixDefault": false}, {"defaultLanguage": "en-us", "domain": "lp.jetbrains.com", "locales": {"de-de": "de-de", "en-us": "en-us", "es-es": "es-es", "fr-fr": "fr-fr", "ja-jp": "ja-jp", "ko-kr": "ko-kr", "pt-br": "pt-br", "ru-ru": "ru-ru", "zh-cn": "zh-cn"}, "pathsLocalization": true, "suffixDefault": false}, {"defaultLanguage": "en-us", "domain": "sales.jetbrains.com", "locales": {"de-de": "de", "en-us": "en-gb", "es-es": "es", "fr-fr": "fr", "ja-jp": "ja", "ko-kr": "ko", "pt-br": "pt-br", "ru-ru": "ru", "zh-cn": "zh-cn"}, "pathsLocalization": true, "prefixPath": "hc", "suffixDefault": true}];
+
+    var english_only_url_prefixes = [];
+    
+    var is_landing_view = false;
+    
+    var theme = 'light';
+</script>
+
+<script></script>
+
+
+
+        <link href="/_assets/common.fede44e47c374964e5b5.css" rel="stylesheet" type="text/css">
+<link href="/_assets/default-page.10e1d69f8c039d1048a3.css" rel="stylesheet" type="text/css">
+<link href="/_assets/grazie/index.entry.01d12efcbf6bb9d002de.css" rel="stylesheet" type="text/css">
+<script src="/_assets/common.f86c73a665a1c1ba1f1f.js" type="text/javascript"></script>
+<script src="/_assets/default-page.e632dd664d1dbd6efa9b.js" type="text/javascript"></script>
+<script src="/_assets/lottie-web.728ed4ae93a85b998d79.js" type="text/javascript"></script>
+<script src="/_assets/grazie/index.entry.aaf18350e50939a4770b.js" type="text/javascript"></script>
+
+                         
+<!-- Social Media tag Starts -->
+<!-- Open Graph data -->
+<meta property="og:title" content="Grazie: AI writing companion for people in tech"/>
+
+<meta property="og:description" content="Streamline non-coding tasks by integrating generative AI into your JetBrains IDEs, browser, and other tools.
+"/>
+<meta property="og:image" content="https://resources.jetbrains.com/storage/products/grazie/img/meta/preview.png
+"/>
+
+<meta property="og:site_name" content="JetBrains"/>
+<meta property="og:type" content="website"/>
+<meta property="og:url" content="https://www.jetbrains.com/grazie/"/>
+<!-- Social Media tag Ends -->
+
+
+            </head>
+
+<body class="nojs  body-adaptive page-color-default-purple wt-primary-map">
+
+        <!-- Google Tag Manager (noscript) -->
+<noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-5P98" height="0" width="0" style="display:none;visibility:hidden"></iframe></noscript>
+<!-- End Google Tag Manager (noscript) -->
+<script>
+/*! modernizr 3.2.0 (Custom Build) | MIT *
+ * http://modernizr.com/download/?-flexbox-flexboxtweener !*/
+!function(e,n,t){function r(e,n){return typeof e===n}function o(){var e,n,t,o,i,s,l;for(var f in v)if(v.hasOwnProperty(f)){if(e=[],n=v[f],n.name&&(e.push(n.name.toLowerCase()),n.options&&n.options.aliases&&n.options.aliases.length))for(t=0;t<n.options.aliases.length;t++)e.push(n.options.aliases[t].toLowerCase());for(o=r(n.fn,"function")?n.fn():n.fn,i=0;i<e.length;i++)s=e[i],l=s.split("."),1===l.length?Modernizr[l[0]]=o:(!Modernizr[l[0]]||Modernizr[l[0]]instanceof Boolean||(Modernizr[l[0]]=new Boolean(Modernizr[l[0]])),Modernizr[l[0]][l[1]]=o),C.push((o?"":"no-")+l.join("-"))}}function i(e,n){return!!~(""+e).indexOf(n)}function s(e){return e.replace(/([a-z])-([a-z])/g,function(e,n,t){return n+t.toUpperCase()}).replace(/^-/,"")}function l(e,n){return function(){return e.apply(n,arguments)}}function f(e,n,t){var o;for(var i in e)if(e[i]in n)return t===!1?e[i]:(o=n[e[i]],r(o,"function")?l(o,t||n):o);return!1}function a(e){return e.replace(/([A-Z])/g,function(e,n){return"-"+n.toLowerCase()}).replace(/^ms-/,"-ms-")}function u(){return"function"!=typeof n.createElement?n.createElement(arguments[0]):b?n.createElementNS.call(n,"http://www.w3.org/2000/svg",arguments[0]):n.createElement.apply(n,arguments)}function d(){var e=n.body;return e||(e=u(b?"svg":"body"),e.fake=!0),e}function p(e,t,r,o){var i,s,l,f,a="modernizr",p=u("div"),c=d();if(parseInt(r,10))for(;r--;)l=u("div"),l.id=o?o[r]:a+(r+1),p.appendChild(l);return i=u("style"),i.type="text/css",i.id="s"+a,(c.fake?c:p).appendChild(i),c.appendChild(p),i.styleSheet?i.styleSheet.cssText=e:i.appendChild(n.createTextNode(e)),p.id=a,c.fake&&(c.style.background="",c.style.overflow="hidden",f=_.style.overflow,_.style.overflow="hidden",_.appendChild(c)),s=t(p,e),c.fake?(c.parentNode.removeChild(c),_.style.overflow=f,_.offsetHeight):p.parentNode.removeChild(p),!!s}function c(n,r){var o=n.length;if("CSS"in e&&"supports"in e.CSS){for(;o--;)if(e.CSS.supports(a(n[o]),r))return!0;return!1}if("CSSSupportsRule"in e){for(var i=[];o--;)i.push("("+a(n[o])+":"+r+")");return i=i.join(" or "),p("@supports ("+i+") { #modernizr { position: absolute; } }",function(e){return"absolute"==getComputedStyle(e,null).position})}return t}function m(e,n,o,l){function f(){d&&(delete E.style,delete E.modElem)}if(l=r(l,"undefined")?!1:l,!r(o,"undefined")){var a=c(e,o);if(!r(a,"undefined"))return a}for(var d,p,m,h,y,v=["modernizr","tspan"];!E.style;)d=!0,E.modElem=u(v.shift()),E.style=E.modElem.style;for(m=e.length,p=0;m>p;p++)if(h=e[p],y=E.style[h],i(h,"-")&&(h=s(h)),E.style[h]!==t){if(l||r(o,"undefined"))return f(),"pfx"==n?h:!0;try{E.style[h]=o}catch(g){}if(E.style[h]!=y)return f(),"pfx"==n?h:!0}return f(),!1}function h(e,n,t,o,i){var s=e.charAt(0).toUpperCase()+e.slice(1),l=(e+" "+x.join(s+" ")+s).split(" ");return r(n,"string")||r(n,"undefined")?m(l,n,o,i):(l=(e+" "+S.join(s+" ")+s).split(" "),f(l,n,t))}function y(e,n,r){return h(e,t,t,n,r)}var v=[],g={_version:"3.2.0",_config:{classPrefix:"",enableClasses:!0,enableJSClass:!0,usePrefixes:!0},_q:[],on:function(e,n){var t=this;setTimeout(function(){n(t[e])},0)},addTest:function(e,n,t){v.push({name:e,fn:n,options:t})},addAsyncTest:function(e){v.push({name:null,fn:e})}},Modernizr=function(){};Modernizr.prototype=g,Modernizr=new Modernizr;var C=[],w="Moz O ms Webkit",x=g._config.usePrefixes?w.split(" "):[];g._cssomPrefixes=x;var S=g._config.usePrefixes?w.toLowerCase().split(" "):[];g._domPrefixes=S;var _=n.documentElement,b="svg"===_.nodeName.toLowerCase(),z={elem:u("modernizr")};Modernizr._q.push(function(){delete z.elem});var E={style:z.elem.style};Modernizr._q.unshift(function(){delete E.style}),g.testAllProps=h,g.testAllProps=y,Modernizr.addTest("flexbox",y("flexBasis","1px",!0)),Modernizr.addTest("flexboxtweener",y("flexAlign","end",!0)),o(),delete g.addTest,delete g.addAsyncTest;for(var P=0;P<Modernizr._q.length;P++)Modernizr._q[P]();e.Modernizr=Modernizr}(window,document);
+
+if (!Modernizr.flexbox && !Modernizr.flexboxtweener) {
+
+  var $body = $('body');
+
+  var nodesClasses = {
+    wrapper: 'not-supported-browser',
+    container: 'not-supported-browser__container',
+
+    title: 'not-supported-browser__title',
+    content: 'not-supported-browser__content',
+    logo: 'not-supported-browser__logo'
+  };
+
+  var nodes = {
+    wrapper: $('<div class="' + nodesClasses.wrapper + '"></div>'),
+    title: $('<div class="' + nodesClasses.title + '">Sorry, your browser is not fully supported</div>'),
+    content: $('<div class="' + nodesClasses.content + '">There may be some issues with pages layout in your current browser.<br/>Please use an alternate browser until we resolve the issues.<br/>Thank you.</div>'),
+    container: $('<div class="' + nodesClasses.container + '"></div>'),
+    logo: $('<div class="' + nodesClasses.logo + '"><svg class="sprite-img _jetbrains" xmlns:xlink="http://www.w3.org/1999/xlink"><use xlink:href="#jetbrains"></use></svg></div>')
+  };
+
+  $body.addClass('overflow-hidden');
+
+
+  nodes.content
+    .prepend(nodes.title)
+    .prepend(nodes.logo);
+
+  nodes.container
+    .append(nodes.content);
+
+  nodes.wrapper
+    .append(nodes.container)
+    .appendTo($body);
+}
+</script>
+<div class="page">
+    
+            <div class="page__header ">
+            <div class="page__header-language-suggestion" id="language-suggest-bar"></div>
+<div class="page__header-country-suggestion" id="country-suggest-bar"></div>
+
+
+<div class="site-header-container" id="js-site-header-container">
+    <div class="site-header-stub site-header-stub--adaptive">
+        <div class="wt-container site-header-stub__inner">
+            <div class="site-header-stub__menu-main-skeleton-text" style="min-width: 69px"></div>
+            <div class="site-header-stub__menu-main-skeleton-text" style="min-width: 81px"></div>
+            <div class="site-header-stub__menu-main-skeleton-text" style="min-width: 46px"></div>
+            <div class="site-header-stub__menu-main-skeleton-button"></div>
+            <div class="site-header-stub__menu-main-skeleton-button"></div>
+        </div>
+    </div>
+</div>
+
+
+
+  <div class="menu-second _theme-dark" id="js-menu-second">
+    <div class="wt-container">
+        <div id="js-menu-second-mobile-wrapper" class="menu-second-mobile-wrapper wt-display-none wt-display-md-block">
+            <div id="js-menu-second-mobile">
+                <div class="menu-second-mobile wt-row wt-row_size_m wt-row_align-items_center wt-row_justify_between _theme-dark">
+                    <div class="wt-col-inline menu-second-skeleton-text-2" style="width: 120px"></div>
+                    <div class="wt-col-inline menu-second-skeleton-button" style="width: 80px"></div>
+                </div>
+            </div>
+        </div>
+
+        <div id="js-menu-second-desktop"
+             class="menu-second-desktop wt-row wt-row_size_s wt-row_align-items_center wt-row_justify_between wt-row_nowrap wt-row-sm_wrap">
+            <div class="wt-col-inline menu-second-title-box-wrapper">
+                <a class="menu-second-title-box"
+                   href="/grazie/">
+                    
+                    <span class="menu-second-title-box__title wt-h3  wt-h3_theme_dark ">Grazie</span>
+                </a>
+            </div>
+
+            <div class="wt-col-auto-fill">
+                <div class="wt-row wt-row_justify_end wt-row_align-items_center wt-row_size_0">
+                                            
+                                                                                <div class="wt-col-inline menu-item menu-second-skeleton-text-2 menu-second__link"></div>
+                                                                    
+                                                                                <div class="wt-col-inline menu-item menu-second-skeleton-text-2 menu-second__link"></div>
+                                                                    
+                                            
+                    <div class="wt-col-inline menu-second__buttons">
+                        
+                                                    <a href="/grazie/#products"
+                               class="menu-item menu-second__button menu-second__download-button wt-button wt-button_size_s
+                                 wt-button_mode_primary">
+                                Download
+                            </a>
+                                            </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+   /* site header stub height is needed to avoid Cumulative Layout Shift (CLS), which is a Web Vital */
+  .site-header-stub {
+    height: var(--site-header-height, 72px);
+    background-color: var(--site-header-bg-color, var(--rs-color-black));
+  }
+
+  @media (max-width: 1000px) {
+    .site-header-stub--adaptive {
+      height: var(--mobile-site-header-height, 48px);
+    }
+  }
+</style>
+
+        </div>
+    
+    <div class="page__content " data-js-crawler="content-root">
+        <div id="announce-placeholder" class="announce-banner" data-product-name="grazie"></div>
+<div id="grazie-overview" class="grazie-overview"></div>
+    </div>
+
+            <div class="page__footer" id="footer-container">
+    <footer class="footer" id="footer"></footer>
+</div>
+    </div>
+
+<script>
+(function () {
+  function getParameterByName(name, url) {
+    if (!url) url = window.location.href;
+    name = name.replace(/[\[\]]/g, "\\$&");
+    var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+      results = regex.exec(url);
+    if (!results) return null;
+    if (!results[2]) return '';
+    return decodeURIComponent(results[2].replace(/\+/g, " "));
+  }
+
+  function updateQueryStringParameter(uri, key, value) {
+    var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+    var separator = uri.indexOf('?') !== -1 ? "&" : "?";
+    if (uri.match(re)) {
+      return uri.replace(re, '$1' + key + "=" + value + '$2');
+    }
+    else {
+      return uri + separator + key + "=" + value;
+    }
+  }
+
+  var downloadLink = document.getElementById("download-link");
+  if (downloadLink != null) {
+    var platform = getParameterByName('platform');
+    platform = platform != null ? platform : "windows";
+    var href = downloadLink.getAttribute("href");
+    var code = getParameterByName("code");
+
+    if(code != null) {
+      href = updateQueryStringParameter(href, "code", code)
+    }
+    href = updateQueryStringParameter(href, "platform", platform);
+    downloadLink.setAttribute("href", href);
+  }
+})();
+</script><script>
+(function() {
+  var STORAGE_KEY_NAME = 'firefoxDisappearedSVGWorkaround';
+  var STORAGE_KEY_VALUE = '1';
+
+  var isFirefox = /firefox/i.test(navigator.userAgent);
+  if (!isFirefox || isFirefox && sessionStorage.getItem(STORAGE_KEY_NAME) === STORAGE_KEY_VALUE) {
+    return;
+  }
+
+  var arrayFrom = function (arrayLike) {
+    return Array.prototype.slice.call(arrayLike, 0);
+  };
+
+  function workaround() {
+    var uses = document.querySelectorAll('.page svg use');
+    var badNodesCount = 0;
+
+    arrayFrom(uses).forEach(function (node) {
+      var rect = node.getBoundingClientRect();
+      if (rect.width === 0 && rect.height === 0)
+        badNodesCount++;
+    });
+
+    if (badNodesCount === uses.length) {
+      sessionStorage.setItem(STORAGE_KEY_NAME, STORAGE_KEY_VALUE);
+      if (typeof dataLayer !== 'undefined')
+        dataLayer.push({'firefoxDisappearedSVGWorkaround': STORAGE_KEY_VALUE});
+
+      window.location.replace(window.location.href);
+    }
+  }
+
+  window.addEventListener('DOMContentLoaded', workaround);
+
+})();
+</script>          <link href="/_assets/banner-rotator.entry.b554f4abfe9fd52b1ca0.css" rel="stylesheet" type="text/css">
+      <script src="/_assets/banner-rotator.entry.171bc8a80e6ffe3b6887.js" type="text/javascript"></script>
+  </body>
+</html>

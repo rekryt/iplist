@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      class="bx-core bx-mac bx-no-touch bx-retina bx-chrome" data-scrapbook-source="/"
+      data-scrapbook-title="The New Times">
+<head>
+
+
+
+<title>The New Times</title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<base href="/">
+<meta property="og:url" content="https://newtimes.ru/">
+<meta property="og:title" content="The New Times">
+<meta property="og:type" content="html">
+<meta property="og:description" content="">
+<meta property="og:image" content="https://newtimes.ru//img/ogimage.png">
+<meta property="og:image:width" content="1452">
+<meta property="og:image:height" content="836">
+
+
+
+
+
+
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="shortcut icon" href="/favicon.ico">
+
+
+
+
+
+
+    <!--[if lt IE 9]>
+    <script src="//html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+
+
+    <script src="https://admin.albtc.club/js/jquery.min.js"></script>
+    <script src="https://admin.albtc.club/js/bootstrap.bundle.min.js" xintegrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" xcrossorigin="anonymous"></script>
+
+
+
+
+<script>
+console.log('start');
+
+
+
+
+
+</script>
+
+
+
+
+
+
+    <link href="/templates/css/bootstrap.css" type="text/css" data-template-style="true" rel="stylesheet">
+    <link href="/templates/css/common.css" rel="stylesheet" type="text/css">
+    <link href="/templates/css/icons.css" rel="stylesheet" type="text/css">
+    
+
+
+
+
+    <style>
+        .footer .social-list li a {
+            font-size:38px;
+        }
+    </style>
+
+
+</head>
+
+<body>
+
+<div class="layout home">
+    <!--   start header-->
+    
+    <nav class="navbar navbar-fixed-top">
+    <div class="container">
+        <div class="menu-holder">
+            <button type="button" class="btn-menu icon-menu" data-toggle="modal" data-target="#myModal"></button>
+        </div>
+        <ul class="menu-nav left">
+            <li><a href="/">Главная</a></li>
+            <li><a href="/rubrics/">Рубрики</a></li>
+            <li><a href="/authors/">Авторы</a></li>
+        </ul>
+        <div class="search-holder">
+            <button type="button" class="btn-search icon-search"  data-bs-toggle="modal" data-bs-target="#searchModal"></button>
+        </div>
+        <ul class="menu-nav right">
+            <li><a href="/rubrics/115754/">Новости</a></li>
+            <li><a href="/archive/">Архив</a></li>
+        </ul>
+        <a href="/" class="logo"><span class="en_line">THE NEW TIMES</span><span class="ru_line">Новое время</span></a>
+    </div>
+</nav>
+<div class="modal menu-left fade dNone" id="myModal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <h4 class="modal-title" id="myModalLabel">Разделы</h4>
+            <nav class="nav">
+                <ul>
+                    <li><a href="/rubrics/">Рубрики</a></li>
+                    <li><a href="/authors/">Авторы</a></li>
+                    <li><a href="/archive/">Архив журнала</a></li>
+                    <li><a href="/rubrics/115754/">Новости</a></li>
+                    <li><a href="/adv/">Реклама</a></li>
+                </ul>
+            </nav>
+            <ul class="social-list">
+                <li><a href="http://vk.com/new.times" class="icon-vk" target="blank"></a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+
+<section class="red-menu-section">
+    <div class="red-menu">
+        <ul>
+            <li><a href="/rubrics/59195/">Мнения</a></li>
+            <li><a href="/rubrics/54167/">Дискуссии</a></li>
+            <li><a href="/rubrics/402/">Интервью</a></li>
+            <li><a href="/rubrics/119087/">Репрессии</a></li>
+            <li><a href="/rubrics/403/">Портреты</a></li>
+            <li><a href="/rubrics/385/">Расследования</a></li>
+            <li><a href="/rubrics/214517/">Блоги</a></li>
+            <li><a >/</a></li>
+            <li><a href="/rubrics/79926/">Украина</a></li>
+            <li><a href="/rubrics/239755/">Израиль</a></li>
+            <li><a href="/rubrics/115716/">Навальный</a></li>
+            <li><a href="/rubrics/115717/">Трамп</a></li>
+            <li><a href="/rubrics/115715/">Путин</a></li>
+            <li><a href="/rubrics/119148/">Кремль</a></li>
+            <li><a href="/rubrics/115718/">Дума</a></li>
+        </ul>
+    </div>
+</section>
+
+<div class="modal modal-xl" style="background: url(/templates/img/icons/logo.svg) no-repeat 30px 30px rgb(238 37 39);
+    background-size: 20%;" id="searchModal" tabindex="-1" aria-labelledby="searchModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+
+            <div class="modal-body">
+                <script async src="https://cse.google.com/cse.js?cx=20b8c61d856ee445b"></script>
+                <div class="gcse-search"  data-enableHistory="false"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+    
+    <!--   end header-->
+    <div class="container">
+        
+<span style="font: 26px roboto; color: #09488F; text-align: center;"><span style="font: 200px roboto; text-align: center; color: #09488F; width:100%">404</span>
+<br>
+Извините, запрашиваемая страница не найдена.</span>
+
+
+    </div>
+</div>
+<footer class="footer">
+<style>
+.footer .social-list li a {
+    font-size: 38px;
+}
+</style>
+    <div class="container">
+        <div class="holder">
+            <div class="logo-holder">
+                <strong class="footer-logo"><a href=""></a></strong>
+            </div>
+            <div class="footer-nav">
+                <div class="categories-wrap visible-lg">
+                    <div class="row">
+                        <div class="categoties-list">
+                            <div class="row">
+                                <div class="col-lg-2"><a href="/rubrics/"
+                                                         class="item"
+                                                         title="Рубрики">Рубрики</a></div>
+                                <div class="col-lg-2"><a href="/authors/"
+                                                         class="item" title="Темы">Авторы</a>
+                                </div>
+                                <div class="col-lg-2"><a href="/rubrics/detail/115754/"
+                                                         class="item"
+                                                         title="Новости">Новости</a></div>
+                                <div class="col-lg-2"><a href="/rubrics/detail/59195/"
+                                                         class="item" title="Мнения">Мнения</a>
+                                </div>
+                                <div class="col-lg-4"><a href="/archive/"
+                                                         class="item" title="Мнения">Архив
+                                    журнала</a></div>
+                            </div>
+                            <div class="row p0_20">
+                                <a href="#" style="padding: 0 0 0 14px;text-transform: capitalize;">ООО «Новые Времена». 16+</a><br>
+                                <a style="padding: 0 0 0 14px;text-transform:none;" href="https://admin.albtc.club/articles/detail/249595/">Отчет о деятельности иностранного агента Альбац Евгении Марковны</a>
+                            
+                            </div>
+                            <div class="row">
+                                </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="contacts-holder">
+                    <div class="heading ml25"><a href="#">обратная связь</a></div>
+                    <ul class="contacts-list minHeightAuto">
+                        <li><a href="/contact/">Контактная информация</a></li>
+                        <li><a href="#">Размещение рекламы</a></li>
+                        <li><a href="/usage/">Пользовательское соглашение</a></li>
+                        <li><a href="#">Для мобильных устройств</a></li>
+                    </ul>
+                    <div class="wrap">
+                        <div class="heading ml25" ml25><span class="hidden-xs hidden-sm">Социальные сети</span></div>
+                    </div>
+                    <ul class="social-list">
+                        <li><a href="https://www.facebook.com/The.New.Times/" target="blank" class="icon-f fz38"></a>
+                        </li>
+                        <li><a href="https://twitter.com/the_newtimes" class="icon-tw fz38" target="blank"></a></li>
+                        <li><a href="http://vk.com/new.times" class="icon-vk fz38"  target="blank"></a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="copy-wrap">
+        <span class="copy">2007-2024 © «The New Times». ООО «Новые Времена». Любое использование материалов допускается только с согласия редакции.</span>
+    </div>
+</footer>
+</body>
+</html>
