@@ -29,7 +29,7 @@ final class Server implements AppModuleInterface {
     private static Server $_instance;
 
     private int $connectionLimit = 1024;
-    private int $connectionPerIpLimit = 10;
+    private int $connectionPerIpLimit = 200;
 
     /**
      * @param ?HttpServer $httpServer
