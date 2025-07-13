@@ -5,6 +5,8 @@ const { t } = useI18n({
 const links = computed(() => [
     { name: t('issue'), Link: 'https://github.com/rekryt/iplist/issues' },
     { name: t('lightVersion'), Link: '/index' },
+    { name: t('genericVersion'), Link: 'https://iplist.opencck.org' },
+    { name: t('betaVersion'), Link: 'https://beta.iplist.opencck.org' },
 ]);
 </script>
 <template>
@@ -17,7 +19,7 @@ const links = computed(() => [
         <v-spacer />
         <span class="font-weight-light copyright">
             &copy; {{ new Date().getFullYear() }}
-            <a href="https://vk.com/rekryt" target="_blank">Rekryt</a>
+            <a href="https://github.com/rekryt" target="_blank">Rekryt</a>
             <v-icon style="margin-top: -3px" color="tertiary" size="17">mdi-star</v-icon>
             for a better web
             <br />
@@ -28,15 +30,21 @@ const links = computed(() => [
 {
     "en": {
         "issue": "Issue",
-        "lightVersion": "Light version"
+        "lightVersion": "Light version",
+        "genericVersion": "Main version",
+        "betaVersion": "Beta version"
     },
     "ru": {
         "issue": "Задать вопрос",
-        "lightVersion": "Лёгкая версия"
+        "lightVersion": "Лёгкая версия",
+        "genericVersion": "Основная версия",
+        "betaVersion": "Бета версия"
     },
     "cn": {
         "issue": "提交问题",
-        "lightVersion": "轻量版"
+        "lightVersion": "轻量版",
+        "genericVersion": "主版本",
+        "betaVersion": "测试版"
     }
 }
 </i18n>
