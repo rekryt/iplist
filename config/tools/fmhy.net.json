@@ -1,0 +1,72 @@
+{
+    "domains": [
+        "a-lemmy.fmhy.net",
+        "api.fmhy.net",
+        "cat.fmhy.net",
+        "dynmap.fmhy.net",
+        "fmhy.lol",
+        "fmhy.net",
+        "guides.fmhy.lol",
+        "i.fmhy.net",
+        "lemmy.fmhy.net",
+        "m-lemmy.fmhy.net",
+        "old-lemmy.fmhy.net",
+        "old.fmhy.net",
+        "old.lemmy.fmhy.net",
+        "op.fmhy.net",
+        "p-lemmy.fmhy.net",
+        "paste.fmhy.net",
+        "pastes.fmhy.net",
+        "redlib.fmhy.net",
+        "searx.fmhy.net",
+        "stats.fmhy.net",
+        "status.fmhy.net",
+        "sub.whoogle.fmhy.net",
+        "ui.fmhy.net",
+        "whoogle.fmhy.net",
+        "www.fmhy.lol",
+        "www.fmhy.net"
+    ],
+    "dns": [
+        "127.0.0.11:53",
+        "77.88.8.88:53",
+        "8.8.8.8:53",
+        "1.1.1.1:53"
+    ],
+    "timeout": 3600,
+    "ip4": [
+        "104.21.112.1",
+        "104.21.16.1",
+        "104.21.32.1",
+        "104.21.48.1",
+        "104.21.64.1",
+        "104.21.80.1",
+        "104.21.96.1",
+        "216.24.57.251",
+        "216.24.57.252",
+        "216.24.57.7"
+    ],
+    "ip6": [
+        "2606:4700:3030::6815:1001",
+        "2606:4700:3030::6815:2001",
+        "2606:4700:3030::6815:3001",
+        "2606:4700:3030::6815:4001",
+        "2606:4700:3030::6815:5001",
+        "2606:4700:3030::6815:6001",
+        "2606:4700:3030::6815:7001"
+    ],
+    "cidr4": [
+        "104.16.0.0/12",
+        "216.24.57.0/24"
+    ],
+    "cidr6": [
+        "2606:4700::/32"
+    ],
+    "external": {
+        "domains": [],
+        "ip4": [],
+        "ip6": [],
+        "cidr4": [],
+        "cidr6": []
+    }
+}
