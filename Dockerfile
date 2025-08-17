@@ -3,7 +3,7 @@ FROM php:8.2-cli
 RUN apt-get update
 
 # dependencies
-RUN apt-get install -y ntp whois dnsutils ipcalc
+RUN apt-get install -y ntpsec whois dnsutils ipcalc golang git
 
 # composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/bin --filename=composer \
@@ -40,6 +40,9 @@ COPY ./index.php /app/
 WORKDIR /app
 
 RUN composer install --no-interaction
+
+RUN git clone https://github.com/v2fly/geoip.git \
+  && cd geoip && go build .
 
 EXPOSE 8080
 

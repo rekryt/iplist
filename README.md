@@ -29,6 +29,7 @@ Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
 | json     | JSON формат                   |
 | text     | Разделение новой строкой      |
 | comma    | Разделение запятыми           |
+| geoip    | v2rayGeoIPDat                 |
 | mikrotik | MikroTik Script               |
 | switchy  | SwitchyOmega RuleList         |
 | nfset    | Dnsmasq nfset                 |
@@ -175,7 +176,15 @@ docker compose up -d
 
 ## Ручной запуск (PHP 8.1+)
 ```shell
-apt-get install -y ntp whois dnsutils ipcalc
+apt-get install -y git golang
+git clone https://github.com/v2fly/geoip.git
+cd geoip
+go build .
+cd ../
+```
+
+```shell
+apt-get install -y ntpsec whois dnsutils ipcalc
 cp .env.example .env
 composer install
 php index.php
@@ -202,6 +211,51 @@ https://iplist.opencck.org/?format=custom&data=domains&wildcard=1&template=data%
 
 Маска подсети в кастомном формате:
 https://iplist.opencck.org/?format=custom&data=cidr4&template=data%3A%20%7Bdata%7D%20group%3A%20%7Bgroup%7D%20site%3A%20%7Bsite%7D%20shortmask%3A%20%7Bshortmask%7D%20mask%3A%20%7Bmask%7D
+```
+
+## Настройка маршрутизации Xray/V2Ray
+Скачайте `iplist.dat` файл в рабочий каталог:
+```
+https://iplist.opencck.org/?format=geoip&data=cidr4
+```
+
+Пример routing конфигурации:
+```json
+{
+  "routing": {
+    "rules": [
+      {
+        "type": "field",
+        "outboundTag": "vpn",
+        "ip": ["ext:iplist.dat"]
+      },
+      ...
+    ]
+  },
+  ...
+}
+```
+
+Пример использования тегов (по имени портала или группы) в конфигурации:
+```json
+{
+  "routing": {
+    "rules": [
+      {
+        "type": "field",
+        "outboundTag": "vpn",
+        "ip": ["ext:iplist.dat:youtube.com"]
+      },
+      {
+        "type": "field",
+        "outboundTag": "vpn",
+        "ip": ["ext:iplist.dat:anime"]
+      },
+      ...
+    ]
+  },
+  ...
+}
 ```
 
 ## Настройка Mikrotik

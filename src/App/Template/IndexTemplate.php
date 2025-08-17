@@ -636,6 +636,7 @@ use OpenCCK\App\Controller\MainController;
                         <option value="json">JSON</option>
                         <option value="text">Text</option>
                         <option value="comma">Comma</option>
+                        <option value="geoip">v2rayGeoIPDat</option>
                         <option value="mikrotik">MikroTik Script</option>
                         <option value="switchy">SwitchyOmega RuleList</option>
                         <option value="nfset">Dnsmasq nfset</option>

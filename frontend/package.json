@@ -4,13 +4,10 @@
     "author": "Rekryt <rekrytkw@gmail.com>",
     "license": "MIT",
     "scripts": {
-        "build": "nuxt build",
         "dev": "nuxt dev",
-        "generate": "nuxt generate",
+        "build": "nuxt generate",
         "preview": "nuxt preview",
         "postinstall": "nuxt prepare",
-        "start": "node .output/server/index.mjs",
-        "test": "vitest --run --reporter verbose --globals",
         "lint": "eslint --ext .ts,.js,.vue ."
     },
     "devDependencies": {

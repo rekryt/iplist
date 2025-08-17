@@ -25,6 +25,7 @@ Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
 | json     | JSON format                   |
 | text     | Newline-separated             |
 | comma    | Comma-separated               |
+| geoip    | v2rayGeoIPDat                 |
 | mikrotik | MikroTik Script               |
 | switchy  | SwitchyOmega RuleList         |
 | nfset    | Dnsmasq nfset                 |
@@ -166,7 +167,15 @@ docker compose up -d
 
 ## Manual Launch (PHP 8.1+)
 ```shell
-apt-get install -y ntp whois dnsutils ipcalc
+apt-get install -y git golang
+git clone https://github.com/v2fly/geoip.git
+cd geoip
+go build .
+cd ../
+```
+
+```shell
+apt-get install -y ntpsec whois dnsutils ipcalc
 cp .env.example .env
 composer install
 php index.php
@@ -194,6 +203,52 @@ https://iplist.opencck.org/?format=custom&data=domains&wildcard=1&template=data%
 Subnet mask in custom format:
 https://iplist.opencck.org/?format=custom&data=cidr4&template=data%3A%20%7Bdata%7D%20group%3A%20%7Bgroup%7D%20site%3A%20%7Bsite%7D%20shortmask%3A%20%7Bshortmask%7D%20mask%3A%20%7Bmask%7D
 ```
+
+## Xray/V2Ray Routing Setup
+Download the `iplist.dat` file into your working directory:
+```
+https://iplist.opencck.org/?format=geoip&data=cidr4
+```
+
+Example routing configuration:
+```json
+{
+  "routing": {
+    "rules": [
+      {
+        "type": "field",
+        "outboundTag": "vpn",
+        "ip": ["ext:iplist.dat"]
+      },
+      ...
+    ]
+  },
+  ...
+}
+```
+
+Example of using tags (by portal name or group) in the configuration:
+```json
+{
+  "routing": {
+    "rules": [
+      {
+        "type": "field",
+        "outboundTag": "vpn",
+        "ip": ["ext:iplist.dat:youtube.com"]
+      },
+      {
+        "type": "field",
+        "outboundTag": "vpn",
+        "ip": ["ext:iplist.dat:anime"]
+      },
+      ...
+    ]
+  },
+  ...
+}
+```
+
 
 ## Setting up Mikrotik
 - In the router's admin panel (or via winbox), navigate to System -> Scripts.

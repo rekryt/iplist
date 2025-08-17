@@ -59,6 +59,7 @@ const formatList = ref([
     { label: 'JSON',                    value: 'json' },
     { label: 'Text',                    value: 'text',          dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
     { label: 'Comma',                   value: 'comma',         dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
+    { label: 'v2rayGeoIPDat',           value: 'geoip',         dataTypes: ['cidr4', 'ip4', 'cidr6', 'ip6']  },
     { label: 'MikroTik Script',         value: 'mikrotik',      dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
     { label: 'SwitchyOmega RuleList',   value: 'switchy',       dataTypes: ['domains'] },
     { label: 'Dnsmasq nfset',           value: 'nfset',         dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
@@ -453,6 +454,7 @@ const submit = () => {
                         hide-details
                     ></v-checkbox>
                     <v-checkbox
+                        v-if="selectedFormat !== 'geoip'"
                         v-model="isFileSave"
                         :label="t('saveToFile')"
                         :value="true"
