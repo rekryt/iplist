@@ -110,7 +110,7 @@
     "mangalib.me": "mangalib.me.png",
     "mangapark.net": "mangapark.net.ico",
     "nyaa.si": "nyaa.si.jpeg",
-    "kodik.info": "kodik.info.",
+    "kodik.info": "blank.png",
     "infinitenovel.eu": "infinitenovel.eu.png",
     "danbooru.donmai.us": "danbooru.donmai.us.png",
     "ficbook.net": "ficbook.net.png",
@@ -198,5 +198,6 @@
     "aistudio.google.com": "aistudio.google.com.png",
     "animevost.org": "animevost.org.ico",
     "fmhy.net": "fmhy.net.ico",
-    "freetp.org": "freetp.org.ico"
+    "freetp.org": "freetp.org.ico",
+    "telegram.org": "telegram.org.ico"
 }
