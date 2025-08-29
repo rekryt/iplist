@@ -23,11 +23,41 @@ class DNSHelper {
     private float $resolveDelay;
     private bool $isUseIpv4;
     private bool $isUseIpv6;
+    private array $dnsServers;
 
-    public function __construct(private array $dnsServers = []) {
+    public function __construct(array $dnsServers = []) {
         $this->resolveDelay = (getEnv('SYS_DNS_RESOLVE_DELAY') ?? 500) / 1000;
         $this->isUseIpv4 = (getEnv('SYS_DNS_RESOLVE_IP4') ?? 'true') == 'true';
         $this->isUseIpv6 = (getEnv('SYS_DNS_RESOLVE_IP6') ?? 'true') == 'true';
+
+        $this->dnsServers = array_filter(
+            array_map(
+                /**
+                 * @throws DnsException
+                 */ function (string $server): ?string {
+                    if (str_contains($server, ':')) {
+                        [$host, $port] = explode(':', $server, 2);
+                    } else {
+                        $host = $server;
+                        $port = null;
+                    }
+
+                    if (filter_var($host, FILTER_VALIDATE_IP)) {
+                        $ip = $host; // если это IP, оставляем как есть
+                    } else {
+                        $ips = resolve($host);
+                        if (empty($ips)) {
+                            App::getLogger()->warning("Failed to resolve dns server: {$host}");
+                            return null;
+                        }
+                        $ip = $ips[0]->getValue();
+                    }
+
+                    return $port ? "{$ip}:{$port}" : $ip;
+                },
+                $dnsServers
+            )
+        );
     }
 
     /**
@@ -36,34 +66,10 @@ class DNSHelper {
      * @throws DnsException
      */
     private function getResolver(array $dnsServers): DnsResolver {
-        $resolvedServers = array_filter(
-            array_map(function (string $server): ?string {
-                if (str_contains($server, ':')) {
-                    [$host, $port] = explode(':', $server, 2);
-                } else {
-                    $host = $server;
-                    $port = null;
-                }
-
-                if (filter_var($host, FILTER_VALIDATE_IP)) {
-                    $ip = $host; // если это IP, оставляем как есть
-                } else {
-                    $ips = resolve($host);
-                    if (empty($ips)) {
-                        App::getLogger()->warning("Failed to resolve dns server: {$host}");
-                        return null;
-                    }
-                    $ip = $ips[0]->getValue();
-                }
-
-                return $port ? "{$ip}:{$port}" : $ip;
-            }, $dnsServers)
-        );
-
         return dnsResolverFactory(
             new Rfc1035StubDnsResolver(
                 null,
-                new class ($resolvedServers) implements DnsConfigLoader {
+                new class ($dnsServers) implements DnsConfigLoader {
                     public function __construct(private readonly array $dnsServers = []) {
                     }
 
@@ -78,6 +84,7 @@ class DNSHelper {
     /**
      * @param string $domain
      * @return array[]
+     * @throws DnsException
      */
     public function resolve(string $domain): array {
         $ipv4 = [];
