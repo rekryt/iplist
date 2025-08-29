@@ -5,6 +5,7 @@ namespace OpenCCK\Domain\Helper;
 use Amp\Dns\DnsConfig;
 use Amp\Dns\DnsConfigLoader;
 
+use Amp\Dns\DnsException;
 use Amp\Dns\DnsRecord;
 use Amp\Dns\DnsResolver;
 use Amp\Dns\HostLoader;
@@ -15,6 +16,7 @@ use Throwable;
 
 use function Amp\delay;
 use function Amp\Dns\dnsResolver as dnsResolverFactory;
+use function Amp\Dns\resolve;
 use function OpenCCK\getEnv;
 
 class DNSHelper {
@@ -31,12 +33,37 @@ class DNSHelper {
     /**
      * @param array $dnsServers
      * @return DnsResolver
+     * @throws DnsException
      */
     private function getResolver(array $dnsServers): DnsResolver {
+        $resolvedServers = array_filter(
+            array_map(function (string $server): ?string {
+                if (str_contains($server, ':')) {
+                    [$host, $port] = explode(':', $server, 2);
+                } else {
+                    $host = $server;
+                    $port = null;
+                }
+
+                if (filter_var($host, FILTER_VALIDATE_IP)) {
+                    $ip = $host; // если это IP, оставляем как есть
+                } else {
+                    $ips = resolve($host);
+                    if (empty($ips)) {
+                        App::getLogger()->warning("Failed to resolve dns server: {$host}");
+                        return null;
+                    }
+                    $ip = $ips[0]->getValue();
+                }
+
+                return $port ? "{$ip}:{$port}" : $ip;
+            }, $dnsServers)
+        );
+
         return dnsResolverFactory(
             new Rfc1035StubDnsResolver(
                 null,
-                new class ($dnsServers) implements DnsConfigLoader {
+                new class ($resolvedServers) implements DnsConfigLoader {
                     public function __construct(private readonly array $dnsServers = []) {
                     }
 
