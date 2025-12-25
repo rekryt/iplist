@@ -15,6 +15,7 @@ class MikrotikController extends AbstractIPListController {
         $sites = SiteFactory::normalizeArray($this->request->getQueryParameters()['site'] ?? []);
         $data = $this->request->getQueryParameter('data') ?? '';
         $append = $this->request->getQueryParameter('append') ?? '';
+        $template = $this->request->getQueryParameter('template') ?? '{group}_{data}';
         if ($data == '') {
             return "# Error: The 'data' GET parameter is required in the URL to access this page";
         }
@@ -28,7 +29,17 @@ class MikrotikController extends AbstractIPListController {
                 continue;
             }
 
-            $listName = $groupName . '_' . $data;
+            foreach (
+                [
+                    'group' => $groupName,
+                    'data' => $data,
+                ]
+                as $key => $value
+            ) {
+                $template = str_replace('{' . $key . '}', $value, $template);
+            }
+
+            $listName = $template;
             $response = array_merge($response, [
                 '/ip firewall address-list remove [find list="' . $listName . '"];',
                 ':delay 5s',

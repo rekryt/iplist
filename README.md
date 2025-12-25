@@ -287,6 +287,12 @@ iplist_v4_cidr
 - А в разделе IP -> Firewall -> Address Lists должны появиться новые списоки (в примере с именем `youtube`)
 - ![4](https://github.com/user-attachments/assets/bb9ada57-60eb-40df-a031-7a0bc05bc4cb)
 
+Через GET-параметр `template` для формата `mikrotik` можно указывать шаблон для имени списка:
+```
+https://iplist.opencck.org/?format=mikrotik&data=cidr4&append=timeout%3D1d&template={group}_{data}
+```
+По умолчанию шаблон имеет значение: `{group}_{data}`
+
 ## Настройка HomeProxy (sing-box)
 Включите "Routing mode" в "Only proxy mainland China":
 ![1](https://github.com/user-attachments/assets/b0295368-b160-430d-8802-9b65db4e096f)
