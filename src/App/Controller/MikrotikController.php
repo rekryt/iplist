@@ -21,6 +21,7 @@ class MikrotikController extends AbstractIPListController {
         }
 
         $response = [];
+        $lists = [];
         foreach ($this->getGroups() as $groupName => $groupSites) {
             if (count($sites)) {
                 $groupSites = array_filter($groupSites, fn(Site $siteEntity) => in_array($siteEntity->name, $sites));
@@ -29,6 +30,7 @@ class MikrotikController extends AbstractIPListController {
                 continue;
             }
 
+            $listName = $template;
             foreach (
                 [
                     'group' => $groupName,
@@ -36,16 +38,9 @@ class MikrotikController extends AbstractIPListController {
                 ]
                 as $key => $value
             ) {
-                $template = str_replace('{' . $key . '}', $value, $template);
+                $listName = str_replace('{' . $key . '}', $value, $listName);
             }
 
-            $listName = $template;
-            $response = array_merge($response, [
-                '/ip firewall address-list remove [find list="' . $listName . '"];',
-                ':delay 5s',
-                '',
-                '/ip firewall address-list',
-            ]);
             $items = [];
             $entries = [];
             foreach ($groupSites as $siteName => $siteEntity) {
@@ -61,6 +56,20 @@ class MikrotikController extends AbstractIPListController {
             }
             $items = SiteFactory::normalizeArray($items, in_array($data, ['ip4', 'ip6', 'cidr4', 'cidr6']));
             $items[count($items) - 1] = $items[count($items) - 1] . ';';
+
+            if (!isset($lists[$listName])) {
+                $lists[$listName] = [];
+            }
+            $lists[$listName] = array_merge($lists[$listName], $items);
+        }
+
+        foreach ($lists as $listName => $items) {
+            $response = array_merge($response, [
+                '/ip firewall address-list remove [find list="' . $listName . '"];',
+                ':delay 5s',
+                '',
+                '/ip firewall address-list',
+            ]);
 
             $response = array_merge($response, $items, ['', '']);
         }
