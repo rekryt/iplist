@@ -15,11 +15,13 @@ class MikrotikController extends AbstractIPListController {
         $sites = SiteFactory::normalizeArray($this->request->getQueryParameters()['site'] ?? []);
         $data = $this->request->getQueryParameter('data') ?? '';
         $append = $this->request->getQueryParameter('append') ?? '';
+        $template = $this->request->getQueryParameter('template') ?? '{group}_{data}';
         if ($data == '') {
             return "# Error: The 'data' GET parameter is required in the URL to access this page";
         }
 
         $response = [];
+        $lists = [];
         foreach ($this->getGroups() as $groupName => $groupSites) {
             if (count($sites)) {
                 $groupSites = array_filter($groupSites, fn(Site $siteEntity) => in_array($siteEntity->name, $sites));
@@ -28,13 +30,17 @@ class MikrotikController extends AbstractIPListController {
                 continue;
             }
 
-            $listName = $groupName . '_' . $data;
-            $response = array_merge($response, [
-                '/ip firewall address-list remove [find list="' . $listName . '"];',
-                ':delay 5s',
-                '',
-                '/ip firewall address-list',
-            ]);
+            $listName = $template;
+            foreach (
+                [
+                    'group' => $groupName,
+                    'data' => $data,
+                ]
+                as $key => $value
+            ) {
+                $listName = str_replace('{' . $key . '}', $value, $listName);
+            }
+
             $items = [];
             $entries = [];
             foreach ($groupSites as $siteName => $siteEntity) {
@@ -50,6 +56,20 @@ class MikrotikController extends AbstractIPListController {
             }
             $items = SiteFactory::normalizeArray($items, in_array($data, ['ip4', 'ip6', 'cidr4', 'cidr6']));
             $items[count($items) - 1] = $items[count($items) - 1] . ';';
+
+            if (!isset($lists[$listName])) {
+                $lists[$listName] = [];
+            }
+            $lists[$listName] = array_merge($lists[$listName], $items);
+        }
+
+        foreach ($lists as $listName => $items) {
+            $response = array_merge($response, [
+                '/ip firewall address-list remove [find list="' . $listName . '"];',
+                ':delay 5s',
+                '',
+                '/ip firewall address-list',
+            ]);
 
             $response = array_merge($response, $items, ['', '']);
         }
