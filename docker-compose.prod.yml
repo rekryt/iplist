@@ -1,0 +1,41 @@
+services:
+    app:
+        restart: unless-stopped
+        build:
+            context: .
+        env_file:
+            - ./.env
+        volumes:
+            - ./src/:/app/src/
+            - ./config/:/app/config/
+            - ./storage/:/app/storage/
+            - ./public/:/app/public/
+        logging:
+            driver: 'json-file'
+            options:
+                max-size: '50m'
+#        networks:
+#            - default
+    nginx:
+        image: 'nginx:latest'
+        restart: unless-stopped
+        ports:
+            - '8080:80'
+        volumes:
+            - ./public:/var/www/public/
+            - ./nginx/conf.d/:/etc/nginx/conf.d/
+            - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+            - ./cache/:/var/cache/
+        depends_on:
+            - app
+        logging:
+            driver: 'json-file'
+            options:
+                max-size: '50m'
+#        networks:
+#            - default
+#            - web
+#networks:
+#    web:
+#        external: true
+#        name: web
