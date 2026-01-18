@@ -81,7 +81,7 @@ abstract class AbstractIPListController extends AbstractController {
             $site->ip6 = array_values(array_filter($site->ip6, fn(string $ip) => !isset($exclude['ip6'][$ip])));
             $site->cidr6 = array_values(array_filter($site->cidr6, fn(string $ip) => !isset($exclude['cidr6'][$ip])));
 
-            $sites[] = $site;
+            $sites[$site->name] = $site;
         }
 
         return $sites;
