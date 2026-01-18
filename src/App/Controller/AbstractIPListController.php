@@ -45,7 +45,9 @@ abstract class AbstractIPListController extends AbstractController {
      */
     protected function getSites(): array {
         $wildcard = !!($this->request->getQueryParameter('wildcard') ?? '');
-        $exclude = [
+        $group = $this->request->getQueryParameterArray('group') ?? [];
+
+        $exclude = array_map(fn($arr) => array_fill_keys($arr, true), [
             'group' => $this->request->getQueryParameterArray('exclude[group]') ?? [],
             'site' => $this->request->getQueryParameterArray('exclude[site]') ?? [],
             'domain' => $this->request->getQueryParameterArray('exclude[domain]') ?? [],
@@ -53,34 +55,36 @@ abstract class AbstractIPListController extends AbstractController {
             'cidr4' => $this->request->getQueryParameterArray('exclude[cidr4]') ?? [],
             'ip6' => $this->request->getQueryParameterArray('exclude[ip6]') ?? [],
             'cidr6' => $this->request->getQueryParameterArray('exclude[cidr6]') ?? [],
-        ];
-        $group = $this->request->getQueryParameterArray('group') ?? [];
-        return array_map(static function (Site $siteEntity) use ($wildcard, $exclude) {
+        ]);
+
+        $sites = [];
+        foreach ($this->service->sites as $siteEntity) {
+            if (isset($exclude['site'][$siteEntity->name])) {
+                continue;
+            }
+            if (isset($exclude['group'][$siteEntity->group])) {
+                continue;
+            }
+            if ($group && !in_array($siteEntity->group, $group, true)) {
+                continue;
+            }
             $site = clone $siteEntity;
+
             $site->domains = array_values(
                 array_filter(
                     $siteEntity->getDomains($wildcard),
-                    fn(string $domain) => !in_array($domain, $exclude['domain'])
+                    fn(string $domain) => !isset($exclude['domain'][$domain])
                 )
             );
-            $site->ip4 = array_values(array_filter($site->ip4, fn(string $ip) => !in_array($ip, $exclude['ip4'])));
-            $site->cidr4 = array_values(
-                array_filter($site->cidr4, fn(string $ip) => !in_array($ip, $exclude['cidr4']))
-            );
-            $site->ip6 = array_values(array_filter($site->ip6, fn(string $ip) => !in_array($ip, $exclude['ip6'])));
-            $site->cidr6 = array_values(
-                array_filter($site->cidr6, fn(string $ip) => !in_array($ip, $exclude['cidr6']))
-            );
+            $site->ip4 = array_values(array_filter($site->ip4, fn(string $ip) => !isset($exclude['ip4'][$ip])));
+            $site->cidr4 = array_values(array_filter($site->cidr4, fn(string $ip) => !isset($exclude['cidr4'][$ip])));
+            $site->ip6 = array_values(array_filter($site->ip6, fn(string $ip) => !isset($exclude['ip6'][$ip])));
+            $site->cidr6 = array_values(array_filter($site->cidr6, fn(string $ip) => !isset($exclude['cidr6'][$ip])));
 
-            return $site;
-        }, array_filter(
-            array_filter(
-                $this->service->sites,
-                fn(Site $siteEntity) => !in_array($siteEntity->name, $exclude['site']) &&
-                    !in_array($siteEntity->group, $exclude['group'])
-            ),
-            fn(Site $siteEntity) => count($group) === 0 || in_array($siteEntity->group, $group)
-        ));
+            $sites[] = $site;
+        }
+
+        return $sites;
     }
 
     /**

@@ -33,15 +33,16 @@ class SwitchyController extends AbstractIPListController {
         ];
 
         $domains = [];
+        $sitesEntities = $this->getSites();
         if (count($sites)) {
             foreach ($sites as $site) {
                 $domains = array_merge(
                     $domains,
-                    array_map($this->wildcardFormat(...), $this->getSites()[$site]->$data)
+                    array_map($this->wildcardFormat(...), $sitesEntities[$site]->$data)
                 );
             }
         } else {
-            foreach ($this->getSites() as $siteEntity) {
+            foreach ($sitesEntities as $siteEntity) {
                 $domains = array_merge($domains, array_map($this->wildcardFormat(...), $siteEntity->$data));
             }
         }

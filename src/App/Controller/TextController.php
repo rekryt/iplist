@@ -19,12 +19,13 @@ class TextController extends AbstractIPListController {
         }
 
         $response = [];
+        $sitesEntities = $this->getSites();
         if (count($sites)) {
             foreach ($sites as $site) {
-                $response = array_merge($response, $this->getSites()[$site]->$data ?? []);
+                $response = array_merge($response, $sitesEntities[$site]->$data ?? []);
             }
         } else {
-            foreach ($this->getSites() as $siteEntity) {
+            foreach ($sitesEntities as $siteEntity) {
                 $response = array_merge($response, $siteEntity->$data ?? []);
             }
         }
