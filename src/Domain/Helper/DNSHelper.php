@@ -74,7 +74,8 @@ class DNSHelper {
                     }
 
                     public function loadConfig(): DnsConfig {
-                        return new DnsConfig($this->dnsServers, (new HostLoader())->loadHosts());
+                        return (new DnsConfig($this->dnsServers, (new HostLoader())->loadHosts()))
+                            ->withAttempts(1);
                     }
                 }
             )
