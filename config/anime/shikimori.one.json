@@ -1,0 +1,29 @@
+{
+    "domains": [
+        "faye-v2.shikimori.one",
+        "shikimori.one",
+        "www.shikimori.one"
+    ],
+    "dns": [
+        "127.0.0.11:53",
+        "77.88.8.88:53",
+        "8.8.8.8:53",
+        "1.1.1.1:53"
+    ],
+    "timeout": 3600,
+    "ip4": [
+        "186.2.163.41"
+    ],
+    "ip6": [],
+    "cidr4": [
+        "186.2.163.0/24"
+    ],
+    "cidr6": [],
+    "external": {
+        "domains": [],
+        "ip4": [],
+        "ip6": [],
+        "cidr4": [],
+        "cidr6": []
+    }
+}
