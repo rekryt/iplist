@@ -1,0 +1,55 @@
+{
+    "domains": [
+        "beeble.com",
+        "kibana.beeble.com",
+        "mail.beeble.com",
+        "mailserv.beeble.com",
+        "matomo.beeble.com",
+        "pmm.beeble.com",
+        "portainer.beeble.com",
+        "posteio.beeble.com",
+        "powerdns.beeble.com",
+        "s3.eu-central-003.backblazeb2.com",
+        "sentry.beeble.com",
+        "www.beeble.com",
+        "youtrack.beeble.com"
+    ],
+    "dns": [
+        "127.0.0.11:53",
+        "77.88.8.88:53",
+        "8.8.8.8:53",
+        "1.1.1.1:53"
+    ],
+    "timeout": 3600,
+    "ip4": [
+        "135.181.173.149",
+        "45.11.36.254",
+        "45.11.37.254",
+        "45.11.38.254",
+        "45.11.39.254",
+        "84.38.139.19",
+        "88.198.21.87"
+    ],
+    "ip6": [
+        "2605:72c0:4fc:b3::b003:1",
+        "2605:72c0:4fd:b3::b003:1",
+        "2605:72c0:4fe:b3::b003:1",
+        "2605:72c0:4ff:b3::b003:1"
+    ],
+    "cidr4": [
+        "135.181.0.0/16",
+        "45.11.36.0/22",
+        "84.38.136.0/21",
+        "88.198.16.0/20"
+    ],
+    "cidr6": [
+        "2605:72C0::/32"
+    ],
+    "external": {
+        "domains": [],
+        "ip4": [],
+        "ip6": [],
+        "cidr4": [],
+        "cidr6": []
+    }
+}
