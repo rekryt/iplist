@@ -7,7 +7,7 @@
         }
     ],
     "require": {
-        "opencck/server": "v1.1.0",
+        "opencck/server": "v1.1.1",
         "amphp/dns": "v2.4.0",
         "vlucas/phpdotenv": "^5.5",
         "amphp/file": "^3.1",
