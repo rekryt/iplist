@@ -28,8 +28,8 @@ use function OpenCCK\getEnv;
 final class Server implements AppModuleInterface {
     private static Server $_instance;
 
-    private int $connectionLimit = 1024;
-    private int $connectionPerIpLimit = 200;
+    private int $connectionLimit = 100000;
+    private int $connectionPerIpLimit = 100000;
 
     /**
      * @param ?HttpServer $httpServer
