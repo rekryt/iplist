@@ -170,7 +170,45 @@ const url = computed(() => {
         data['filesave'] = '1';
     }
 
-    window.location.href = '/?' + toQueryParams(data);
+    return window.location.origin + '/?' + toQueryParams(data);
+});
+const submit = () => {
+    window.location.href = url.value;
+};
+const copyToClipboard = (text: string) => {
+    // Modern async API
+    if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard
+            .writeText(text)
+            .then(() => true)
+            .catch(() => fallbackCopy(text));
+    } else {
+        // Fallback for older browsers
+        return fallbackCopy(text);
+    }
+};
+
+const fallbackCopy = (text: string) => {
+    try {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+
+        // Prevent scrolling / visual jump
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textarea);
+
+        return successful;
+    } catch (err) {
+        console.error('Copy failed:', err);
+        return false;
+    }
 };
 </script>
 <i18n lang="json">
@@ -467,6 +505,21 @@ const url = computed(() => {
                 <v-col cols="12">
                     <v-btn color="primary" block size="50" @click="submit">{{ t('submit') }}</v-btn>
                 </v-col>
+                <v-col cols="12">
+                    <client-only>
+                        <v-card color="background" class="baseForm-url pa-4 position-relative">
+                            <v-btn
+                                class="baseForm-clipboard"
+                                elevation="5"
+                                variant="text"
+                                @click="copyToClipboard(url)"
+                            >
+                                <v-icon>mdi-clipboard-multiple-outline</v-icon>
+                            </v-btn>
+                            {{ url }}
+                        </v-card>
+                    </client-only>
+                </v-col>
             </v-row>
         </v-card>
     </v-form>
@@ -474,5 +527,15 @@ const url = computed(() => {
 <style lang="scss">
 .baseForm {
     max-width: 920px;
+    &-url {
+        word-break: break-all;
+        font-size: 12px;
+    }
+    &-clipboard {
+        float: right;
+        min-width: 32px;
+        margin-bottom: 6px;
+        margin-left: 6px;
+    }
 }
 </style>
