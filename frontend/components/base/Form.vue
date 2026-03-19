@@ -67,6 +67,7 @@ const formatList = ref([
     { label: 'ClashX',                  value: 'clashx',        dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
     { label: 'Keenetic KVAS',           value: 'kvas',          dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
     { label: 'Keenetic Routes (.bat)',  value: 'bat',           dataTypes: ['ip4', 'cidr4'] },
+    { label: 'Keenetic DNS',            value: 'wildcard',      dataTypes: ['domains'] },
     { label: 'Amnezia',                 value: 'amnezia',       dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
     { label: 'Proxy auto configuration (PAC)', value: 'pac',    dataTypes: ['domains', 'cidr4'] },
     { label: 'Custom',                  value: 'custom',        dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
@@ -123,7 +124,7 @@ const toQueryParams = (params: Record<string, never>): string => {
     return parts.join('&');
 };
 
-const submit = () => {
+const url = computed(() => {
     const data = {
         format: selectedFormat.value,
     };
@@ -445,7 +446,7 @@ const submit = () => {
                 </v-col>
                 <v-col class="py-0" cols="12">
                     <v-checkbox
-                        v-if="selectedDataType === 'domains'"
+                        v-if="selectedDataType === 'domains' && selectedFormat !== 'wildcard'"
                         v-model="isWildCard"
                         :label="t('onlyWildcard')"
                         :value="true"

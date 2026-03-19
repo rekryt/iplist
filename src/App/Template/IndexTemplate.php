@@ -644,6 +644,7 @@ use OpenCCK\App\Controller\MainController;
                         <option value="clashx">ClashX</option>
                         <option value="kvas">Keenetic KVAS</option>
                         <option value="bat">Keenetic Routes (.bat)</option>
+                        <option value="wildcard">Keenetic DNS</option>
                         <option value="amnezia">Amnezia</option>
                         <option value="pac">Proxy auto configuration (PAC)</option>
                     </select>
