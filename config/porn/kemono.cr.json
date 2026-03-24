@@ -1,0 +1,53 @@
+{
+    "domains": [
+        "a.kemono.cr",
+        "b.kemono.cr",
+        "beta.kemono.cr",
+        "code.kemono.cr",
+        "git.kemono.cr",
+        "img.kemono.cr",
+        "kemono.cr",
+        "n1.kemono.cr",
+        "n2.kemono.cr",
+        "n3.kemono.cr",
+        "n4.kemono.cr",
+        "old.kemono.cr",
+        "sentry.kemono.cr",
+        "status.kemono.cr",
+        "www.kemono.cr"
+    ],
+    "dns": [
+        "127.0.0.11:53",
+        "77.88.8.88:53",
+        "8.8.8.8:53",
+        "1.1.1.1:53"
+    ],
+    "timeout": 3600,
+    "ip4": [
+        "190.115.31.240",
+        "91.149.227.10",
+        "91.149.227.11",
+        "91.149.227.12",
+        "91.149.227.13"
+    ],
+    "ip6": [
+        "2a0a:cd80:1001:91:149:227:0:10",
+        "2a0a:cd80:1001:91:149:227:0:11",
+        "2a0a:cd80:1001:91:149:227:0:12",
+        "2a0a:cd80:1001:91:149:227:0:13"
+    ],
+    "cidr4": [
+        "190.115.31.0/24",
+        "91.149.227.0/24"
+    ],
+    "cidr6": [
+        "2a0a:cd80:1001::/48"
+    ],
+    "external": {
+        "domains": [],
+        "ip4": [],
+        "ip6": [],
+        "cidr4": [],
+        "cidr6": []
+    }
+}
