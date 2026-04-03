@@ -1,0 +1,58 @@
+{
+    "domains": [
+        "akamai.myheritage.com",
+        "blog-cache.myheritage.com",
+        "blog.myheritage.com",
+        "careers.myheritage.com",
+        "faq.myheritage.com",
+        "footballdna.myheritage.com",
+        "fr-mhchefs.myheritage.com",
+        "gifts-uk.myheritage.com",
+        "influencers.myheritage.com",
+        "live2018.myheritage.com",
+        "lp.myheritage.com",
+        "media.myheritage.com",
+        "myheritage.com",
+        "myheritage.ee",
+        "pocgifts.myheritage.com",
+        "secure.myheritage.com",
+        "stories.myheritage.com",
+        "tableau.myheritage.com",
+        "testerchoice.myheritage.com",
+        "translations.myheritage.com",
+        "treehouse.myheritage.com",
+        "www.myheritage.com",
+        "www.myheritage.ee",
+        "www.tableau.myheritage.com"
+    ],
+    "dns": [
+        "127.0.0.11:53",
+        "77.88.8.88:53",
+        "8.8.8.8:53",
+        "1.1.1.1:53"
+    ],
+    "timeout": 3600,
+    "ip4": [
+        "35.231.113.27",
+        "45.60.11.42",
+        "45.60.13.42",
+        "45.60.19.42",
+        "45.60.65.253",
+        "45.60.72.253",
+        "78.136.12.24"
+    ],
+    "ip6": [],
+    "cidr4": [
+        "35.224.0.0/12",
+        "45.60.0.0/16",
+        "78.136.12.24/29"
+    ],
+    "cidr6": [],
+    "external": {
+        "domains": [],
+        "ip4": [],
+        "ip6": [],
+        "cidr4": [],
+        "cidr6": []
+    }
+}
