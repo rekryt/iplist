@@ -42,7 +42,7 @@ class GeoipController extends AbstractIPListController {
             }
         }
 
-        $path = \OpenCCK\getEnv('GEOIP_PATH') ?? '/geoip/';
+        $path = \OpenCCK\getEnv('GEOIP_PATH') ?? PATH_ROOT . '/geoip/';
         try {
             if (!File\isDirectory($path . 'input/')) {
                 File\createDirectory($path . 'input/');

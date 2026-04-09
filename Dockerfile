@@ -22,8 +22,8 @@ RUN apt-get install -y libzip-dev zlib1g-dev zip \
   && docker-php-ext-install zip
 
 # geoip
-RUN git clone https://github.com/v2fly/geoip.git \
-  && cd geoip && go build .
+RUN git clone https://github.com/v2fly/geoip.git /app/geoip/ \
+  && cd /app/geoip/ && go build .
 
 RUN rm -rf /var/lib/apt/lists/*
 
