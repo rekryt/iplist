@@ -31,7 +31,12 @@ abstract class AbstractIPListController extends AbstractController {
 
         $isFileSave = !!($this->request->getQueryParameter('filesave') ?? '');
         if ($isFileSave) {
-            $ext = in_array($this->request->getQueryParameter('format'), ['json', 'amnezia']) ? 'json' : 'txt';
+            $map = [
+                'json' => 'json',
+                'amnezia' => 'json',
+                'bat' => 'bat',
+            ];
+            $ext = $map[$this->request->getQueryParameter('format')] ?? 'txt';
             $this->setHeaders(['content-disposition' => 'attachment; filename="ip-list.' . $ext . '"']);
         }
     }
