@@ -3,6 +3,7 @@
 namespace OpenCCK\App\Controller;
 
 use OpenCCK\Domain\Factory\SiteFactory;
+use OpenCCK\Domain\Helper\IP4Helper;
 
 class AmneziaController extends AbstractIPListController {
     /**
@@ -29,6 +30,10 @@ class AmneziaController extends AbstractIPListController {
             }
         }
         $response = SiteFactory::normalizeArray($response, in_array($data, ['ipv4', 'ipv6', 'cidr4', 'cidr6']));
+
+        if ($data === 'cidr4') {
+            $response = IP4Helper::minimizeSubnets($response);
+        }
 
         return json_encode(
             array_map(fn(string $item) => ['hostname' => $item, 'ip' => ''], $response),

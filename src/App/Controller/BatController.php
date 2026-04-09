@@ -37,6 +37,10 @@ class BatController extends AbstractIPListController {
         }
         $response = SiteFactory::normalizeArray($response, true);
 
+        if ($data === 'cidr4') {
+            $response = IP4Helper::minimizeSubnets($response);
+        }
+
         return implode(
             "\n",
             array_map(function (string $item) {

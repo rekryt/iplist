@@ -3,6 +3,7 @@
 namespace OpenCCK\App\Controller;
 
 use OpenCCK\Domain\Factory\SiteFactory;
+use OpenCCK\Domain\Helper\IP4Helper;
 
 class TextController extends AbstractIPListController {
     const DELIMITER = "\n";
@@ -28,6 +29,10 @@ class TextController extends AbstractIPListController {
             foreach ($sitesEntities as $siteEntity) {
                 $response = array_merge($response, $siteEntity->$data ?? []);
             }
+        }
+
+        if ($data === 'cidr4') {
+            $response = IP4Helper::minimizeSubnets($response);
         }
 
         return $this->render(

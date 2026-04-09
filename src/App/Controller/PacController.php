@@ -31,6 +31,10 @@ class PacController extends AbstractIPListController {
             }
         }
 
+        if ($data === 'cidr4') {
+            $items = IP4Helper::minimizeSubnets($items);
+        }
+
         $response = ['const items = ['];
         $response[] = implode(
             ",\n",
