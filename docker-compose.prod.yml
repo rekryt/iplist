@@ -9,7 +9,6 @@ services:
             - ./src/:/app/src/
             - ./config/:/app/config/
             - ./storage/:/app/storage/
-            - ./public/:/app/public/
         logging:
             driver: 'json-file'
             options:
@@ -22,7 +21,6 @@ services:
         ports:
             - '8080:80'
         volumes:
-            - ./public:/var/www/public/
             - ./nginx/conf.d/:/etc/nginx/conf.d/
             - ./nginx/nginx.conf:/etc/nginx/nginx.conf
             - ./cache/:/var/cache/
