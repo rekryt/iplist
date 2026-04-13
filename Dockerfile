@@ -53,7 +53,9 @@ COPY ./composer.json /app/
 
 RUN composer install --no-interaction
 
-COPY ./src ./config ./storage /app/
+COPY ./src /app/src
+COPY ./config /app/config
+COPY ./storage /app/storage
 COPY --from=frontend-builder /app/public /app/public
 COPY ./index.php /app/
 
