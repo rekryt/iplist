@@ -10,6 +10,17 @@ ARG GEOIP_VERSION=202604050243
 RUN GOBIN=/out go install github.com/v2fly/geoip@${GEOIP_VERSION}
 
 FROM composer:2 AS composer
+FROM oven/bun:1.3.5 AS frontend-builder
+
+WORKDIR /app/frontend
+
+COPY ./frontend/package.json ./frontend/bun.lock /app/frontend/
+
+RUN bun install --frozen-lockfile
+
+COPY ./frontend /app/frontend
+
+RUN bun run build
 
 FROM php:8.2-cli
 
@@ -42,7 +53,8 @@ COPY ./composer.json /app/
 
 RUN composer install --no-interaction
 
-COPY ./src ./config ./storage ./public /app/
+COPY ./src ./config ./storage /app/
+COPY --from=frontend-builder /app/public /app/public
 COPY ./index.php /app/
 
 EXPOSE 8080

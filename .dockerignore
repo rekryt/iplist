@@ -2,5 +2,8 @@
 .nuxt
 .output
 node_modules
+frontend/node_modules
+frontend/.nuxt
+frontend/.output
 tmp
 package-lock.json
