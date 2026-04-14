@@ -117,6 +117,9 @@ typings/
 # Nuxt generate
 dist
 
+# Generated frontend output
+public/
+
 # vuepress build output
 .vuepress/dist
 
