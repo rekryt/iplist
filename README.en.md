@@ -2,7 +2,9 @@
 This service is designed for collecting and updating IP addresses (IPv4 and IPv6) and their CIDR zones for specified domains. It is implemented as a web server using asynchronous PHP 8.1+ with the AMPHP library and integrates with Linux utilities like `whois` and `ipcalc`. The service provides interfaces for retrieving lists of domains, IPv4 addresses, IPv6 addresses, as well as CIDRv4 and CIDRv6 zones in various formats, including plain text, JSON, and scripts for adding to "Address List" on Mikrotik routers (RouterOS), Keenetic KVAS\BAT, SwitchyOmega, Amnezia and more.
 
 Main portal: [https://iplist.opencck.org](https://iplist.opencck.org)
+
 Portal with other services: [https://beta.iplist.opencck.org](https://beta.iplist.opencck.org)
+
 Portal with Russian services: [https://russia.iplist.opencck.org](https://russia.iplist.opencck.org)
 
 ![iplist](https://github.com/user-attachments/assets/e004bc06-3646-4eec-acce-9c6799a3661a)
