@@ -1,7 +1,9 @@
 ### IP Address Collection and Management Service with multiple formats 
 For english readme: [README.en.md](README.en.md)
 
-Demo URL: [https://iplist.opencck.org](https://iplist.opencck.org)
+Основной портал: [https://iplist.opencck.org](https://iplist.opencck.org)
+Портал с прочими сервисами: [https://beta.iplist.opencck.org](https://beta.iplist.opencck.org)
+Портал с российскими сервисами: [https://russia.iplist.opencck.org](https://russia.iplist.opencck.org)
 
 ![iplist](https://github.com/user-attachments/assets/e004bc06-3646-4eec-acce-9c6799a3661a)
 
