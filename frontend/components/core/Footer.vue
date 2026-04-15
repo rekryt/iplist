@@ -7,6 +7,7 @@ const links = computed(() => [
     { name: t('lightVersion'), Link: '/index' },
     { name: t('genericVersion'), Link: 'https://iplist.opencck.org' },
     { name: t('betaVersion'), Link: 'https://beta.iplist.opencck.org' },
+    { name: t('russiaVersion'), Link: 'https://russia.iplist.opencck.org' },
 ]);
 </script>
 <template>
@@ -32,19 +33,22 @@ const links = computed(() => [
         "issue": "Issue",
         "lightVersion": "Light version",
         "genericVersion": "Main version",
-        "betaVersion": "Beta version"
+        "betaVersion": "Beta version",
+        "russiaVersion": "Russia version"
     },
     "ru": {
         "issue": "Задать вопрос",
         "lightVersion": "Лёгкая версия",
         "genericVersion": "Основная версия",
-        "betaVersion": "Бета версия"
+        "betaVersion": "Бета версия",
+        "russiaVersion": "Russia версия"
     },
     "cn": {
         "issue": "提交问题",
         "lightVersion": "轻量版",
         "genericVersion": "主版本",
-        "betaVersion": "测试版"
+        "betaVersion": "测试版",
+        "russiaVersion": "俄语版"
     }
 }
 </i18n>
