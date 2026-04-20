@@ -1,0 +1,84 @@
+{
+    "domains": [
+        "morpho.org",
+        "www.morpho.org",
+        "api.morpho.org",
+        "backend.morpho.org",
+        "docs.morpho.org",
+        "app.morpho.org",
+        "help.morpho.org",
+        "brand.morpho.org",
+        "cdn.morpho.org",
+        "agents.morpho.org",
+        "anchorage.morpho.org",
+        "api.morpho.org",
+        "app.blue-api.morpho.org",
+        "app.morpho.org",
+        "auth.morpho.org",
+        "backend.morpho.org",
+        "beta.app.morpho.org",
+        "beta.blue-api.morpho.org",
+        "beta.morpho.org",
+        "blog.morpho.org",
+        "blue-api.morpho.org",
+        "blue-services.morpho.org",
+        "brand.morpho.org",
+        "campaigns.morpho.org",
+        "cdn.morpho.org",
+        "curator-api.morpho.org",
+        "curator-v1.morpho.org",
+        "curator.morpho.org",
+        "data.morpho.org",
+        "delegate.morpho.org",
+        "doc.morpho.org",
+        "docs.morpho.org",
+        "documentation.morpho.org",
+        "fallback.morpho.org",
+        "forum.morpho.org",
+        "governance.morpho.org",
+        "help.morpho.org",
+        "job.morpho.org",
+        "jobs.morpho.org",
+        "lb.services.morpho.org",
+        "legacy.morpho.org",
+        "liquidation.morpho.org",
+        "lite.morpho.org",
+        "matomo.morpho.org",
+        "mcp.morpho.org",
+        "private-rewards.morpho.org",
+        "private.api.morpho.org",
+        "private.blue-api.morpho.org",
+        "rewards-legacy.morpho.org",
+        "rewards.morpho.org",
+        "status.morpho.org",
+        "whitelisting.morpho.org",
+        "www.jobs.morpho.org",
+        "www.morpho.org"
+    ],
+    "dns": [
+        "127.0.0.11:53",
+        "77.88.8.88:53",
+        "8.8.8.8:53",
+        "1.1.1.1:53"
+    ],
+    "timeout": 3600,
+    "ip4": [
+
+    ],
+    "ip6": [
+
+    ],
+    "cidr4": [
+
+    ],
+    "cidr6": [
+
+    ],
+    "external": {
+        "domains": [],
+        "ip4": [],
+        "ip6": [],
+        "cidr4": [],
+        "cidr6": []
+    }
+}
