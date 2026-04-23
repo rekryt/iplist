@@ -132,25 +132,18 @@ class IP6Helper {
      * @return array
      */
     public static function minimizeSubnets(array $subnets): array {
+        // Delegate containment to isInCidr, which already does the right thing
+        // in 128-bit space via byte-wise string masks. The previous implementation
+        // computed masks as `(1 << 128) - (1 << 128 - $prefix)` in PHP ints —
+        // both shifts overflow to 0 on 64-bit, so every prefix ≤ 64 produced a
+        // zero mask and every subnet after the first was dropped as "contained".
         $result = [];
         foreach (self::sortSubnets(array_filter($subnets, fn(string $subnet) => !!$subnet)) as $subnet) {
-            if (!$subnet) {
-                continue;
-            }
-            [$address, $prefix] = explode('/', $subnet);
-
-            $addressNum = inet_pton($address);
-            $addressNum = unpack('J', $addressNum)[1];
+            [$address] = explode('/', $subnet);
 
             $isUnique = true;
             foreach ($result as $existingCidr) {
-                [$existingAddress, $existingPrefix] = explode('/', $existingCidr);
-                $existingAddressNum = inet_pton($existingAddress);
-                $existingAddressNum = unpack('J', $existingAddressNum)[1];
-
-                $mask = (1 << 128) - (1 << 128 - $prefix);
-                $existingMask = (1 << 128) - (1 << 128 - $existingPrefix);
-                if (($addressNum & $mask) === ($existingAddressNum & $existingMask)) {
+                if (self::isInCidr($address, $existingCidr)) {
                     $isUnique = false;
                     break;
                 }
