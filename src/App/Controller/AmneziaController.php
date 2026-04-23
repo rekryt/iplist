@@ -30,6 +30,7 @@ class AmneziaController extends AbstractIPListController {
             }
         }
         $response = SiteFactory::normalizeArray($response, in_array($data, ['ipv4', 'ipv6', 'cidr4', 'cidr6']));
+        $response = SiteFactory::normalizeArray($response, in_array($data, ['ip4', 'ip6', 'cidr4', 'cidr6']));
 
         if ($data === 'cidr4') {
             $response = IP4Helper::minimizeSubnets($response);

@@ -36,7 +36,7 @@ class TextController extends AbstractIPListController {
         }
 
         return $this->render(
-            SiteFactory::normalizeArray($response, in_array($data, ['ipv4', 'ipv6', 'cidr4', 'cidr6']))
+            SiteFactory::normalizeArray($response, in_array($data, ['ip4', 'ip6', 'cidr4', 'cidr6']))
         );
     }
 
