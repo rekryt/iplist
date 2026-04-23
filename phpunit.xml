@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+    bootstrap="test/bootstrap.php"
+    colors="true"
+>
+    <coverage>
+        <include>
+            <directory suffix=".php">./test</directory>
+        </include>
+    </coverage>
+    <testsuites>
+        <testsuite name="server">
+            <directory suffix="Test.php">test</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <env name="AMP_DEBUG" value="true" />
+        <env name="HTTP_DOCUMENT_ROOT" value="" />
+        <env name="HTTP_PORT" value="8090" />
+        <env name="SYS_DNS_RESOLVE_IP4" value="false" />
+        <env name="SYS_DNS_RESOLVE_IP6" value="false" />
+        <env name="RUN_STRESS" value="1" />
+    </php>
+</phpunit>

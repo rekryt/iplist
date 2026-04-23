@@ -14,6 +14,11 @@
         "ext-fileinfo": "*",
         "ext-libxml": "*"
     },
+    "require-dev": {
+        "phpunit/phpunit": "^9",
+        "amphp/phpunit-util": "^3",
+        "amphp/http-client": "^5.3"
+    },
     "autoload": {
         "files": [
             "src/functions.php"
@@ -23,6 +28,16 @@
                 "src/"
             ]
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "OpenCCK\\": [
+                "test/"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
     },
     "config": {
         "allow-plugins": {
