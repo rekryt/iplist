@@ -36,28 +36,24 @@ class SwitchyController extends AbstractIPListController {
         $sitesEntities = $this->getSites();
         if (count($sites)) {
             foreach ($sites as $site) {
-                $domains = array_merge(
-                    $domains,
-                    array_map($this->wildcardFormat(...), $sitesEntities[$site]->$data)
-                );
+                foreach ($sitesEntities[$site]->$data as $row) {
+                    $domains[] = '*' . $row . '/*';
+                }
             }
         } else {
             foreach ($sitesEntities as $siteEntity) {
-                $domains = array_merge($domains, array_map($this->wildcardFormat(...), $siteEntity->$data));
+                foreach ($siteEntity->$data as $row) {
+                    $domains[] = '*' . $row . '/*';
+                }
             }
         }
 
-        $response = array_merge($response, SiteFactory::normalizeArray($domains));
-        $response = array_merge($response, ['', '#END']);
+        foreach (SiteFactory::normalizeArray($domains) as $row) {
+            $response[] = $row;
+        }
+        $response[] = '';
+        $response[] = '#END';
 
         return implode("\n", $response);
-    }
-
-    /**
-     * @param string $domain
-     * @return string
-     */
-    private function wildcardFormat(string $domain): string {
-        return '*' . $domain . '/*';
     }
 }

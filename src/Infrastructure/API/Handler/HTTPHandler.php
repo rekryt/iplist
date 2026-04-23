@@ -27,12 +27,11 @@ final class HTTPHandler extends Handler implements HTTPHandlerInterface {
      */
     public function getHandler(string $controllerName = 'main'): RequestHandler {
         return new ClosureRequestHandler(function (Request $request) use ($controllerName): Response {
+            $controllerClass = ucfirst($request->getQueryParameter('format') ?: $controllerName);
+            $startNs = hrtime(true);
+
             try {
-                $response = $this->getController(
-                    ucfirst($request->getQueryParameter('format') ?: $controllerName),
-                    $request,
-                    $this->headers ?? []
-                )();
+                $response = $this->getController($controllerClass, $request, $this->headers ?? [])();
             } catch (Throwable $e) {
                 $this->logger->warning('Exception', [
                     'exception' => $e::class,
@@ -52,6 +51,21 @@ final class HTTPHandler extends Handler implements HTTPHandlerInterface {
                     )
                 );
             }
+
+            // Per-request diagnostic — one line per request, gated to DEBUG so
+            // prod logs stay quiet until an operator flips DEBUG=true to investigate.
+            $durationMs = (hrtime(true) - $startNs) / 1e6;
+            $uri = $request->getUri();
+            $pathQuery = $uri->getPath() . ($uri->getQuery() !== '' ? '?' . $uri->getQuery() : '');
+            $this->logger->debug(sprintf(
+                '%s %s → %d | %s | %.1fms | peak %.1f MiB',
+                $request->getMethod(),
+                $pathQuery,
+                $response->getStatus(),
+                $controllerClass,
+                $durationMs,
+                memory_get_peak_usage(true) / 1_048_576
+            ));
 
             return $response;
         });

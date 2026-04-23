@@ -23,11 +23,15 @@ class PacController extends AbstractIPListController {
         $sitesEntities = $this->getSites();
         if (count($sites)) {
             foreach ($sites as $site) {
-                $items = array_merge($items, $sitesEntities[$site]->$data);
+                foreach ($sitesEntities[$site]->$data as $row) {
+                    $items[] = $row;
+                }
             }
         } else {
             foreach ($sitesEntities as $siteEntity) {
-                $items = array_merge($items, $siteEntity->$data);
+                foreach ($siteEntity->$data as $row) {
+                    $items[] = $row;
+                }
             }
         }
 

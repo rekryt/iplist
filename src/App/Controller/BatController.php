@@ -28,11 +28,15 @@ class BatController extends AbstractIPListController {
         $sitesEntities = $this->getSites();
         if (count($sites)) {
             foreach ($sites as $site) {
-                $response = array_merge($response, $sitesEntities[$site]->$data ?? []);
+                foreach ($sitesEntities[$site]->$data ?? [] as $row) {
+                    $response[] = $row;
+                }
             }
         } else {
             foreach ($sitesEntities as $siteEntity) {
-                $response = array_merge($response, $siteEntity->$data);
+                foreach ($siteEntity->$data as $row) {
+                    $response[] = $row;
+                }
             }
         }
         $response = SiteFactory::normalizeArray($response, true);

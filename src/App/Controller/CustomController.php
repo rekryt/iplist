@@ -25,6 +25,7 @@ class CustomController extends AbstractIPListController {
         }
 
         $response = [];
+        $isIpData = in_array($data, ['ip4', 'ip6', 'cidr4', 'cidr6']);
         foreach ($this->getGroups() as $groupName => $groupSites) {
             if (count($sites)) {
                 $groupSites = array_filter($groupSites, fn(Site $siteEntity) => in_array($siteEntity->name, $sites));
@@ -33,37 +34,30 @@ class CustomController extends AbstractIPListController {
                 continue;
             }
 
-            $items = [];
             foreach ($groupSites as $siteName => $siteEntity) {
-                $items = array_merge(
-                    $items,
-                    $this->generateList(
-                        $siteEntity,
-                        SiteFactory::normalizeArray(
-                            $siteEntity->{$data},
-                            in_array($data, ['ip4', 'ip6', 'cidr4', 'cidr6'])
-                        ),
-                        $data,
-                        $template
-                    )
+                $this->appendRenderedRows(
+                    $response,
+                    $siteEntity,
+                    SiteFactory::normalizeArray($siteEntity->{$data}, $isIpData),
+                    $data,
+                    $template
                 );
             }
-
-            $response = array_merge($response, $items);
         }
 
         return implode("\n", $response);
     }
 
     /**
-     * @param Site $siteEntity
-     * @param array $dataArray
-     * @param string $data
-     * @param string $template
-     * @return array
+     * @param array<int, string> $out
      */
-    private function generateList(Site $siteEntity, array $dataArray, string $data, string $template): array {
-        $items = [];
+    private function appendRenderedRows(
+        array &$out,
+        Site $siteEntity,
+        array $dataArray,
+        string $data,
+        string $template
+    ): void {
         foreach ($dataArray as $item) {
             $patterns = [
                 'group' => $siteEntity->group,
@@ -97,8 +91,7 @@ class CustomController extends AbstractIPListController {
             foreach ($patterns as $key => $value) {
                 $result = str_replace('{' . $key . '}', $value, $result);
             }
-            $items[] = $result;
+            $out[] = $result;
         }
-        return $items;
     }
 }

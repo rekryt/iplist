@@ -19,8 +19,8 @@ class MikrotikController extends AbstractIPListController {
         if ($data == '') {
             return "# Error: The 'data' GET parameter is required in the URL to access this page";
         }
+        $appendStr = $append ? ' ' . $append : '';
 
-        $response = [];
         $lists = [];
         foreach ($this->getGroups() as $groupName => $groupSites) {
             if (count($sites)) {
@@ -30,65 +30,56 @@ class MikrotikController extends AbstractIPListController {
                 continue;
             }
 
-            $listName = $template;
-            foreach (
-                [
-                    'group' => $groupName,
-                    'data' => $data,
-                ]
-                as $key => $value
-            ) {
-                $listName = str_replace('{' . $key . '}', $value, $listName);
-            }
+            $listName = str_replace(['{group}', '{data}'], [$groupName, $data], $template);
 
+            // Flip-map dedup — $seen is reset per group so the "one add per IP
+            // per list" rule still holds across sites in the same group, without
+            // the O(N²) in_array scan.
             $items = [];
-            $entries = [];
+            $seen = [];
             foreach ($groupSites as $siteName => $siteEntity) {
                 if (count($sites) && !in_array($siteName, $sites)) {
                     continue;
                 }
-                $filteredItems = array_filter($siteEntity->$data, fn(string $row) => !in_array($row, $entries));
-                $items = array_merge(
-                    $items,
-                    $this->generateList($siteEntity, $listName, $filteredItems, $append ? ' ' . $append : '')
-                );
-                $entries = array_merge($entries, $filteredItems);
+                foreach ($siteEntity->$data as $row) {
+                    if (isset($seen[$row])) {
+                        continue;
+                    }
+                    $seen[$row] = true;
+                    $items[] = 'add list=' . $listName . ' address=' . $row . ' comment=' . $siteEntity->name . $appendStr;
+                }
             }
-            $items = SiteFactory::normalizeArray($items, in_array($data, ['ip4', 'ip6', 'cidr4', 'cidr6']));
-            $items[count($items) - 1] = $items[count($items) - 1] . ';';
+
+            // Skip empty list blocks entirely — the trailing-";" line below
+            // assumes at least one entry. Appending to index -1 of an empty
+            // array raises "Undefined array key -1" and surfaces as HTTP 500
+            // once the warning is promoted to a throwable.
+            if (!$items) {
+                continue;
+            }
+            $items[array_key_last($items)] .= ';';
 
             if (!isset($lists[$listName])) {
                 $lists[$listName] = [];
             }
-            $lists[$listName] = array_merge($lists[$listName], $items);
+            foreach ($items as $item) {
+                $lists[$listName][] = $item;
+            }
         }
 
+        $response = [];
         foreach ($lists as $listName => $items) {
-            $response = array_merge($response, [
-                '/ip firewall address-list remove [find list="' . $listName . '"];',
-                ':delay 5s',
-                '',
-                '/ip firewall address-list',
-            ]);
-
-            $response = array_merge($response, $items, ['', '']);
+            $response[] = '/ip firewall address-list remove [find list="' . $listName . '"];';
+            $response[] = ':delay 5s';
+            $response[] = '';
+            $response[] = '/ip firewall address-list';
+            foreach ($items as $item) {
+                $response[] = $item;
+            }
+            $response[] = '';
+            $response[] = '';
         }
 
         return implode("\n", $response);
-    }
-
-    /**
-     * @param Site $siteEntity
-     * @param string $listName
-     * @param array $array
-     * @param string $append
-     * @return array
-     */
-    private function generateList(Site $siteEntity, string $listName, array $array, string $append = ''): array {
-        $items = [];
-        foreach ($array as $item) {
-            $items[] = 'add list=' . $listName . ' address=' . $item . ' comment=' . $siteEntity->name . $append;
-        }
-        return $items;
     }
 }
