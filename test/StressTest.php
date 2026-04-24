@@ -138,4 +138,111 @@ final class StressTest extends AsyncTest {
 
         return $sites;
     }
+
+    /**
+     * Regression guard for the quadratic blow-up in `IP4Helper::minimizeSubnets`
+     * when a portal's `replace.cidr4` expands into tens of thousands of /32
+     * entries (the Adobe production scenario). Before the O(N log N) rewrite
+     * this scenario ran for ~100 s at 10 000 entries; budget here is 5 s,
+     * leaving plenty of headroom on slow CI while making any reintroduced
+     * O(N²) scan fail loudly.
+     *
+     * @return array<string, array{int, float}> [slash32_count, budget_seconds]
+     */
+    public static function replaceLadder(): array {
+        return [
+            'replace-05000-slash32' => [5_000, 2.5],
+            'replace-15000-slash32' => [15_000, 5.0],
+        ];
+    }
+
+    /**
+     * @dataProvider replaceLadder
+     */
+    public function testTextCidr4WithHugeReplaceMap(int $slash32Count, float $budget): void {
+        $service = $this->service();
+        $original = $service->sites;
+
+        try {
+            $service->sites = $this->buildReplaceFixture($slash32Count);
+
+            $start = microtime(true);
+
+            $request = new Request(
+                $this->buildUrl('/', ['format' => 'text', 'data' => 'cidr4']),
+                'GET'
+            );
+            $request->setBodySizeLimit(512 * 1024 * 1024);
+            $request->setTransferTimeout($budget * 3);
+            $request->setInactivityTimeout($budget * 3);
+
+            $response = $this->httpClient->request($request);
+            $body = $this->body($response);
+            $duration = microtime(true) - $start;
+
+            self::assertSame(200, $response->getStatus());
+            self::assertNotEmpty($body);
+            // Parent replace key must be gone from the output (substituted).
+            self::assertStringNotContainsString('100.0.0.0/8', $body);
+            // A representative /32 from the value array must be present —
+            // `buildReplaceFixture` starts its IP walk at 100.64.0.0 and
+            // emits one entry per $i, so 100.64.0.0 is always the first.
+            self::assertStringContainsString('100.64.0.0/32', $body);
+
+            fprintf(
+                STDERR,
+                "\n[stress text/cidr4 replace=%d /32s] duration=%.2fs budget=%.0fs body=%.1f MB\n",
+                $slash32Count,
+                $duration,
+                $budget,
+                strlen($body) / 1_048_576
+            );
+
+            self::assertLessThan(
+                $budget,
+                $duration,
+                sprintf(
+                    'exceeded %.1fs budget at %d /32s in replace.cidr4 — O(N^2) regression in minimizeSubnets?',
+                    $budget,
+                    $slash32Count
+                )
+            );
+        } finally {
+            $service->sites = $original;
+        }
+    }
+
+    /**
+     * One portal whose `replace.cidr4` maps parent `100.0.0.0/8` to an array
+     * of `$count` scattered /32 entries — worst case for the containment
+     * scan because no /32 is contained in any other, so the inner loop of
+     * the old `minimizeSubnets` never short-circuits.
+     *
+     * @return array<string, Site>
+     */
+    private function buildReplaceFixture(int $count): array {
+        $values = [];
+        for ($i = 0; $i < $count; $i++) {
+            $values[] = sprintf('100.%d.%d.%d/32', 64 + ($i >> 16), ($i >> 8) & 0xff, $i & 0xff);
+        }
+        $replace = (object) [
+            'cidr4' => (object) ['100.0.0.0/8' => $values],
+            'cidr6' => new \stdClass(),
+        ];
+        return [
+            'adobe-like' => new Site(
+                'adobe-like',
+                'tools',
+                [],
+                [],
+                0,
+                [],
+                [],
+                ['100.0.0.0/8'],
+                [],
+                new \stdClass(),
+                $replace
+            ),
+        ];
+    }
 }

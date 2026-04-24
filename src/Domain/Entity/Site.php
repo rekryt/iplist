@@ -122,15 +122,37 @@ final class Site {
         }
 
         if ((getEnv('SYS_REPLACE_ESCALATE_IPS') ?? 'true') === 'true') {
+            $aggregate = (getEnv('SYS_REPLACE_AGGREGATE_SUBNETS') ?? 'false') === 'true';
+            $thresholdIp4Narrow = max(0, (int) (getEnv('SYS_REPLACE_COLLAPSE_THRESHOLD_IP4_24') ?? 0));
+            $thresholdIp4Wide = max(0, (int) (getEnv('SYS_REPLACE_COLLAPSE_THRESHOLD_IP4_16') ?? 0));
+            $thresholdIp6Narrow = max(0, (int) (getEnv('SYS_REPLACE_COLLAPSE_THRESHOLD_IP6_64') ?? 0));
+            $thresholdIp6Wide = max(0, (int) (getEnv('SYS_REPLACE_COLLAPSE_THRESHOLD_IP6_32') ?? 0));
             if ($this->isUseIpv4) {
-                IP4Helper::growReplace($this->replace, $this->ip4);
+                IP4Helper::growReplace(
+                    $this->replace,
+                    $this->ip4,
+                    $aggregate,
+                    $thresholdIp4Narrow,
+                    $thresholdIp4Wide
+                );
             }
             if ($this->isUseIpv6) {
-                IP6Helper::growReplace($this->replace, $this->ip6);
+                IP6Helper::growReplace(
+                    $this->replace,
+                    $this->ip6,
+                    $aggregate,
+                    $thresholdIp6Narrow,
+                    $thresholdIp6Wide
+                );
             }
             App::getLogger()->debug('growReplace done for ' . $this->name, [
                 'cidr4_keys' => count((array) ($this->replace->cidr4 ?? [])),
                 'cidr6_keys' => count((array) ($this->replace->cidr6 ?? [])),
+                'aggregate' => $aggregate,
+                'threshold_ip4_24' => $thresholdIp4Narrow,
+                'threshold_ip4_16' => $thresholdIp4Wide,
+                'threshold_ip6_64' => $thresholdIp6Narrow,
+                'threshold_ip6_32' => $thresholdIp6Wide,
             ]);
         }
 

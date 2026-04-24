@@ -199,4 +199,240 @@ final class IP4HelperTest extends AsyncTest {
         $replace = $this->replace([]);
         self::assertSame(['10.0.0.0/8'], IP4Helper::applyReplace(['10.0.0.0/8'], $replace));
     }
+
+    // ------------------------------------------------------------------
+    // aggregateSubnets — CIDR supernetting (IPv4)
+    // ------------------------------------------------------------------
+
+    public function testAggregateSubnetsEmptyReturnsEmpty(): void {
+        self::assertSame([], IP4Helper::aggregateSubnets([]));
+    }
+
+    public function testAggregateSubnetsMergesFourConsecutiveSlash32IntoSlash30(): void {
+        self::assertSame(
+            ['1.0.0.0/30'],
+            IP4Helper::aggregateSubnets(['1.0.0.0/32', '1.0.0.1/32', '1.0.0.2/32', '1.0.0.3/32'])
+        );
+    }
+
+    public function testAggregateSubnets256ConsecutiveSlash32IntoSlash24(): void {
+        $inputs = [];
+        for ($i = 0; $i < 256; $i++) {
+            $inputs[] = "10.0.0.$i/32";
+        }
+        self::assertSame(['10.0.0.0/24'], IP4Helper::aggregateSubnets($inputs));
+    }
+
+    public function testAggregateSubnetsMergesAdjacentRanges(): void {
+        // 10.0.0.0/24 and 10.0.1.0/24 are adjacent → /23.
+        self::assertSame(['10.0.0.0/23'], IP4Helper::aggregateSubnets(['10.0.0.0/24', '10.0.1.0/24']));
+    }
+
+    public function testAggregateSubnetsCollapsesOverlappingRanges(): void {
+        // /24 absorbs a /32 inside it; no residual /32 in output.
+        self::assertSame(['10.0.0.0/24'], IP4Helper::aggregateSubnets(['10.0.0.0/24', '10.0.0.5/32']));
+    }
+
+    public function testAggregateSubnetsKeepsDisjointRanges(): void {
+        $result = IP4Helper::aggregateSubnets(['10.0.0.0/24', '192.0.2.0/24']);
+        self::assertSame(['10.0.0.0/24', '192.0.2.0/24'], $result);
+    }
+
+    public function testAggregateSubnetsRespectsParentCapBelowFullCoverage(): void {
+        // Four /32s filling a /30 can aggregate to /30, but the parent is /30.
+        // Cap forces output strictly narrower than /30 → two /31 blocks.
+        $result = IP4Helper::aggregateSubnets(
+            ['1.0.0.0/32', '1.0.0.1/32', '1.0.0.2/32', '1.0.0.3/32'],
+            '1.0.0.0/30'
+        );
+        self::assertSame(['1.0.0.0/31', '1.0.0.2/31'], $result);
+    }
+
+    public function testAggregateSubnetsNeverEmitsParentItself(): void {
+        // Input literally equals parent → must be split into two halves.
+        self::assertSame(
+            ['1.0.0.0/9', '1.128.0.0/9'],
+            IP4Helper::aggregateSubnets(['1.0.0.0/8'], '1.0.0.0/8')
+        );
+    }
+
+    public function testAggregateSubnetsSkipsMalformedEntries(): void {
+        self::assertSame(
+            ['10.0.0.0/24'],
+            IP4Helper::aggregateSubnets(['not-a-cidr', '', '10.0.0.0/24', '10.0.0.0/99', 'bogus/24'])
+        );
+    }
+
+    public function testAggregateSubnetsIdempotent(): void {
+        $first = IP4Helper::aggregateSubnets(['1.0.0.0/32', '1.0.0.1/32', '1.0.0.2/32', '1.0.0.3/32']);
+        $second = IP4Helper::aggregateSubnets($first);
+        self::assertSame($first, $second);
+    }
+
+    public function testGrowReplaceWithAggregateFusesContiguousIps(): void {
+        // 4 consecutive IPs inside the parent /16 — without aggregate they'd
+        // stay as four /32 entries; with aggregate they collapse to one /30.
+        $replace = $this->replace(['2.16.0.0/13' => []]);
+        IP4Helper::growReplace(
+            $replace,
+            ['2.16.0.0', '2.16.0.1', '2.16.0.2', '2.16.0.3'],
+            true
+        );
+        self::assertSame(['2.16.0.0/30'], $replace->cidr4->{'2.16.0.0/13'});
+    }
+
+    public function testGrowReplaceWithAggregateNeverProducesParentKey(): void {
+        // Fill the entire parent /30 with /32s. Aggregation would normally
+        // collapse to /30 (== parent), but the cap splits it into two /31s.
+        $replace = $this->replace(['1.0.0.0/30' => []]);
+        IP4Helper::growReplace(
+            $replace,
+            ['1.0.0.0', '1.0.0.1', '1.0.0.2', '1.0.0.3'],
+            true
+        );
+        self::assertSame(['1.0.0.0/31', '1.0.0.2/31'], $replace->cidr4->{'1.0.0.0/30'});
+    }
+
+    public function testGrowReplaceDefaultDoesNotAggregate(): void {
+        // Default behaviour preserved: without $aggregate, minimize keeps
+        // individual /32 entries because they don't contain each other.
+        $replace = $this->replace(['2.16.0.0/13' => []]);
+        IP4Helper::growReplace($replace, ['2.16.0.0', '2.16.0.1']);
+        self::assertEqualsCanonicalizing(
+            ['2.16.0.0/32', '2.16.0.1/32'],
+            $replace->cidr4->{'2.16.0.0/13'}
+        );
+    }
+
+    // ------------------------------------------------------------------
+    // Density collapse — lossy /24-bucket expansion (IPv4)
+    // ------------------------------------------------------------------
+
+    public function testAggregateSubnetsDensityCollapsesScatteredSlash32(): void {
+        // 10 sparse /32s inside a single /24 — none are adjacent, so lossless
+        // aggregation would keep all 10. With densityThreshold=10 the whole
+        // /24 is claimed.
+        $cidrs = [
+            '2.16.0.5/32', '2.16.0.10/32', '2.16.0.20/32', '2.16.0.40/32', '2.16.0.50/32',
+            '2.16.0.60/32', '2.16.0.70/32', '2.16.0.80/32', '2.16.0.90/32', '2.16.0.100/32',
+        ];
+        self::assertSame(['2.16.0.0/24'], IP4Helper::aggregateSubnets($cidrs, '2.16.0.0/13', 10));
+    }
+
+    public function testAggregateSubnetsDensityBelowThresholdKeepsOriginalBlocks(): void {
+        $cidrs = [
+            '2.16.0.5/32', '2.16.0.10/32', '2.16.0.20/32', '2.16.0.40/32', '2.16.0.50/32',
+            '2.16.0.60/32', '2.16.0.70/32', '2.16.0.80/32', '2.16.0.90/32', '2.16.0.100/32',
+        ];
+        // Coverage = 10, threshold = 11 → no expansion.
+        self::assertSame($cidrs, IP4Helper::aggregateSubnets($cidrs, '2.16.0.0/13', 11));
+    }
+
+    public function testAggregateSubnetsDensityCountsCoveredAddressesNotBlocks(): void {
+        // Four blocks: one /30 (4 addresses) + three /32s = 7 addresses.
+        // Threshold 7 should trigger the collapse; threshold 8 should not.
+        $cidrs = ['10.0.0.0/30', '10.0.0.100/32', '10.0.0.120/32', '10.0.0.150/32'];
+        self::assertSame(['10.0.0.0/24'], IP4Helper::aggregateSubnets($cidrs, '10.0.0.0/16', 7));
+        self::assertSame($cidrs, IP4Helper::aggregateSubnets($cidrs, '10.0.0.0/16', 8));
+    }
+
+    public function testAggregateSubnetsDensityMergesAdjacentExpandedBuckets(): void {
+        // Two adjacent /24s each reach the threshold → both expand → they
+        // touch at the boundary → re-merge fuses them into /23.
+        $cidrs = array_merge(
+            array_map(fn(int $i) => "1.0.0.$i/32", range(0, 9)),
+            array_map(fn(int $i) => "1.0.1.$i/32", range(0, 9))
+        );
+        self::assertSame(['1.0.0.0/23'], IP4Helper::aggregateSubnets($cidrs, '1.0.0.0/8', 10));
+    }
+
+    public function testAggregateSubnetsDensitySkippedWhenParentPrefixAtLeast24(): void {
+        // Parent is /24 itself — no room for /24 buckets inside. Density
+        // logic is skipped; standard aggregation applies (with parent cap
+        // forcing /25+).
+        $result = IP4Helper::aggregateSubnets(
+            ['1.0.0.0/32', '1.0.0.1/32', '1.0.0.2/32'],
+            '1.0.0.0/24',
+            2
+        );
+        self::assertSame(['1.0.0.0/31', '1.0.0.2/32'], $result);
+    }
+
+    public function testAggregateSubnetsDensityZeroIsIdentityToLossless(): void {
+        $cidrs = ['1.0.0.0/32', '1.0.0.50/32', '1.0.0.100/32'];
+        $lossless = IP4Helper::aggregateSubnets($cidrs, '1.0.0.0/8');
+        $withZero = IP4Helper::aggregateSubnets($cidrs, '1.0.0.0/8', 0);
+        self::assertSame($lossless, $withZero);
+    }
+
+    public function testGrowReplacePassesDensityThresholdThrough(): void {
+        $replace = $this->replace(['2.16.0.0/13' => []]);
+        // 20 scattered IPs in /24 at 2.16.0.0 — enough to trip threshold 15.
+        $ips = array_map(fn(int $i) => '2.16.0.' . ($i * 10), range(0, 19));
+        IP4Helper::growReplace($replace, $ips, true, 15);
+        self::assertSame(['2.16.0.0/24'], $replace->cidr4->{'2.16.0.0/13'});
+    }
+
+    // ------------------------------------------------------------------
+    // Density collapse — wide /16 tier
+    // ------------------------------------------------------------------
+
+    public function testAggregateSubnetsDensityWideCollapsesAcrossSlash24s(): void {
+        // 40 /32s spread across 4 different /24s within one /16. Each /24
+        // has only 10 covered addresses — under a narrow tier threshold of
+        // 11 no /24 inflates. But the wide tier sees 40 addresses in the
+        // /16 and claims the whole /16.
+        $cidrs = [];
+        for ($s = 0; $s < 4; $s++) {
+            for ($i = 0; $i < 10; $i++) {
+                $cidrs[] = "100.64.$s.$i/32";
+            }
+        }
+        self::assertSame(['100.64.0.0/16'], IP4Helper::aggregateSubnets($cidrs, '100.64.0.0/10', 11, 40));
+    }
+
+    public function testAggregateSubnetsDensityTieredPyramidFeedsWideFromNarrow(): void {
+        // Each /24 reaches narrow threshold (5) → inflated to full /24 (256
+        // addresses). Four inflated /24s give 1024 addresses in the /16 →
+        // wide threshold (1000) triggers → /16 is claimed.
+        $cidrs = [];
+        for ($s = 0; $s < 4; $s++) {
+            for ($i = 0; $i < 10; $i++) {
+                $cidrs[] = "100.64.$s.$i/32";
+            }
+        }
+        self::assertSame(['100.64.0.0/16'], IP4Helper::aggregateSubnets($cidrs, '100.64.0.0/10', 5, 1000));
+    }
+
+    public function testAggregateSubnetsDensityWideSkippedWhenParentPrefixAtLeast16(): void {
+        // Parent /16 leaves no room for /16 buckets — wide tier skipped.
+        // Narrow tier still runs (parent=16 < 24).
+        $result = IP4Helper::aggregateSubnets(
+            ['100.64.0.0/32', '100.64.0.1/32', '100.64.0.2/32', '100.64.0.3/32'],
+            '100.64.0.0/16',
+            4,
+            4
+        );
+        // Narrow threshold 4 + 4 coverage → /24 inflates. Wide is skipped.
+        self::assertSame(['100.64.0.0/24'], $result);
+    }
+
+    public function testAggregateSubnetsDensityWideZeroDoesNotTrigger(): void {
+        // wide=0 means disabled — only narrow runs (if set).
+        $cidrs = array_map(fn(int $i) => "100.64.$i.0/32", range(0, 9));
+        $result = IP4Helper::aggregateSubnets($cidrs, '100.64.0.0/10', 0, 0);
+        self::assertSame($cidrs, $result);
+    }
+
+    public function testGrowReplacePassesBothDensityThresholdsThrough(): void {
+        $replace = $this->replace(['100.64.0.0/10' => []]);
+        $ips = [];
+        for ($s = 0; $s < 4; $s++) {
+            for ($i = 0; $i < 10; $i++) {
+                $ips[] = "100.64.$s.$i";
+            }
+        }
+        IP4Helper::growReplace($replace, $ips, true, 5, 1000);
+        self::assertSame(['100.64.0.0/16'], $replace->cidr4->{'100.64.0.0/10'});
+    }
 }
