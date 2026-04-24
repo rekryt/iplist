@@ -38,10 +38,12 @@ class CustomController extends AbstractIPListController {
                 // Skip per-site minimize for the common no-replace case — cidr4
                 // is already minimized at load, cidr6 is kept raw by design.
                 $rawRows = match (true) {
-                    $data === 'cidr4' && $siteEntity->hasReplace('cidr4') => IP4Helper::minimizeSubnets(
+                    $data === 'cidr4' && !$this->native && $siteEntity->hasReplace('cidr4')
+                        => IP4Helper::minimizeSubnets(
                         IP4Helper::applyReplace($siteEntity->cidr4, $siteEntity->replace)
                     ),
-                    $data === 'cidr6' && $siteEntity->hasReplace('cidr6') => IP6Helper::minimizeSubnets(
+                    $data === 'cidr6' && !$this->native && $siteEntity->hasReplace('cidr6')
+                        => IP6Helper::minimizeSubnets(
                         IP6Helper::applyReplace($siteEntity->cidr6, $siteEntity->replace)
                     ),
                     default => $siteEntity->{$data},

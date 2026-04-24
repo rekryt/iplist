@@ -20,6 +20,14 @@ abstract class AbstractIPListController extends AbstractController {
     protected IPListService $service;
 
     /**
+     * `?native=1` — return raw `cidr4`/`cidr6` without the `replace`
+     * substitution. Cached once in the constructor because `siteRows`/
+     * `applyReplace` sites in hot per-site loops; re-reading the query
+     * parameter array on every iteration is wasted work.
+     */
+    protected readonly bool $native;
+
+    /**
      * @param Request $request
      * @param array $headers
      * @throws BufferException
@@ -30,6 +38,7 @@ abstract class AbstractIPListController extends AbstractController {
 
         $this->logger = App::getLogger();
         $this->service = IPListService::getInstance();
+        $this->native = !!($this->request->getQueryParameter('native') ?? '');
 
         $isFileSave = !!($this->request->getQueryParameter('filesave') ?? '');
         if ($isFileSave) {
@@ -149,7 +158,7 @@ abstract class AbstractIPListController extends AbstractController {
      * @return array<int, string>
      */
     protected function resolvedCidr(Site $site, string $field): array {
-        if (!$site->hasReplace($field)) {
+        if ($this->native || !$site->hasReplace($field)) {
             return $site->{$field};
         }
         return $field === 'cidr4'

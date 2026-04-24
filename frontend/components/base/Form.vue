@@ -29,6 +29,7 @@ const selectedExcludedIP6 = ref<string[]>([]);
 const selectedExcludedCIDR6 = ref<string[]>([]);
 const isWildCard = ref(false);
 const isFileSave = ref(false);
+const isNative = ref(false);
 
 const items = computed<Group[]>(() => {
     return Object.entries(data.value as Record<string, string[]>).reduce<Group[]>((acc, [site, group]) => {
@@ -133,6 +134,9 @@ const url = computed(() => {
         if (selectedDataType.value === 'domains' && isWildCard.value) {
             data['wildcard'] = '1';
         }
+        if ((selectedDataType.value === 'cidr4' || selectedDataType.value === 'cidr6') && isNative.value) {
+            data['native'] = '1';
+        }
     }
     if (selected.value.length > 0) {
         data['site'] = selected.value.map((item) => item.label);
@@ -235,6 +239,7 @@ const fallbackCopy = (text: string) => {
         "excludeIp": "Exclude IP",
         "excludeDomains": "Exclude domains",
         "onlyWildcard": "Only wildcard domains",
+        "nativeCidr": "Raw CIDR (no replace substitution)",
         "saveToFile": "Save as file",
         "submit": "Submit",
         "allData": "All data",
@@ -266,6 +271,7 @@ const fallbackCopy = (text: string) => {
         "excludeIp": "Исключить IP",
         "excludeDomains": "Исключить домены",
         "onlyWildcard": "Только wildcard домены",
+        "nativeCidr": "Исходные CIDR без сжатия",
         "saveToFile": "Сохранить как файл",
         "submit": "Отправить",
         "allData": "Все данные",
@@ -297,6 +303,7 @@ const fallbackCopy = (text: string) => {
         "excludeIp": "排除 IP",
         "excludeDomains": "排除域名",
         "onlyWildcard": "仅限通配符域名",
+        "nativeCidr": "原始 CIDR（不应用替换）",
         "saveToFile": "保存为文件",
         "submit": "提交",
         "allData": "所有数据",
@@ -487,6 +494,15 @@ const fallbackCopy = (text: string) => {
                         v-if="selectedDataType === 'domains' && selectedFormat !== 'wildcard'"
                         v-model="isWildCard"
                         :label="t('onlyWildcard')"
+                        :value="true"
+                        color="primary"
+                        density="compact"
+                        hide-details
+                    ></v-checkbox>
+                    <v-checkbox
+                        v-if="selectedDataType === 'cidr4' || selectedDataType === 'cidr6'"
+                        v-model="isNative"
+                        :label="t('nativeCidr')"
                         :value="true"
                         color="primary"
                         density="compact"

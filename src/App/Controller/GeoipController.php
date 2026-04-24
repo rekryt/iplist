@@ -140,10 +140,10 @@ class GeoipController extends AbstractIPListController {
      */
     private function siteRows(Site $site, string $data): array {
         $rows = match (true) {
-            $data === 'cidr4' && $site->hasReplace('cidr4') => IP4Helper::minimizeSubnets(
+            $data === 'cidr4' && !$this->native && $site->hasReplace('cidr4') => IP4Helper::minimizeSubnets(
                 IP4Helper::applyReplace($site->cidr4, $site->replace)
             ),
-            $data === 'cidr6' && $site->hasReplace('cidr6') => IP6Helper::minimizeSubnets(
+            $data === 'cidr6' && !$this->native && $site->hasReplace('cidr6') => IP6Helper::minimizeSubnets(
                 IP6Helper::applyReplace($site->cidr6, $site->replace)
             ),
             default => $site->$data ?? [],

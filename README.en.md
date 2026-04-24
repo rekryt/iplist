@@ -166,6 +166,7 @@ http://0.0.0.0:8080/?format=comma&data=cidr4
 | exclude[domain] | Exclude domains            | ?exclude[domain]=youtube.com                                                                                   |
 | wildcard        | Keep only wildcard domains | ?wildcard=1                                                                                                    |
 | filesave        | Save as a file             | ?filesave=1                                                                                                    |
+| native          | Return the portal's raw `cidr4`/`cidr6` without applying `replace` (see [docs/REPLACE.en.md](docs/REPLACE.en.md)) | ?data=cidr4&native=1                                                                                           |
 | template        | Custom output format       | ?format=custom&template=[more](https://github.com/rekryt/iplist/blob/master/README.en.md#custom-output-format) |
 
 ## SSL Setup
