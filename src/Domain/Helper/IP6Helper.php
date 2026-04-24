@@ -2,8 +2,10 @@
 
 namespace OpenCCK\Domain\Helper;
 
+use OpenCCK\Domain\Factory\SiteFactory;
 use OpenCCK\Infrastructure\API\App;
 use OpenCCK\Infrastructure\Storage\CIDRStorage;
+use stdClass;
 
 use function Amp\async;
 use function Amp\delay;
@@ -87,8 +89,7 @@ class IP6Helper {
             })->await();
         }
 
-        //return self::minimizeSubnets($results);
-        return $results;
+        return self::minimizeSubnets($results);
     }
 
     /**
@@ -193,6 +194,53 @@ class IP6Helper {
             }
         }
         return false;
+    }
+
+    /**
+     * IPv6 counterpart of IP4Helper::growReplace. Uses /128 for host-level
+     * escalation, operates on $replace->cidr6, and applies minimizeSubnets
+     * to each value array on every call — see the v4 docblock for the full
+     * contract. Mutates $replace in place. Must stay synchronous.
+     */
+    public static function growReplace(object $replace, array $ips): void {
+        if (!isset($replace->cidr6) || !is_object($replace->cidr6)) {
+            return;
+        }
+        $map = $replace->cidr6;
+        foreach ($map as $cidr => $values) {
+            $values = (array) $values;
+            foreach ($ips as $ip) {
+                if (self::isInCidr($ip, $cidr)) {
+                    $values[] = $ip . '/128';
+                }
+            }
+            $map->{$cidr} = self::minimizeSubnets(SiteFactory::normalize($values, true));
+        }
+    }
+
+    /**
+     * IPv6 counterpart of IP4Helper::applyReplace. Operates on
+     * $replace->cidr6. See the v4 docblock for the contract.
+     */
+    public static function applyReplace(array $cidrs, object $replace): array {
+        if (!isset($replace->cidr6) || !is_object($replace->cidr6)) {
+            return $cidrs;
+        }
+        $map = (array) $replace->cidr6;
+        if (!$map) {
+            return $cidrs;
+        }
+
+        $result = [];
+        foreach ($cidrs as $cidr) {
+            if (!isset($map[$cidr])) {
+                $result[] = $cidr;
+            }
+        }
+        foreach ($map as $values) {
+            $result = array_merge($result, (array) $values);
+        }
+        return $result;
     }
 
     /**

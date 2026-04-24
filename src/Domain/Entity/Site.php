@@ -2,6 +2,7 @@
 
 namespace OpenCCK\Domain\Entity;
 
+use Amp\Dns\DnsException;
 use OpenCCK\Domain\Factory\SiteFactory;
 use OpenCCK\Domain\Helper\DNSHelper;
 use OpenCCK\Domain\Helper\IP4Helper;
@@ -20,6 +21,13 @@ final class Site {
     private bool $isUseIpv4;
 
     /**
+     * Per-portal CIDR-replacement map. Not promoted in the constructor
+     * signature because its default is a nested stdClass, which is not a
+     * valid constant expression for a promoted-property default.
+     */
+    public object $replace;
+
+    /**
      * @param string $name Name of portal
      * @param string $group Group of portal
      * @param array $domains List of portal domains
@@ -30,6 +38,12 @@ final class Site {
      * @param array $cidr4 List of CIDRv4 zones of IPv4 addresses
      * @param array $cidr6 List of CIDRv6 zones of IPv6 addresses
      * @param object $external Lists of URLs to retrieve  data from external sources
+     * @param ?object $replace Per-portal CIDR-replacement map: $replace->cidr4/cidr6
+     *                        are objects whose keys are CIDR strings to drop from
+     *                        output and whose values are arrays of CIDR/IP-with-mask
+     *                        strings to substitute. Null defaults to the stable shape
+     *                        `{cidr4:{}, cidr6:{}}` so the JSON form is identical
+     *                        for portals that haven't configured any replacement.
      *
      */
     public function __construct(
@@ -42,8 +56,10 @@ final class Site {
         public array $ip6 = [],
         public array $cidr4 = [],
         public array $cidr6 = [],
-        public object $external = new stdClass()
+        public object $external = new stdClass(),
+        ?object $replace = null
     ) {
+        $this->replace = $replace ?? (object) ['cidr4' => new stdClass(), 'cidr6' => new stdClass()];
         $this->dnsHelper = new DNSHelper($dns);
         $this->isUseIpv4 = (getEnv('SYS_DNS_RESOLVE_IP4') ?? 'true') == 'true';
         $this->isUseIpv6 = (getEnv('SYS_DNS_RESOLVE_IP6') ?? 'true') == 'true';
@@ -75,6 +91,7 @@ final class Site {
 
     /**
      * @return void
+     * @throws DnsException
      */
     public function reload(): void {
         $startTime = time();
@@ -102,6 +119,19 @@ final class Site {
             $this->cidr6 = SiteFactory::normalize(IP6Helper::processCIDR($newIp6, $this->cidr6), true);
 
             $this->ip6 = SiteFactory::normalize(array_merge($this->ip6, $ip6), true);
+        }
+
+        if ((getEnv('SYS_REPLACE_ESCALATE_IPS') ?? 'true') === 'true') {
+            if ($this->isUseIpv4) {
+                IP4Helper::growReplace($this->replace, $this->ip4);
+            }
+            if ($this->isUseIpv6) {
+                IP6Helper::growReplace($this->replace, $this->ip6);
+            }
+            App::getLogger()->debug('growReplace done for ' . $this->name, [
+                'cidr4_keys' => count((array) ($this->replace->cidr4 ?? [])),
+                'cidr6_keys' => count((array) ($this->replace->cidr6 ?? [])),
+            ]);
         }
 
         $this->saveConfig();
@@ -156,10 +186,11 @@ final class Site {
 
         if (isset($this->external->cidr6) && $this->isUseIpv6) {
             foreach ($this->external->cidr6 as $url) {
-                // todo IP6Helper::minimizeSubnets
-                $this->cidr6 = SiteFactory::normalize(
-                    array_merge($this->cidr6, SiteFactory::trimArray(explode("\n", file_get_contents($url)))),
-                    true
+                $this->cidr6 = IP6Helper::minimizeSubnets(
+                    SiteFactory::normalize(
+                        array_merge($this->cidr6, SiteFactory::trimArray(explode("\n", file_get_contents($url)))),
+                        true
+                    )
                 );
             }
         }
@@ -180,6 +211,7 @@ final class Site {
             'cidr4' => SiteFactory::normalizeArray($this->cidr4, true),
             'cidr6' => SiteFactory::normalizeArray($this->cidr6, true),
             'external' => $this->external,
+            'replace' => $this->replace,
         ];
     }
 
@@ -191,6 +223,28 @@ final class Site {
             PATH_ROOT . '/config/' . $this->group . '/' . $this->name . '.json',
             json_encode($this->getConfig(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE)
         );
+    }
+
+    /**
+     * Fast-path probe for the `replace` feature. Returns true iff the
+     * replacement map for `$field` has at least one key — i.e. view-time
+     * substitution would actually change something. Controllers use this
+     * to skip `applyReplace` + per-site `minimizeSubnets` on the common
+     * case (most portals ship no `replace` block).
+     *
+     * @param string $field `cidr4` or `cidr6`
+     */
+    public function hasReplace(string $field): bool {
+        $map = $this->replace->{$field} ?? null;
+        if (!$map instanceof stdClass) {
+            return false;
+        }
+        // Cheap "has any property" check — avoids a full (array) cast on
+        // the stdClass, which would allocate just to discard the result.
+        foreach ($map as $_) {
+            return true;
+        }
+        return false;
     }
 
     /**
