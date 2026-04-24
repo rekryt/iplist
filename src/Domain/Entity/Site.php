@@ -21,13 +21,6 @@ final class Site {
     private bool $isUseIpv4;
 
     /**
-     * Per-portal CIDR-replacement map. Not promoted in the constructor
-     * signature because its default is a nested stdClass, which is not a
-     * valid constant expression for a promoted-property default.
-     */
-    public object $replace;
-
-    /**
      * @param string $name Name of portal
      * @param string $group Group of portal
      * @param array $domains List of portal domains
@@ -64,6 +57,13 @@ final class Site {
         $this->isUseIpv4 = (getEnv('SYS_DNS_RESOLVE_IP4') ?? 'true') == 'true';
         $this->isUseIpv6 = (getEnv('SYS_DNS_RESOLVE_IP6') ?? 'true') == 'true';
     }
+
+    /**
+     * Per-portal CIDR-replacement map. Not promoted in the constructor
+     * signature because its default is a nested stdClass, which is not a
+     * valid constant expression for a promoted-property default.
+     */
+    public object $replace;
 
     /**
      * @return void
