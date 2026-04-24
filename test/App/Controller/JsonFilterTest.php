@@ -54,7 +54,7 @@ final class JsonFilterTest extends AsyncTest {
     }
 
     public function testExcludeMultipleGroups(): void {
-        $data = $this->json(['exclude[group]' => ['casino', 'tools']]);
+        $data = $this->json(['exclude[group]' => ['casino', 'tools', 'replace']]);
         self::assertEqualsCanonicalizing(['game-a', 'game-b'], array_keys($data));
     }
 

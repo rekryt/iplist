@@ -45,7 +45,7 @@ final class EdgeCasesTest extends AsyncTest {
         $response = $this->get('/', [
             'format' => 'mikrotik',
             'data' => 'ip4',
-            'exclude[group]' => ['games', 'tools', 'casino'],
+            'exclude[group]' => ['games', 'tools', 'casino', 'replace'],
         ]);
         self::assertSame(200, $response->getStatus());
         self::assertSame('', $this->body($response));
@@ -62,13 +62,7 @@ final class EdgeCasesTest extends AsyncTest {
             'format' => 'mikrotik',
             'data' => 'ip4',
             'group' => 'games',
-            'exclude[ip4]' => [
-                '203.0.113.1',
-                '203.0.113.2',
-                '203.0.113.3',
-                '198.51.100.10',
-                '198.51.100.11',
-            ],
+            'exclude[ip4]' => ['203.0.113.1', '203.0.113.2', '203.0.113.3', '198.51.100.10', '198.51.100.11'],
         ]);
 
         self::assertSame(200, $response->getStatus());

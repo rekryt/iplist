@@ -21,15 +21,22 @@ class PacController extends AbstractIPListController {
 
         $items = [];
         $sitesEntities = $this->getSites();
+        $isCidr4 = $data === 'cidr4';
         if (count($sites)) {
             foreach ($sites as $site) {
-                foreach ($sitesEntities[$site]->$data as $row) {
+                $entity = $sitesEntities[$site] ?? null;
+                if ($entity === null) {
+                    continue;
+                }
+                $rows = $isCidr4 ? $this->resolvedCidr($entity, 'cidr4') : $entity->$data;
+                foreach ($rows as $row) {
                     $items[] = $row;
                 }
             }
         } else {
             foreach ($sitesEntities as $siteEntity) {
-                foreach ($siteEntity->$data as $row) {
+                $rows = $isCidr4 ? $this->resolvedCidr($siteEntity, 'cidr4') : $siteEntity->$data;
+                foreach ($rows as $row) {
                     $items[] = $row;
                 }
             }

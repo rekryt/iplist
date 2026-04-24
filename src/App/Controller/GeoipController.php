@@ -2,8 +2,10 @@
 
 namespace OpenCCK\App\Controller;
 
+use OpenCCK\Domain\Entity\Site;
 use OpenCCK\Domain\Factory\SiteFactory;
 use OpenCCK\Domain\Helper\IP4Helper;
+use OpenCCK\Domain\Helper\IP6Helper;
 use Amp\File;
 use Amp\Process\Process;
 use Amp\Process\ProcessException;
@@ -31,14 +33,14 @@ class GeoipController extends AbstractIPListController {
         if (count($sites)) {
             $items = $this->getSites();
             foreach ($sites as $site) {
-                $response[$site . '/' . $items[$site]->group] = SiteFactory::normalizeArray($items[$site]->$data, true);
+                if (!isset($items[$site])) {
+                    continue;
+                }
+                $response[$site . '/' . $items[$site]->group] = $this->siteRows($items[$site], $data);
             }
         } else {
             foreach ($this->getSites() as $siteEntity) {
-                $response[$siteEntity->name . '/' . $siteEntity->group] = SiteFactory::normalizeArray(
-                    $siteEntity->$data,
-                    true
-                );
+                $response[$siteEntity->name . '/' . $siteEntity->group] = $this->siteRows($siteEntity, $data);
             }
         }
 
@@ -124,5 +126,28 @@ class GeoipController extends AbstractIPListController {
         } catch (\Throwable $e) {
             return '# Error: ' . $e->getMessage();
         }
+    }
+
+    /**
+     * Per-site row source. For cidr4/cidr6 we only pay `applyReplace` +
+     * per-site `minimizeSubnets` when the site declares a replacement —
+     * otherwise the raw property is already in canonical form (both cidr4
+     * and cidr6 are minimized at load and kept minimized across reloads).
+     * The final `normalizeArray` pass still sorts/dedupes and strips
+     * private ranges before handing off to the geoip binary.
+     *
+     * @return array<int, string>
+     */
+    private function siteRows(Site $site, string $data): array {
+        $rows = match (true) {
+            $data === 'cidr4' && $site->hasReplace('cidr4') => IP4Helper::minimizeSubnets(
+                IP4Helper::applyReplace($site->cidr4, $site->replace)
+            ),
+            $data === 'cidr6' && $site->hasReplace('cidr6') => IP6Helper::minimizeSubnets(
+                IP6Helper::applyReplace($site->cidr6, $site->replace)
+            ),
+            default => $site->$data ?? [],
+        };
+        return SiteFactory::normalizeArray($rows, true);
     }
 }

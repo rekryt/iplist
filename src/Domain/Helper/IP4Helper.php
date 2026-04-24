@@ -2,8 +2,10 @@
 
 namespace OpenCCK\Domain\Helper;
 
+use OpenCCK\Domain\Factory\SiteFactory;
 use OpenCCK\Infrastructure\API\App;
 use OpenCCK\Infrastructure\Storage\CIDRStorage;
+use stdClass;
 
 use function Amp\async;
 use function Amp\delay;
@@ -154,6 +156,78 @@ class IP4Helper {
             }
         }
         return false;
+    }
+
+    /**
+     * Reload-time half of the `replace` feature for IPv4.
+     *
+     * For each key `$cidr` in `$replace->cidr4`, walks `$ips` and appends
+     * `"$ip/32"` to the value array of that key whenever the IP falls inside
+     * the zone. Each value array is then normalized and minimized, so:
+     *   - repeated reloads don't grow the list with duplicates;
+     *   - /32 entries inside a narrower admin-provided zone (say /24) are
+     *     absorbed by `minimizeSubnets`;
+     *   - the on-disk JSON converges to a stable, minimized form.
+     *
+     * Mutates `$replace` in place. No-op when `$replace->cidr4` is missing
+     * or empty.
+     *
+     * **Must stay synchronous** — no `await`/`delay`/`async` inside. The
+     * concurrency invariant is that a parallel HTTP request sees either
+     * the fully pre-mutation or fully post-mutation snapshot of `$replace`,
+     * never an intermediate state. Introducing a fiber-yield point here
+     * breaks that guarantee.
+     */
+    public static function growReplace(object $replace, array $ips): void {
+        if (!isset($replace->cidr4) || !is_object($replace->cidr4)) {
+            return;
+        }
+        $map = $replace->cidr4;
+        foreach ($map as $cidr => $values) {
+            $values = (array) $values;
+            foreach ($ips as $ip) {
+                if (self::isInCIDR($ip, $cidr)) {
+                    $values[] = $ip . '/32';
+                }
+            }
+            $map->{$cidr} = self::minimizeSubnets(SiteFactory::normalize($values, true));
+        }
+    }
+
+    /**
+     * View-time half of the `replace` feature for IPv4.
+     *
+     * Returns `$cidrs` with every string that matches a key of
+     * `$replace->cidr4` removed, plus the flattened concatenation of every
+     * value array. Does NOT run `minimizeSubnets` on the result — the caller
+     * typically aggregates across sites first, so a second minimization pass
+     * at the aggregation layer is more efficient than doing it per site here.
+     *
+     * CIDR-key comparison is strict byte-for-byte: admins must write
+     * replacement keys in exactly the form in which they appear in `$cidrs`.
+     * No trim, no canonicalization. The filter uses `isset` against the
+     * hash-cast map so the cost scales as O(|cidrs| + |keys|) rather than
+     * the O(|cidrs| × |keys|) of `array_diff`.
+     */
+    public static function applyReplace(array $cidrs, object $replace): array {
+        if (!isset($replace->cidr4) || !is_object($replace->cidr4)) {
+            return $cidrs;
+        }
+        $map = (array) $replace->cidr4;
+        if (!$map) {
+            return $cidrs;
+        }
+
+        $result = [];
+        foreach ($cidrs as $cidr) {
+            if (!isset($map[$cidr])) {
+                $result[] = $cidr;
+            }
+        }
+        foreach ($map as $values) {
+            $result = array_merge($result, (array) $values);
+        }
+        return $result;
     }
 
     /**

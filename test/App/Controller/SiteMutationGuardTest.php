@@ -39,6 +39,10 @@ final class SiteMutationGuardTest extends AsyncTest {
                 'cidr4' => $site->cidr4,
                 'cidr6' => $site->cidr6,
                 'external' => $site->external,
+                // `replace` is mutated by growReplace at reload time, NOT by
+                // any controller. Snapshot it here so any accidental
+                // view-time mutation surfaces as a failure.
+                'replace' => unserialize(serialize($site->replace)),
             ];
         }
         return $out;
@@ -60,25 +64,25 @@ final class SiteMutationGuardTest extends AsyncTest {
     /** @return array<string, array{string, string}> */
     public static function formatsWithoutFilters(): array {
         return [
-            'json-all'          => ['json', ''],
-            'json-ip4'          => ['json', 'ip4'],
-            'text-ip4'          => ['text', 'ip4'],
-            'text-cidr4'        => ['text', 'cidr4'],
-            'text-domains'      => ['text', 'domains'],
-            'mikrotik-ip4'      => ['mikrotik', 'ip4'],
-            'mikrotik-cidr4'    => ['mikrotik', 'cidr4'],
-            'bat-ip4'           => ['bat', 'ip4'],
-            'bat-cidr4'         => ['bat', 'cidr4'],
-            'amnezia-ip4'       => ['amnezia', 'ip4'],
-            'kvas-ip4'          => ['kvas', 'ip4'],
-            'clashx-ip4'        => ['clashx', 'ip4'],
-            'clashx-cidr4'      => ['clashx', 'cidr4'],
-            'nfset-ip4'         => ['nfset', 'ip4'],
-            'ipset-ip4'         => ['ipset', 'ip4'],
-            'pac-cidr4'         => ['pac', 'cidr4'],
-            'pac-domains'       => ['pac', 'domains'],
-            'switchy-domains'   => ['switchy', 'domains'],
-            'comma-ip4'         => ['comma', 'ip4'],
+            'json-all' => ['json', ''],
+            'json-ip4' => ['json', 'ip4'],
+            'text-ip4' => ['text', 'ip4'],
+            'text-cidr4' => ['text', 'cidr4'],
+            'text-domains' => ['text', 'domains'],
+            'mikrotik-ip4' => ['mikrotik', 'ip4'],
+            'mikrotik-cidr4' => ['mikrotik', 'cidr4'],
+            'bat-ip4' => ['bat', 'ip4'],
+            'bat-cidr4' => ['bat', 'cidr4'],
+            'amnezia-ip4' => ['amnezia', 'ip4'],
+            'kvas-ip4' => ['kvas', 'ip4'],
+            'clashx-ip4' => ['clashx', 'ip4'],
+            'clashx-cidr4' => ['clashx', 'cidr4'],
+            'nfset-ip4' => ['nfset', 'ip4'],
+            'ipset-ip4' => ['ipset', 'ip4'],
+            'pac-cidr4' => ['pac', 'cidr4'],
+            'pac-domains' => ['pac', 'domains'],
+            'switchy-domains' => ['switchy', 'domains'],
+            'comma-ip4' => ['comma', 'ip4'],
         ];
     }
 

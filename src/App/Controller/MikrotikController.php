@@ -4,6 +4,8 @@ namespace OpenCCK\App\Controller;
 
 use OpenCCK\Domain\Entity\Site;
 use OpenCCK\Domain\Factory\SiteFactory;
+use OpenCCK\Domain\Helper\IP4Helper;
+use OpenCCK\Domain\Helper\IP6Helper;
 
 class MikrotikController extends AbstractIPListController {
     /**
@@ -34,19 +36,25 @@ class MikrotikController extends AbstractIPListController {
 
             // Flip-map dedup — $seen is reset per group so the "one add per IP
             // per list" rule still holds across sites in the same group, without
-            // the O(N²) in_array scan.
+            // the O(N²) in_array scan. For cidr4/cidr6 the rows come from
+            // `resolvedCidr` (replace substitution applied) and are minimized
+            // PER SITE, not cross-site: otherwise one site's /16 would absorb
+            // another site's /32 and the corresponding `comment=<site>` line
+            // would vanish — the atribution is worth the occasional overlap.
             $items = [];
             $seen = [];
             foreach ($groupSites as $siteName => $siteEntity) {
                 if (count($sites) && !in_array($siteName, $sites)) {
                     continue;
                 }
-                foreach ($siteEntity->$data as $row) {
+                $rows = $this->siteRows($siteEntity, $data);
+                foreach ($rows as $row) {
                     if (isset($seen[$row])) {
                         continue;
                     }
                     $seen[$row] = true;
-                    $items[] = 'add list=' . $listName . ' address=' . $row . ' comment=' . $siteEntity->name . $appendStr;
+                    $items[] =
+                        'add list=' . $listName . ' address=' . $row . ' comment=' . $siteEntity->name . $appendStr;
                 }
             }
 
@@ -81,5 +89,32 @@ class MikrotikController extends AbstractIPListController {
         }
 
         return implode("\n", $response);
+    }
+
+    /**
+     * Per-site row source. For cidr4/cidr6 we only pay for `applyReplace` +
+     * per-site `minimizeSubnets` when the site actually declares a `replace`
+     * block — otherwise the raw property is returned as-is. Skipping the
+     * O(N²) minimize pass here is the whole point of the `hasReplace` probe:
+     * both `$site->cidr4` and `$site->cidr6` are already minimized at load
+     * by `SiteFactory::create` and kept minimized across `reload`/
+     * `reloadExternal`, so returning them directly is safe.
+     *
+     * @return array<int, string>
+     */
+    private function siteRows(Site $site, string $data): array {
+        if ($data === 'cidr4') {
+            if (!$site->hasReplace('cidr4')) {
+                return $site->cidr4;
+            }
+            return IP4Helper::minimizeSubnets(IP4Helper::applyReplace($site->cidr4, $site->replace));
+        }
+        if ($data === 'cidr6') {
+            if (!$site->hasReplace('cidr6')) {
+                return $site->cidr6;
+            }
+            return IP6Helper::minimizeSubnets(IP6Helper::applyReplace($site->cidr6, $site->replace));
+        }
+        return $site->$data ?? [];
     }
 }

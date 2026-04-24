@@ -8,6 +8,8 @@ use Amp\Http\Server\Request;
 use OpenCCK\App\Service\IPListService;
 use OpenCCK\Domain\Entity\Site;
 use OpenCCK\Domain\Factory\SiteFactory;
+use OpenCCK\Domain\Helper\IP4Helper;
+use OpenCCK\Domain\Helper\IP6Helper;
 use OpenCCK\Infrastructure\API\App;
 
 use Monolog\Logger;
@@ -127,6 +129,32 @@ abstract class AbstractIPListController extends AbstractController {
         }
 
         return $sites;
+    }
+
+    /**
+     * Returns the site's CIDR list with the `replace` substitution applied.
+     * Pure read helper — does not mutate the Site. Does NOT run
+     * minimizeSubnets on the result; callers that aggregate across sites
+     * are expected to minimize at the aggregation layer.
+     *
+     * Fast path: when the site has no replacement configured for the
+     * requested field, returns the raw property array (no allocation,
+     * no helper call). Callers can further skip per-site `minimizeSubnets`
+     * by checking `$site->hasReplace($field)` themselves — both cidr4 and
+     * cidr6 are already minimized at load by `SiteFactory::create` and
+     * remain minimized across `reload`/`reloadExternal`.
+     *
+     * @param Site $site
+     * @param string $field `cidr4` or `cidr6`
+     * @return array<int, string>
+     */
+    protected function resolvedCidr(Site $site, string $field): array {
+        if (!$site->hasReplace($field)) {
+            return $site->{$field};
+        }
+        return $field === 'cidr4'
+            ? IP4Helper::applyReplace($site->cidr4, $site->replace)
+            : IP6Helper::applyReplace($site->cidr6, $site->replace);
     }
 
     /**

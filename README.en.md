@@ -82,6 +82,7 @@ Configuration files are stored in the `config/<group>/<site>.json`. Each JSON fi
 | cidr4    | string[] | Initial list of CIDRv4 zones of IPv4 addresses            |
 | cidr6    | string[] | Initial list of CIDRv6 zones of IPv6 addresses            |
 | external | object   | Lists of URLs to retrieve data from external sources      |
+| replace  | object   | Per-portal CIDR-replacement map (see the section below)   |
 
 | property | type     | description                                                  |
 |----------|----------|--------------------------------------------------------------|
@@ -90,6 +91,56 @@ Configuration files are stored in the `config/<group>/<site>.json`. Each JSON fi
 | ip6      | string[] | List of URLs for replenishing IPv6 addresses                 |
 | cidr4    | string[] | List of URLs for replenishing CIDRv4 zones of IPv4 addresses |
 | cidr6    | string[] | List of URLs for replenishing CIDRv6 zones of IPv6 addresses |
+
+### Replacing overlapping CIDR zones (`replace` property)
+
+Some CIDR zones belong to more than one portal at once (for instance,
+`172.217.0.0/16` appears on both `google` and `yandex` — whois cannot
+split them automatically). To avoid routing someone else's traffic,
+a portal config may declare targeted replacements:
+
+```json
+{
+    ...
+    "replace": {
+        "cidr4": {
+            "172.217.0.0/16": ["172.217.17.206/32", "172.217.17.207/32", "172.217.18.0/24"]
+        },
+        "cidr6": {
+            "2001::/32": ["2001:4860::/32"]
+        }
+    }
+}
+```
+
+The feature works in two phases.
+
+**Reload-time (during portal data refresh).** At the end of each `reload`
+cycle, when `SYS_REPLACE_ESCALATE_IPS=true` (the default), the service
+walks the keys of `replace.cidr4`/`replace.cidr6` and appends to each
+value array every `ip4`/`ip6` of the portal that falls inside the key
+zone, masked as `/32` (or `/128` for IPv6). Each value array is then
+passed through `minimizeSubnets` — entries absorbed by a narrower
+admin-provided zone disappear, and a repeated `reload` never grows
+duplicates. The result is persisted to the portal's JSON config.
+
+**View-time (when answering HTTP clients).** Every output format except
+`json` drops the `replace` keys from `cidr4`/`cidr6` and substitutes
+the value arrays instead. After cross-site aggregation the result is
+passed through `minimizeSubnets`, so the response contains no
+duplicates.
+
+The `json` format deliberately returns the raw portal state along with
+the `replace` block — clients may decide for themselves how to
+interpret it.
+
+Replacement does NOT apply to `ip4`/`ip6`/`domains` and never mutates
+`cidr4`/`cidr6` in memory or on disk — only the value arrays inside
+`replace` itself grow over time. Keys are compared byte-for-byte:
+write them in exactly the same form they appear in the portal's
+`cidr4`/`cidr6`. An invalid `replace` structure (values that are not
+an object / not an array / not a string) causes a load-time error
+and stops the server.
 
 ## Setting Up and Running in Docker
 ```shell
@@ -109,6 +160,7 @@ If needed, edit the `.env` file:
 | SYS_DNS_RESOLVE_CHUNK_SIZE | 10            | Chunk size for retrieving DNS records                          |
 | SYS_DNS_RESOLVE_DELAY      | 100           | Delay between receiving dns records (milliseconds)             |
 | SYS_IP6_SUBNET_PREFIX_CAP  | 64            | The maximum allowed IPv6 subnet prefix length                  |
+| SYS_REPLACE_ESCALATE_IPS   | true          | At reload time, escalate `ip4`/`ip6` into `replace` value lists |
 | SYS_MEMORY_LIMIT           | 1024M         | Memory limit                                                   |
 | SYS_TIMEZONE               | Europe/Moscow | List of URLs to obtain initial CIDRv4 zones for IPv4 addresses |
 | HTTP_HOST                  | 0.0.0.0       | IP of network interface (default is all interfaces)            |

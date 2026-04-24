@@ -35,10 +35,21 @@ class CustomController extends AbstractIPListController {
             }
 
             foreach ($groupSites as $siteName => $siteEntity) {
+                // Skip per-site minimize for the common no-replace case — cidr4
+                // is already minimized at load, cidr6 is kept raw by design.
+                $rawRows = match (true) {
+                    $data === 'cidr4' && $siteEntity->hasReplace('cidr4') => IP4Helper::minimizeSubnets(
+                        IP4Helper::applyReplace($siteEntity->cidr4, $siteEntity->replace)
+                    ),
+                    $data === 'cidr6' && $siteEntity->hasReplace('cidr6') => IP6Helper::minimizeSubnets(
+                        IP6Helper::applyReplace($siteEntity->cidr6, $siteEntity->replace)
+                    ),
+                    default => $siteEntity->{$data},
+                };
                 $this->appendRenderedRows(
                     $response,
                     $siteEntity,
-                    SiteFactory::normalizeArray($siteEntity->{$data}, $isIpData),
+                    SiteFactory::normalizeArray($rawRows, $isIpData),
                     $data,
                     $template
                 );
