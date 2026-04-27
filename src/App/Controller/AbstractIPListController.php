@@ -28,6 +28,20 @@ abstract class AbstractIPListController extends AbstractController {
     protected readonly bool $native;
 
     /**
+     * `exclude[cidr4]` / `exclude[cidr6]` materialized as lookup maps.
+     * Applied both pre-replace in `getSites()` (to drop key zones and to
+     * keep `JsonController`'s raw view honest) and post-replace inside
+     * `resolvedCidr()` — without the post-replace pass, exclude can't
+     * match CIDRs that only appear after `applyReplace` substitutes a
+     * parent zone with its narrower children.
+     *
+     * @var array<string, true>
+     */
+    protected readonly array $excludeCidr4;
+    /** @var array<string, true> */
+    protected readonly array $excludeCidr6;
+
+    /**
      * @param Request $request
      * @param array $headers
      * @throws BufferException
@@ -39,6 +53,8 @@ abstract class AbstractIPListController extends AbstractController {
         $this->logger = App::getLogger();
         $this->service = IPListService::getInstance();
         $this->native = !!($this->request->getQueryParameter('native') ?? '');
+        $this->excludeCidr4 = array_fill_keys($this->request->getQueryParameterArray('exclude[cidr4]') ?? [], true);
+        $this->excludeCidr6 = array_fill_keys($this->request->getQueryParameterArray('exclude[cidr6]') ?? [], true);
 
         $isFileSave = !!($this->request->getQueryParameter('filesave') ?? '');
         if ($isFileSave) {
@@ -70,10 +86,10 @@ abstract class AbstractIPListController extends AbstractController {
             'site' => $this->request->getQueryParameterArray('exclude[site]') ?? [],
             'domain' => $this->request->getQueryParameterArray('exclude[domain]') ?? [],
             'ip4' => $this->request->getQueryParameterArray('exclude[ip4]') ?? [],
-            'cidr4' => $this->request->getQueryParameterArray('exclude[cidr4]') ?? [],
             'ip6' => $this->request->getQueryParameterArray('exclude[ip6]') ?? [],
-            'cidr6' => $this->request->getQueryParameterArray('exclude[cidr6]') ?? [],
         ]);
+        $exclude['cidr4'] = $this->excludeCidr4;
+        $exclude['cidr6'] = $this->excludeCidr6;
 
         // Skip clone + field materialization when no per-field mutation
         // is requested. For the common case (format=mikrotik&data=ip4 without
@@ -158,12 +174,27 @@ abstract class AbstractIPListController extends AbstractController {
      * @return array<int, string>
      */
     protected function resolvedCidr(Site $site, string $field): array {
+        $excludes = $field === 'cidr4' ? $this->excludeCidr4 : $this->excludeCidr6;
+
         if ($this->native || !$site->hasReplace($field)) {
             return $site->{$field};
         }
-        return $field === 'cidr4'
-            ? IP4Helper::applyReplace($site->cidr4, $site->replace)
-            : IP6Helper::applyReplace($site->cidr6, $site->replace);
+
+        $resolved =
+            $field === 'cidr4'
+                ? IP4Helper::applyReplace($site->cidr4, $site->replace)
+                : IP6Helper::applyReplace($site->cidr6, $site->replace);
+
+        if (!$excludes) {
+            return $resolved;
+        }
+        $filtered = [];
+        foreach ($resolved as $cidr) {
+            if (!isset($excludes[$cidr])) {
+                $filtered[] = $cidr;
+            }
+        }
+        return $filtered;
     }
 
     /**

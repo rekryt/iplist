@@ -39,13 +39,9 @@ class CustomController extends AbstractIPListController {
                 // is already minimized at load, cidr6 is kept raw by design.
                 $rawRows = match (true) {
                     $data === 'cidr4' && !$this->native && $siteEntity->hasReplace('cidr4')
-                        => IP4Helper::minimizeSubnets(
-                        IP4Helper::applyReplace($siteEntity->cidr4, $siteEntity->replace)
-                    ),
+                        => IP4Helper::minimizeSubnets($this->resolvedCidr($siteEntity, 'cidr4')),
                     $data === 'cidr6' && !$this->native && $siteEntity->hasReplace('cidr6')
-                        => IP6Helper::minimizeSubnets(
-                        IP6Helper::applyReplace($siteEntity->cidr6, $siteEntity->replace)
-                    ),
+                        => IP6Helper::minimizeSubnets($this->resolvedCidr($siteEntity, 'cidr6')),
                     default => $siteEntity->{$data},
                 };
                 $this->appendRenderedRows(

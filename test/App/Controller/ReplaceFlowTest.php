@@ -101,6 +101,79 @@ final class ReplaceFlowTest extends AsyncTest {
         self::assertEquals($after1, $replace);
     }
 
+    public function testExcludeCidr4DropsSubstitutedValueAfterReplace(): void {
+        // Reported bug: `exclude[cidr4]` was applied only to the raw
+        // `$site->cidr4` in `getSites()`, before `applyReplace` substituted
+        // the parent zone with its narrower children. So users could not
+        // exclude a CIDR that only appeared post-substitution. After the
+        // fix, the exclude is reapplied to the resolved list.
+        $base = ['format' => 'text', 'data' => 'cidr4', 'site' => 'mock-google'];
+
+        $without = explode("\n", $this->body($this->get('/', $base)));
+        self::assertContains('172.217.17.206/32', $without);
+        self::assertContains('172.217.17.207/32', $without);
+
+        $with = explode("\n", $this->body($this->get('/', $base + ['exclude[cidr4]' => '172.217.17.206/32'])));
+        self::assertNotContains('172.217.17.206/32', $with);
+        // Sibling substitute and parent stay consistent: parent still
+        // replaced out, the other /32 still emitted.
+        self::assertContains('172.217.17.207/32', $with);
+        self::assertNotContains('172.217.0.0/16', $with);
+    }
+
+    public function testExcludeCidr6DropsSubstitutedValueAfterReplace(): void {
+        $base = ['format' => 'text', 'data' => 'cidr6', 'site' => 'mock-google'];
+
+        $without = explode("\n", $this->body($this->get('/', $base)));
+        self::assertContains('2001:db8::1/128', $without);
+
+        $with = explode("\n", $this->body($this->get('/', $base + ['exclude[cidr6]' => '2001:db8::1/128'])));
+        self::assertNotContains('2001:db8::1/128', $with);
+        self::assertNotContains('2001:db8::/32', $with);
+    }
+
+    public function testExcludeCidr4WorksOnMikrotikFormatAfterReplace(): void {
+        // MikrotikController used to call applyReplace directly and so had
+        // the same bug. Pin that excluding a substituted /32 actually drops
+        // it from the rendered `add address=… list=…` lines.
+        $base = ['format' => 'mikrotik', 'data' => 'cidr4', 'site' => 'mock-google'];
+
+        $without = $this->body($this->get('/', $base));
+        self::assertStringContainsString('172.217.17.206/32', $without);
+
+        $with = $this->body($this->get('/', $base + ['exclude[cidr4]' => '172.217.17.206/32']));
+        self::assertStringNotContainsString('172.217.17.206/32', $with);
+        self::assertStringContainsString('172.217.17.207/32', $with);
+    }
+
+    public function testExcludeCidr4WorksOnCustomFormatAfterReplace(): void {
+        // CustomController also bypassed resolvedCidr and inherited the bug.
+        $base = [
+            'format' => 'custom',
+            'data' => 'cidr4',
+            'site' => 'mock-google',
+            'template' => '{data}',
+        ];
+
+        $without = explode("\n", $this->body($this->get('/', $base)));
+        self::assertContains('172.217.17.206/32', $without);
+
+        $with = explode("\n", $this->body($this->get('/', $base + ['exclude[cidr4]' => '172.217.17.206/32'])));
+        self::assertNotContains('172.217.17.206/32', $with);
+        self::assertContains('172.217.17.207/32', $with);
+    }
+
+    public function testExcludeKeyZoneStillWorks(): void {
+        // Pin pre-existing behavior: excluding the parent zone removes it
+        // from the raw `$site->cidr4` (still done by `getSites()`). Note
+        // that `applyReplace` always emits the map's value array regardless
+        // of whether the key was filtered from input — so the substitutes
+        // remain in the output. That's outside the scope of this bug.
+        $base = ['format' => 'text', 'data' => 'cidr4', 'site' => 'mock-google'];
+        $with = explode("\n", $this->body($this->get('/', $base + ['exclude[cidr4]' => '172.217.0.0/16'])));
+        self::assertNotContains('172.217.0.0/16', $with);
+    }
+
     public function testGrowReplacePersistsEscalatedIpsForZonesAdminListed(): void {
         // Cold-start scenario: admin writes replace.cidr4 with empty values,
         // Site::reload picks up existing ip4 and grows the list to /32 entries.

@@ -104,16 +104,14 @@ class MikrotikController extends AbstractIPListController {
      */
     private function siteRows(Site $site, string $data): array {
         if ($data === 'cidr4') {
-            if ($this->native || !$site->hasReplace('cidr4')) {
-                return $site->cidr4;
-            }
-            return IP4Helper::minimizeSubnets(IP4Helper::applyReplace($site->cidr4, $site->replace));
+            return $site->hasReplace('cidr4') && !$this->native
+                ? IP4Helper::minimizeSubnets($this->resolvedCidr($site, 'cidr4'))
+                : $this->resolvedCidr($site, 'cidr4');
         }
         if ($data === 'cidr6') {
-            if ($this->native || !$site->hasReplace('cidr6')) {
-                return $site->cidr6;
-            }
-            return IP6Helper::minimizeSubnets(IP6Helper::applyReplace($site->cidr6, $site->replace));
+            return $site->hasReplace('cidr6') && !$this->native
+                ? IP6Helper::minimizeSubnets($this->resolvedCidr($site, 'cidr6'))
+                : $this->resolvedCidr($site, 'cidr6');
         }
         return $site->$data ?? [];
     }
