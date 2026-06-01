@@ -33,4 +33,20 @@ final class AmneziaControllerTest extends AsyncTest {
         $response = $this->get('/', ['format' => 'amnezia', 'data' => 'ip4', 'filesave' => '1']);
         self::assertStringContainsString('ip-list.json', $response->getHeader('content-disposition') ?? '');
     }
+
+    /**
+     * Every buffered response must advertise an exact Content-Length so a
+     * reverse-proxy cache (and the downloading client) can detect a truncated
+     * body instead of persisting it as if complete. Pins the corrupt-download
+     * regression: AMPHP does not derive Content-Length from a string body, so
+     * AbstractController sets it explicitly from strlen().
+     */
+    public function testContentLengthMatchesBodyByteLength(): void {
+        $response = $this->get('/', ['format' => 'amnezia', 'data' => 'cidr4', 'filesave' => '1']);
+        $body = $this->body($response);
+        $contentLength = $response->getHeader('content-length');
+
+        self::assertNotNull($contentLength, 'Content-Length header must be present');
+        self::assertSame(strlen($body), (int) $contentLength);
+    }
 }

@@ -38,17 +38,20 @@ final class HTTPHandler extends Handler implements HTTPHandlerInterface {
                     'error' => $e->getMessage(),
                     'code' => $e->getCode(),
                 ]);
+                $errorBody = json_encode(
+                    array_merge(
+                        ['message' => $e->getMessage(), 'code' => $e->getCode()],
+                        getEnv('DEBUG') === 'true'
+                            ? ['file' => $e->getFile() . ':' . $e->getLine(), 'trace' => $e->getTrace()]
+                            : []
+                    )
+                );
                 $response = new Response(
                     status: $e->getCode() ?: 500,
-                    headers: $this->headers ?? ['content-type' => 'application/json; charset=utf-8'],
-                    body: json_encode(
-                        array_merge(
-                            ['message' => $e->getMessage(), 'code' => $e->getCode()],
-                            getEnv('DEBUG') === 'true'
-                                ? ['file' => $e->getFile() . ':' . $e->getLine(), 'trace' => $e->getTrace()]
-                                : []
-                        )
-                    )
+                    headers: array_merge($this->headers ?? ['content-type' => 'application/json; charset=utf-8'], [
+                        'content-length' => (string) strlen($errorBody),
+                    ]),
+                    body: $errorBody
                 );
             }
 
@@ -57,15 +60,17 @@ final class HTTPHandler extends Handler implements HTTPHandlerInterface {
             $durationMs = (hrtime(true) - $startNs) / 1e6;
             $uri = $request->getUri();
             $pathQuery = $uri->getPath() . ($uri->getQuery() !== '' ? '?' . $uri->getQuery() : '');
-            $this->logger->debug(sprintf(
-                '%s %s → %d | %s | %.1fms | peak %.1f MiB',
-                $request->getMethod(),
-                $pathQuery,
-                $response->getStatus(),
-                $controllerClass,
-                $durationMs,
-                memory_get_peak_usage(true) / 1_048_576
-            ));
+            $this->logger->debug(
+                sprintf(
+                    '%s %s → %d | %s | %.1fms | peak %.1f MiB',
+                    $request->getMethod(),
+                    $pathQuery,
+                    $response->getStatus(),
+                    $controllerClass,
+                    $durationMs,
+                    memory_get_peak_usage(true) / 1_048_576
+                )
+            );
 
             return $response;
         });

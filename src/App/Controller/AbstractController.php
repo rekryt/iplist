@@ -24,6 +24,14 @@ abstract class AbstractController implements ControllerInterface {
      */
     public function __invoke(): Response {
         $body = $this->getBody();
+        // AMPHP's Http1Driver does NOT derive Content-Length from a buffered
+        // string body — it only emits the header if the application set it.
+        // Without it the driver falls back to chunked (HTTP/1.1) or
+        // connection-close delimiting (HTTP/1.0, which is how nginx talks to the
+        // upstream by default), and a length-less response lets a reverse-proxy
+        // cache persist a truncated body as if it were complete. strlen() is the
+        // byte length, exactly what Content-Length requires.
+        $this->headers['content-length'] = (string) strlen($body);
         return new Response(status: $this->httpStatus, headers: $this->headers, body: $body);
     }
 
