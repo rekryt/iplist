@@ -1,0 +1,62 @@
+{
+    "domains": [
+        "aida64.com",
+        "android-forums.aida64.com",
+        "api.aida64.com",
+        "app-forums.aida64.com",
+        "ceerem.aida64.com",
+        "download.aida64.com",
+        "download2.aida64.com",
+        "forums.aida64.com",
+        "sensorpanel.aida64.com",
+        "services.aida64.com",
+        "support.aida64.com",
+        "update.aida64.com",
+        "update2.aida64.com",
+        "users.aida64.com",
+        "www.aida64.com"
+    ],
+    "dns": [
+        "127.0.0.11:53",
+        "77.88.8.88:53",
+        "8.8.8.8:53",
+        "1.1.1.1:53"
+    ],
+    "timeout": 3600,
+    "ip4": [
+        "104.248.16.228",
+        "15.197.142.173",
+        "15.197.225.128",
+        "161.35.221.206",
+        "164.90.152.13",
+        "167.172.187.222",
+        "209.97.156.73",
+        "3.33.152.147",
+        "3.33.251.168"
+    ],
+    "ip6": [],
+    "cidr4": [
+        "104.248.0.0/16",
+        "15.196.0.0/14",
+        "161.35.0.0/16",
+        "164.90.128.0/17",
+        "167.172.0.0/16",
+        "209.97.128.0/18",
+        "3.0.0.0/9"
+    ],
+    "cidr6": [],
+    "external": {
+        "domains": [],
+        "ip4": [],
+        "ip6": [],
+        "cidr4": [],
+        "cidr6": []
+    },
+    "replace": {
+        "cidr4": {
+            "15.196.0.0/14": [],
+            "3.0.0.0/9": []
+        },
+        "cidr6": {}
+    }
+}
