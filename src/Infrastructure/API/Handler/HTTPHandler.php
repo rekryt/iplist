@@ -22,6 +22,25 @@ final class HTTPHandler extends Handler implements HTTPHandlerInterface {
     }
 
     /**
+     * Лёгкая точка входа для healthcheck — не дёргает IPListService и контроллеры,
+     * отвечает 200 максимально быстро, чтобы docker мог отслеживать живость сервиса.
+     * @return RequestHandler
+     */
+    public function getHealthHandler(): RequestHandler {
+        return new ClosureRequestHandler(function (Request $request): Response {
+            $body = json_encode(['status' => 'ok']);
+            return new Response(
+                status: 200,
+                headers: [
+                    'content-type' => 'application/json; charset=utf-8',
+                    'content-length' => (string) strlen($body),
+                ],
+                body: $body
+            );
+        });
+    }
+
+    /**
      * @param string $controllerName
      * @return RequestHandler
      */

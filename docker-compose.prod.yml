@@ -10,12 +10,33 @@ services:
             - ./config/:/app/config/
             - ./storage/:/app/storage/
             - ./public/:/app/public/
+        healthcheck:
+            test: ['CMD', 'curl', '-fsS', 'http://127.0.0.1:8080/health']
+            interval: 30s
+            timeout: 10s
+            retries: 2
+            start_period: 30s
+        labels:
+            - 'autoheal=true'
         logging:
             driver: 'json-file'
             options:
                 max-size: '50m'
 #        networks:
 #            - default
+    autoheal:
+        image: 'willfarrell/autoheal:latest'
+        restart: unless-stopped
+        environment:
+            - AUTOHEAL_CONTAINER_LABEL=autoheal
+            - AUTOHEAL_INTERVAL=10
+            - AUTOHEAL_START_PERIOD=30
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        logging:
+            driver: 'json-file'
+            options:
+                max-size: '50m'
     nginx:
         image: 'nginx:latest'
         restart: unless-stopped
