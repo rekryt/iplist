@@ -19,7 +19,7 @@ final class MikrotikControllerTest extends AsyncTest {
         $body = $this->body($response);
 
         // Default template is {group}_{data}
-        self::assertStringContainsString('/ip firewall address-list remove [find list="games_ip4"];', $body);
+        self::assertStringContainsString('/ip firewall address-list remove [find list="games_ip4" dynamic=no];', $body);
         self::assertStringContainsString('/ip firewall address-list', $body);
         self::assertMatchesRegularExpression('/add list=games_ip4 address=203\.0\.113\.\d+ comment=game-/', $body);
         self::assertStringContainsString(':delay 5s', $body);

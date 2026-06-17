@@ -77,7 +77,7 @@ class MikrotikController extends AbstractIPListController {
 
         $response = [];
         foreach ($lists as $listName => $items) {
-            $response[] = '/ip firewall address-list remove [find list="' . $listName . '"];';
+            $response[] = '/ip firewall address-list remove [find list="' . $listName . '" dynamic=no];';
             $response[] = ':delay 5s';
             $response[] = '';
             $response[] = '/ip firewall address-list';
