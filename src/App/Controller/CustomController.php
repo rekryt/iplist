@@ -84,11 +84,13 @@ class CustomController extends AbstractIPListController {
                     break;
                 case 'cidr4':
                     $parts = explode('/', $item);
+                    $patterns['shortdata'] = $parts[0];
                     $patterns['shortmask'] = $parts[1];
                     $patterns['mask'] = IP4Helper::formatShortIpMask($patterns['shortmask']);
                     break;
                 case 'cidr6':
                     $parts = explode('/', $item);
+                    $patterns['shortdata'] = $parts[0];
                     $patterns['shortmask'] = $parts[1];
                     $patterns['mask'] = IP6Helper::formatShortIpMask($patterns['shortmask']);
                     break;

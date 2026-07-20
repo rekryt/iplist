@@ -363,7 +363,7 @@ const fallbackCopy = (text: string) => {
                                     <ul>
                                         <li>{group} - {{ t('groupName') }}</li>
                                         <li>{site} - {{ t('siteName') }}</li>
-                                        <li>{data} - {{ t('groupName') }}</li>
+                                        <li>{data} \ {shortdata} - {{ t('data') }}</li>
                                         <li>{shortmask} - {{ t('shortmask') }}</li>
                                         <li>{mask} - {{ t('mask') }}</li>
                                     </ul>
