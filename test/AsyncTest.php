@@ -25,13 +25,28 @@ use OpenCCK\Infrastructure\API\App;
  * Subclasses send HTTP requests via $this->get() and assert on the response.
  */
 abstract class AsyncTest extends AsyncTestCase {
+    /**
+     * Один клиент на весь прогон, а не по клиенту на тест.
+     *
+     * PHPUnit держит экземпляры тест-кейсов живыми до конца прогона (они нужны
+     * ему для отчёта), поэтому клиент каждого теста тоже остаётся жив вместе со
+     * своим keep-alive пулом соединений. Число открытых сокетов росло линейно с
+     * числом тестов, а Revolt на Windows работает через StreamSelectDriver,
+     * который на каждом тике обходит весь набор дескрипторов — к концу прогона
+     * запросы начинали упираться в таймауты на ровном месте (падал то StressTest,
+     * то TextFilterTest, в зависимости от порядка). С общим клиентом соединение
+     * переиспользуется и набор дескрипторов не растёт.
+     */
+    private static ?HttpClient $sharedHttpClient = null;
+
     protected HttpClient $httpClient;
     protected string $baseUrl;
     protected App $app;
 
     protected function setUp(): void {
         parent::setUp();
-        $this->httpClient = (new HttpClientBuilder())->followRedirects(0)->build();
+        self::$sharedHttpClient ??= (new HttpClientBuilder())->followRedirects(0)->build();
+        $this->httpClient = self::$sharedHttpClient;
         $this->baseUrl = 'http://127.0.0.1:' . ($_ENV['HTTP_PORT'] ?? 8090);
         $this->app = App::getInstance();
     }

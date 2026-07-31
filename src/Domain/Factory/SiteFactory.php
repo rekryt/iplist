@@ -78,7 +78,7 @@ class SiteFactory {
             }
         }
 
-        $domains = self::normalize($domains);
+        $domains = self::normalizeDomains($domains);
         $ip4 = self::normalize($ip4, true);
         $ip6 = self::normalize($ip6, true);
         $cidr4 = IP4Helper::minimizeSubnets(self::normalize($cidr4, true));
@@ -190,6 +190,41 @@ class SiteFactory {
     public static function normalizeArray(array $array, bool $isIpAddresses = false): array {
         sort($array);
         return SiteFactory::normalize($array, $isIpAddresses);
+    }
+
+    /**
+     * Чистка доменных списков поверх normalize(). Домены, в отличие от адресов,
+     * приходят из внешних источников и парсинга страниц, поэтому среди них
+     * встречается разметка: завершающая точка (легальная FQDN-запись,
+     * `example.com.`) и пустые метки от скрейпинга (`DNSdumpster..`).
+     *
+     * Без этой чистки такая запись в wildcard-режиме схлопывалась в `.`
+     * (две последние метки у `DNSdumpster..` — пустые), а `.` в sing-box и
+     * geosite — это правило-джокер, которое матчит несопоставимо больше
+     * задуманного. См. Site::getDomains(), где стоит парная проверка.
+     *
+     * @param array $domains
+     * @return array
+     */
+    public static function normalizeDomains(array $domains): array {
+        $result = [];
+        foreach ($domains as $domain) {
+            $domain = trim((string) $domain);
+            // Пустая метка внутри записи — однозначный мусор, чинить нечего:
+            // от `DNSdumpster..` остаётся имя без зоны, которое никуда не ведёт
+            if ($domain === '' || str_contains($domain, '..')) {
+                continue;
+            }
+            // А одиночная точка по краям — просто разметка: завершающая точка это
+            // легальный FQDN (`example.com.`), ведущая — запись суффикса (`.example.com`)
+            $domain = trim($domain, '.');
+            if ($domain === '') {
+                continue;
+            }
+            $result[] = $domain;
+        }
+
+        return self::normalize($result);
     }
 
     /**

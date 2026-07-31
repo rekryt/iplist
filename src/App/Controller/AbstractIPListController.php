@@ -62,6 +62,9 @@ abstract class AbstractIPListController extends AbstractController {
                 'json' => 'json',
                 'amnezia' => 'json',
                 'bat' => 'bat',
+                'geosite' => 'dat',
+                'singbox' => 'json',
+                'srs' => 'srs',
             ];
             $ext = $map[$this->request->getQueryParameter('format')] ?? 'txt';
             $this->setHeaders(['content-disposition' => 'attachment; filename="ip-list.' . $ext . '"']);

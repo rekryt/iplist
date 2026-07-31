@@ -41,7 +41,11 @@ final class StressTest extends AsyncTest {
 
     protected function setUp(): void {
         parent::setUp();
-        if (getenv('RUN_STRESS') !== '1') {
+        // Читаем через $_SERVER: под PHPUnit `getenv()` и `$_ENV` для унаследованных
+        // из шелла переменных пусты (variables_order=GPCS, без E), поэтому проверка
+        // только по getenv() делала документированный запуск невозможным.
+        $runStress = $_SERVER['RUN_STRESS'] ?? ($_ENV['RUN_STRESS'] ?? getenv('RUN_STRESS'));
+        if ($runStress !== '1') {
             self::markTestSkipped('Set RUN_STRESS=1 to run stress tests.');
         }
         $this->setTimeout(180.0);
@@ -168,10 +172,7 @@ final class StressTest extends AsyncTest {
 
             $start = microtime(true);
 
-            $request = new Request(
-                $this->buildUrl('/', ['format' => 'text', 'data' => 'cidr4']),
-                'GET'
-            );
+            $request = new Request($this->buildUrl('/', ['format' => 'text', 'data' => 'cidr4']), 'GET');
             $request->setBodySizeLimit(512 * 1024 * 1024);
             $request->setTransferTimeout($budget * 3);
             $request->setInactivityTimeout($budget * 3);

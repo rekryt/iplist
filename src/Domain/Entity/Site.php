@@ -171,7 +171,7 @@ final class Site {
     private function reloadExternal(): void {
         if (isset($this->external->domains)) {
             foreach ($this->external->domains as $url) {
-                $this->domains = SiteFactory::normalize(
+                $this->domains = SiteFactory::normalizeDomains(
                     array_merge($this->domains, SiteFactory::trimArray(explode("\n", file_get_contents($url))))
                 );
             }
@@ -281,6 +281,14 @@ final class Site {
                 $wildcardDomain = array_slice($parts, -2);
                 if (in_array(implode('.', $wildcardDomain), SiteFactory::TWO_LEVEL_DOMAIN_ZONES)) {
                     $wildcardDomain = array_slice($parts, -3);
+                }
+                // Пустая метка в результате означает мусорный ввод вроде
+                // `DNSdumpster..`: его две последние метки пусты, и запись
+                // схлопывалась в `.` — суффикс-джокер, встававший первой строкой
+                // списка доменов. Штатно такое отсекает SiteFactory::normalizeDomains
+                // при загрузке, здесь — страховка для Site, собранных напрямую.
+                if (in_array('', $wildcardDomain, true)) {
+                    continue;
                 }
                 $domains[] = implode('.', $wildcardDomain);
             }

@@ -67,6 +67,15 @@ final class SiteTest extends TestCase {
         self::assertSame(['localhost'], $domains);
     }
 
+    public function testGetDomainsWildcardSkipsEntriesCollapsingToBareDot(): void {
+        // `DNSdumpster..` даёт две пустые метки → раньше в выдачу попадала "."
+        // и вставала первой строкой (сортировка), матча куда больше задуманного
+        $domains = $this->site(['DNSdumpster..', 'foo.com', 'www.foo.com'])->getDomains(true);
+
+        self::assertNotContains('.', $domains);
+        self::assertSame(['foo.com'], $domains);
+    }
+
     public function testGetDomainsWildcardNormalizesOutput(): void {
         // Collapsing produces duplicates; normalizeArray sorts + dedups the result.
         $domains = $this->site([

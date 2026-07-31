@@ -27,7 +27,9 @@ const selectedExcludedIP4 = ref<string[]>([]);
 const selectedExcludedDomains = ref<string[]>([]);
 const selectedExcludedIP6 = ref<string[]>([]);
 const selectedExcludedCIDR6 = ref<string[]>([]);
-const isWildCard = ref(false);
+// Wildcard-домены включены по умолчанию: список 2/3-уровневых зон короче и
+// покрывает поддомены, а полный список сырых доменов нужен реже
+const isWildCard = ref(true);
 const isFileSave = ref(false);
 const isNative = ref(false);
 
@@ -61,6 +63,9 @@ const formatList = ref([
     { label: 'Text',                    value: 'text',          dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
     { label: 'Comma',                   value: 'comma',         dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
     { label: 'v2rayGeoIPDat',           value: 'geoip',         dataTypes: ['cidr4', 'ip4', 'cidr6', 'ip6']  },
+    { label: 'v2rayGeoSiteDat',         value: 'geosite',       dataTypes: ['domains'] },
+    { label: 'Sing-box rule-set (json)',value: 'singbox',       dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
+    { label: 'Sing-box rule-set (srs)', value: 'srs',           dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
     { label: 'MikroTik Script',         value: 'mikrotik',      dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
     { label: 'SwitchyOmega RuleList',   value: 'switchy',       dataTypes: ['domains'] },
     { label: 'Dnsmasq nfset',           value: 'nfset',         dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
@@ -97,6 +102,37 @@ watch(selectedFormat, () => {
         }
     }
 });
+// Тип доменного правила: geosite пишет его в Domain.type, sing-box — выбирает
+// между domain/domain_suffix/domain_keyword/domain_regex
+const domainTypeFormats = ['geosite', 'singbox', 'srs'];
+const domainTypeList = computed(() => [
+    { label: t('domainTypeSuffix'), value: 'suffix' },
+    { label: t('domainTypeFull'), value: 'full' },
+    { label: t('domainTypeKeyword'), value: 'keyword' },
+    { label: t('domainTypeRegex'), value: 'regex' },
+]);
+const selectedDomainType = ref('suffix');
+const showDomainType = computed(
+    () => domainTypeFormats.includes(selectedFormat.value) && selectedDataType.value === 'domains'
+);
+
+// Версия формата rule-set: 1 читают все sing-box от 1.8, старшие нужны только
+// под новые элементы правил
+const versionFormats = ['singbox', 'srs'];
+const versionList = ref([
+    { label: '1 (sing-box 1.8+)', value: '1' },
+    { label: '2 (sing-box 1.10+)', value: '2' },
+    { label: '3 (sing-box 1.11+)', value: '3' },
+    { label: '4 (sing-box 1.13+)', value: '4' },
+    { label: '5 (sing-box 1.14+)', value: '5' },
+]);
+const selectedVersion = ref('1');
+const showVersion = computed(() => versionFormats.includes(selectedFormat.value));
+
+// Форматы, которые всегда отдаются файлом-вложением: чекбокс «сохранить в файл»
+// для них не нужен
+const attachmentFormats = ['geoip', 'geosite', 'srs'];
+
 const tab = ref('portals');
 const toQueryParams = (params: Record<string, never>): string => {
     const parts: string[] = [];
@@ -147,6 +183,12 @@ const url = computed(() => {
     if (selectedFormat.value === 'custom') {
         data['template'] = customTemplate.value;
     }
+    if (showDomainType.value && selectedDomainType.value !== 'suffix') {
+        data['domaintype'] = selectedDomainType.value;
+    }
+    if (showVersion.value && selectedVersion.value !== '1') {
+        data['version'] = selectedVersion.value;
+    }
 
     if (selectedExcluded.value.length > 0) {
         data['exclude[site]'] = selectedExcluded.value.map((item) => item.label);
@@ -170,7 +212,7 @@ const url = computed(() => {
         data['exclude[domain]'] = selectedExcludedDomains.value;
     }
 
-    if (isFileSave.value) {
+    if (isFileSave.value && !attachmentFormats.includes(selectedFormat.value)) {
         data['filesave'] = '1';
     }
 
@@ -240,6 +282,12 @@ const fallbackCopy = (text: string) => {
         "excludeDomains": "Exclude domains",
         "onlyWildcard": "Only wildcard domains",
         "nativeCidr": "Raw CIDR (no replace substitution)",
+        "domainType": "Domain rule type",
+        "domainTypeSuffix": "Domain and subdomains (suffix)",
+        "domainTypeFull": "Exact match",
+        "domainTypeKeyword": "Keyword (substring)",
+        "domainTypeRegex": "Regular expression",
+        "ruleSetVersion": "rule-set format version",
         "saveToFile": "Save as file",
         "submit": "Submit",
         "allData": "All data",
@@ -272,6 +320,12 @@ const fallbackCopy = (text: string) => {
         "excludeDomains": "Исключить домены",
         "onlyWildcard": "Только wildcard домены",
         "nativeCidr": "Исходные CIDR без сжатия",
+        "domainType": "Тип доменного правила",
+        "domainTypeSuffix": "Домен и поддомены (суффикс)",
+        "domainTypeFull": "Точное совпадение",
+        "domainTypeKeyword": "Ключевое слово (подстрока)",
+        "domainTypeRegex": "Регулярное выражение",
+        "ruleSetVersion": "Версия формата rule-set",
         "saveToFile": "Сохранить как файл",
         "submit": "Отправить",
         "allData": "Все данные",
@@ -304,6 +358,12 @@ const fallbackCopy = (text: string) => {
         "excludeDomains": "排除域名",
         "onlyWildcard": "仅限通配符域名",
         "nativeCidr": "原始 CIDR（不应用替换）",
+        "domainType": "域名规则类型",
+        "domainTypeSuffix": "域名及其子域名（后缀）",
+        "domainTypeFull": "完全匹配",
+        "domainTypeKeyword": "关键词（子串）",
+        "domainTypeRegex": "正则表达式",
+        "ruleSetVersion": "rule-set 格式版本",
         "saveToFile": "保存为文件",
         "submit": "提交",
         "allData": "所有数据",
@@ -338,6 +398,30 @@ const fallbackCopy = (text: string) => {
                         item-title="label"
                         item-value="value"
                         :label="t('dataType')"
+                        variant="outlined"
+                        density="compact"
+                        hide-details
+                    ></v-select>
+                </v-col>
+                <v-col v-if="showDomainType" cols="12" md="6">
+                    <v-select
+                        v-model="selectedDomainType"
+                        :items="domainTypeList"
+                        item-title="label"
+                        item-value="value"
+                        :label="t('domainType')"
+                        variant="outlined"
+                        density="compact"
+                        hide-details
+                    ></v-select>
+                </v-col>
+                <v-col v-if="showVersion" cols="12" md="6">
+                    <v-select
+                        v-model="selectedVersion"
+                        :items="versionList"
+                        item-title="label"
+                        item-value="value"
+                        :label="t('ruleSetVersion')"
                         variant="outlined"
                         density="compact"
                         hide-details
@@ -509,7 +593,7 @@ const fallbackCopy = (text: string) => {
                         hide-details
                     ></v-checkbox>
                     <v-checkbox
-                        v-if="selectedFormat !== 'geoip'"
+                        v-if="!attachmentFormats.includes(selectedFormat)"
                         v-model="isFileSave"
                         :label="t('saveToFile')"
                         :value="true"

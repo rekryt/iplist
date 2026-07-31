@@ -99,4 +99,26 @@ final class SiteFactoryTest extends TestCase {
             SiteFactory::trimArray(["  foo.com  ", "\tbar.com\n", '   '])
         );
     }
+
+    public function testNormalizeDomainsDropsEntriesWithEmptyLabels(): void {
+        // Реальный случай из config/apple/apple@tech.json: такая запись в
+        // wildcard-режиме схлопывалась в "." — суффикс-джокер в выдаче
+        self::assertSame(['foo.com'], SiteFactory::normalizeDomains(['DNSdumpster..', 'foo.com', 'a..b.com']));
+    }
+
+    public function testNormalizeDomainsTrimsTrailingDotOfFqdn(): void {
+        // Завершающая точка — легальная FQDN-запись, а не мусор: приводим к обычной форме
+        self::assertSame(['foo.com', 'bar.com'], SiteFactory::normalizeDomains(['foo.com.', '.bar.com']));
+    }
+
+    public function testNormalizeDomainsTrimsWhitespaceAndDropsEmpty(): void {
+        self::assertSame(['foo.com'], SiteFactory::normalizeDomains(["  foo.com \n", '', '   ', '.', '..']));
+    }
+
+    public function testNormalizeDomainsKeepsNormalListIntactAndDedups(): void {
+        self::assertSame(
+            ['foo.com', 'bar.com'],
+            SiteFactory::normalizeDomains(['foo.com', 'bar.com', 'foo.com', '#comment'])
+        );
+    }
 }

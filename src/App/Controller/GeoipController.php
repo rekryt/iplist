@@ -6,14 +6,29 @@ use OpenCCK\Domain\Entity\Site;
 use OpenCCK\Domain\Factory\SiteFactory;
 use OpenCCK\Domain\Helper\IP4Helper;
 use OpenCCK\Domain\Helper\IP6Helper;
-use Amp\File;
-use Amp\Process\Process;
-use Amp\Process\ProcessException;
+use OpenCCK\Infrastructure\Codec\DatEncoder;
+use OpenCCK\Infrastructure\Codec\GeoipDatWriter;
+use OpenCCK\Infrastructure\Process\ProcessRunner;
+use OpenCCK\Infrastructure\Storage\TempWorkspace;
+use OpenCCK\Infrastructure\Task\EncodeDatTask;
+use Throwable;
+
+use function OpenCCK\getEnv;
 
 /**
+ * v2ray/xray `geoip.dat`.
+ *
+ * По умолчанию файл собирается на месте (`GeoipDatWriter`) — без временных
+ * файлов и без fork/exec: на полном каталоге прежний путь писал ~409 входных
+ * файлов и запускал Go-утилиту на каждый запрос. Путь через внешний бинарник
+ * остаётся под `SYS_GEOIP_NATIVE=false` как страховка на один релиз.
+ *
  * @see https://github.com/v2fly/geoip/blob/HEAD/configuration.md
  */
 class GeoipController extends AbstractIPListController {
+    /** Имя выходного файла внутри воркспейса запроса. */
+    private const OUTPUT_NAME = 'iplist.dat';
+
     /**
      * @return string
      */
@@ -44,87 +59,128 @@ class GeoipController extends AbstractIPListController {
             }
         }
 
-        $path = \OpenCCK\getEnv('GEOIP_PATH') ?? PATH_ROOT . '/geoip/';
-        try {
-            if (!File\isDirectory($path . 'input/')) {
-                File\createDirectory($path . 'input/');
+        if ((getEnv('SYS_GEOIP_NATIVE') ?? 'true') === 'true') {
+            return $this->renderNative($response);
+        }
+
+        return $this->renderWithBinary($response);
+    }
+
+    /**
+     * Нативная сборка: те же данные, что уходили в Go-утилиту, только
+     * кодируются на месте или в процессе-воркере (по объёму выдачи).
+     *
+     * @param array<string, array<int, string>> $response ключ — `сайт/группа`
+     */
+    private function renderNative(array $response): string {
+        // Каждый список маркируется дважды — под именем портала и под именем
+        // группы: ровно то, что делал input-конфиг для Go-утилиты, где один и
+        // тот же файл регистрировался под двумя именами.
+        $entries = [];
+        $rowCount = 0;
+        foreach ($response as $siteNameAndGroup => $rows) {
+            if (!count($rows)) {
+                continue;
             }
+            [$siteName, $siteGroup] = explode('/', $siteNameAndGroup);
+            foreach ([$siteName, $siteGroup] as $code) {
+                $entries[$code] = isset($entries[$code]) ? array_merge($entries[$code], $rows) : $rows;
+            }
+            $rowCount += count($rows) * 2;
+        }
+
+        $body = DatEncoder::encode(EncodeDatTask::KIND_GEOIP, GeoipDatWriter::payload($entries), $rowCount);
+
+        $this->setHeaders([
+            'content-type' => 'application/octet-stream',
+            'content-disposition' => 'attachment; filename="iplist.dat"',
+        ]);
+
+        return $body;
+    }
+
+    /**
+     * Путь через внешнюю утилиту `v2fly/geoip` — страховка на один релиз,
+     * включается `SYS_GEOIP_NATIVE=false`.
+     *
+     * @param array<string, array<int, string>> $response
+     */
+    private function renderWithBinary(array $response): string {
+        $binaryDir = rtrim(getEnv('GEOIP_PATH') ?: PATH_ROOT . '/geoip/', '/\\');
+
+        // Весь ввод/вывод запроса живёт в собственном каталоге: имена не могут
+        // столкнуться с параллельным запросом, а уборка сводится к удалению
+        // одного дерева в finally. Тело ответа буферизуется в строку
+        // (AbstractController::__invoke считает strlen), поэтому к моменту
+        // destroy() данные пользователю уже отданы — ждать флаша сокета не нужно.
+        $workspace = null;
+        try {
+            $workspace = TempWorkspace::create('geoip');
 
             $inputConfig = [];
+            $index = 0;
             foreach ($response as $siteNameAndGroup => $value) {
                 if (!count($value)) {
                     continue;
                 }
                 [$siteName, $siteGroup] = explode('/', $siteNameAndGroup);
-                $dataFilePath = $path . 'input/' . microtime(true) . '.' . $siteName . '.data.txt';
-                if (File\exists($dataFilePath)) {
-                    File\deleteFile($dataFilePath);
+                // Имя файла — индекс, а не имя портала: в именах порталов есть
+                // точки и '@', а сам файл живёт только до конца запроса.
+                $dataFilePath = $workspace->write('input/' . $index++ . '.txt', implode("\n", $value));
+                foreach ([$siteName, $siteGroup] as $listName) {
+                    $inputConfig[] = [
+                        'type' => 'text',
+                        'action' => 'add',
+                        'args' => [
+                            'name' => $listName,
+                            'uri' => $dataFilePath,
+                        ],
+                    ];
                 }
-                File\write($dataFilePath, implode("\n", $value));
-                $inputConfig[] = [
-                    'type' => 'text',
-                    'action' => 'add',
-                    'args' => [
-                        'name' => $siteName,
-                        'uri' => $dataFilePath,
-                    ],
-                ];
-                $inputConfig[] = [
-                    'type' => 'text',
-                    'action' => 'add',
-                    'args' => [
-                        'name' => $siteGroup,
-                        'uri' => $dataFilePath,
-                    ],
-                ];
             }
 
-            $configFilePath = $path . microtime(true) . '.config.json';
-            if (File\exists($configFilePath)) {
-                File\deleteFile($configFilePath);
-            }
-
-            $outputDir = $path . 'output/';
-            if (!File\exists($outputDir)) {
-                File\createDirectory($outputDir);
-            }
-            $outputFileName = microtime(true) . '.iplist.dat';
-            if (File\exists($outputFileName)) {
-                File\deleteFile($outputFileName);
-            }
-            File\write(
-                $configFilePath,
-                json_encode([
-                    'input' => $inputConfig,
-                    'output' => [
-                        [
-                            'type' => 'v2rayGeoIPDat',
-                            'action' => 'output',
-                            'args' => [
-                                'outputDir' => $path . 'output',
-                                'outputName' => $outputFileName,
+            $outputDir = $workspace->createDirectory('output');
+            $configFilePath = $workspace->write(
+                'config.json',
+                json_encode(
+                    [
+                        'input' => $inputConfig,
+                        'output' => [
+                            [
+                                'type' => 'v2rayGeoIPDat',
+                                'action' => 'output',
+                                'args' => [
+                                    'outputDir' => $outputDir,
+                                    'outputName' => self::OUTPUT_NAME,
+                                ],
                             ],
                         ],
                     ],
-                ])
+                    JSON_THROW_ON_ERROR
+                )
             );
-            $process = Process::start('./geoip -c ' . $configFilePath, $path);
-            $process->join();
 
-            //            foreach ($inputConfig as $config) {
-            //                if (File\exists($config['args']['uri'])) {
-            //                    File\deleteFile($config['args']['uri']);
-            //                }
-            //            }
-            //            File\deleteFile($configFilePath);
+            $result = ProcessRunner::run(['./geoip', '-c', $configFilePath], $binaryDir);
+            if ($result['code'] !== 0) {
+                $this->logger->warning('geoip failed', $result);
+                $errorOutput = ProcessRunner::errorOutput($result);
 
-            $rawData = File\read($path . 'output/' . $outputFileName);
-            // File\deleteFile($path . 'output/' . $outputFileName);
+                return '# Error: geoip exited with ' .
+                    $result['code'] .
+                    ($errorOutput !== '' ? ': ' . $errorOutput : '');
+            }
 
-            $this->setHeaders(['content-disposition' => 'attachment; filename="iplist.dat"']);
+            $rawData = $workspace->read('output/' . self::OUTPUT_NAME);
+
+            $this->setHeaders([
+                'content-type' => 'application/octet-stream',
+                'content-disposition' => 'attachment; filename="iplist.dat"',
+            ]);
             return $rawData;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return '# Error: ' . $e->getMessage();
+        } finally {
+            $workspace?->destroy();
         }
     }
 

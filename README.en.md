@@ -28,11 +28,14 @@ Portal with Russian services: [https://russia.iplist.opencck.org](https://russia
 # Formats of Output
 
 | format   | description                   |
-| -------- | ----------------------------- |
+|----------|-------------------------------|
 | json     | JSON format                   |
 | text     | Newline-separated             |
 | comma    | Comma-separated               |
 | geoip    | v2rayGeoIPDat                 |
+| geosite  | v2rayGeoSiteDat               |
+| singbox  | sing-box rule-set (JSON)      |
+| srs      | sing-box rule-set (binary)    |
 | mikrotik | MikroTik Script               |
 | switchy  | SwitchyOmega RuleList         |
 | nfset    | Dnsmasq nfset                 |
@@ -77,7 +80,7 @@ Configuration files are stored in the `config/<group>/<site>.json`. Each JSON fi
 ```
 
 | property | type     | description                                               |
-| -------- | -------- | --------------------------------------------------------- |
+|----------|----------|-----------------------------------------------------------|
 | domains  | string[] | List of portal domains                                    |
 | dns      | string[] | List of DNS servers for updating IP addresses             |
 | timeout  | int      | Time interval between domain IP address updates (seconds) |
@@ -89,7 +92,7 @@ Configuration files are stored in the `config/<group>/<site>.json`. Each JSON fi
 | replace  | object   | Per-portal CIDR-replacement map (see the section below)   |
 
 | property | type     | description                                                  |
-| -------- | -------- | ------------------------------------------------------------ |
+|----------|----------|--------------------------------------------------------------|
 | domains  | string[] | List of URLs for replenishing portal domains                 |
 | ip4      | string[] | List of URLs for replenishing ipv4 addresses                 |
 | ip6      | string[] | List of URLs for replenishing IPv6 addresses                 |
@@ -118,26 +121,37 @@ cp .env.example .env
 
 If needed, edit the `.env` file:
 
-| property                              | default value | description                                                     |
-| ------------------------------------- | ------------- | --------------------------------------------------------------- |
-| COMPOSE_PROJECT_NAME                  | iplist        | Name of the compose project                                     |
-| STORAGE_SAVE_INTERVAL                 | 120           | Cache save interval for whois (seconds)                         |
-| SYS_DNS_RESOLVE_IP4                   | true          | Resolve IPv4 addresses                                          |
-| SYS_DNS_RESOLVE_IP6                   | true          | Resolve IPv6 addresses                                          |
-| SYS_DNS_RESOLVE_CHUNK_SIZE            | 10            | Chunk size for retrieving DNS records                           |
-| SYS_DNS_RESOLVE_DELAY                 | 100           | Delay between receiving dns records (milliseconds)              |
-| SYS_IP6_SUBNET_PREFIX_CAP             | 64            | The maximum allowed IPv6 subnet prefix length                   |
-| SYS_REPLACE_ESCALATE_IPS              | true          | At reload time, escalate `ip4`/`ip6` into `replace` value lists |
-| SYS_REPLACE_AGGREGATE_SUBNETS         | false         | Aggregate (supernet) `replace` value arrays at reload time      |
-| SYS_REPLACE_COLLAPSE_THRESHOLD_IP4_24 | 0             | /24 density-collapse threshold (v4 narrow tier). 0 = off        |
-| SYS_REPLACE_COLLAPSE_THRESHOLD_IP4_16 | 0             | /16 density-collapse threshold (v4 wide tier). 0 = off          |
-| SYS_REPLACE_COLLAPSE_THRESHOLD_IP6_64 | 0             | /64 density-collapse threshold (v6 narrow tier). 0 = off        |
-| SYS_REPLACE_COLLAPSE_THRESHOLD_IP6_32 | 0             | /32 density-collapse threshold (v6 wide tier). 0 = off          |
-| SYS_MEMORY_LIMIT                      | 1024M         | Memory limit                                                    |
-| SYS_TIMEZONE                          | Europe/Moscow | List of URLs to obtain initial CIDRv4 zones for IPv4 addresses  |
-| HTTP_HOST                             | 0.0.0.0       | IP of network interface (default is all interfaces)             |
-| HTTP_PORT                             | 8080          | Server network port (default 8080)                              |
-| DEBUG                                 | true          | Determines the logging level                                    |
+| property                              | default value           | description                                                                                              |
+|---------------------------------------|-------------------------|----------------------------------------------------------------------------------------------------------|
+| COMPOSE_PROJECT_NAME                  | iplist                  | Name of the compose project                                                                              |
+| STORAGE_SAVE_INTERVAL                 | 120                     | Cache save interval for whois (seconds)                                                                  |
+| SYS_DNS_RESOLVE_IP4                   | true                    | Resolve IPv4 addresses                                                                                   |
+| SYS_DNS_RESOLVE_IP6                   | true                    | Resolve IPv6 addresses                                                                                   |
+| SYS_DNS_RESOLVE_CHUNK_SIZE            | 10                      | Chunk size for retrieving DNS records                                                                    |
+| SYS_DNS_RESOLVE_DELAY                 | 100                     | Delay between receiving dns records (milliseconds)                                                       |
+| SYS_IP6_SUBNET_PREFIX_CAP             | 64                      | The maximum allowed IPv6 subnet prefix length                                                            |
+| SYS_REPLACE_ESCALATE_IPS              | true                    | At reload time, escalate `ip4`/`ip6` into `replace` value lists                                          |
+| SYS_REPLACE_AGGREGATE_SUBNETS         | false                   | Aggregate (supernet) `replace` value arrays at reload time                                               |
+| SYS_REPLACE_COLLAPSE_THRESHOLD_IP4_24 | 0                       | /24 density-collapse threshold (v4 narrow tier). 0 = off                                                 |
+| SYS_REPLACE_COLLAPSE_THRESHOLD_IP4_16 | 0                       | /16 density-collapse threshold (v4 wide tier). 0 = off                                                   |
+| SYS_REPLACE_COLLAPSE_THRESHOLD_IP6_64 | 0                       | /64 density-collapse threshold (v6 narrow tier). 0 = off                                                 |
+| SYS_REPLACE_COLLAPSE_THRESHOLD_IP6_32 | 0                       | /32 density-collapse threshold (v6 wide tier). 0 = off                                                   |
+| SYS_MEMORY_LIMIT                      | 1024M                   | Memory limit                                                                                             |
+| SYS_TIMEZONE                          | Europe/Moscow           | List of URLs to obtain initial CIDRv4 zones for IPv4 addresses                                           |
+| SYS_TMP_PATH                          | storage/tmp             | Directory for generator temp files (see below)                                                           |
+| SYS_TMP_TTL                           | 900                     | Age after which an orphaned temp directory is removed (seconds)                                          |
+| SYS_TMP_SWEEP_INTERVAL                | 600                     | Sweep period for orphaned temp directories (seconds). 0 = off                                            |
+| SYS_ENCODE_WORKER_THRESHOLD           | 20000                   | Record count above which `.dat` encoding is offloaded to a separate process. 0 = always offload          |
+| SYS_GEOIP_NATIVE                      | true                    | Build `geoip.dat` in-process. `false` falls back to the v2fly/geoip tool                                 |
+| HTTP_HOST                             | 0.0.0.0                 | IP of network interface (default is all interfaces)                                                      |
+| HTTP_PORT                             | 8080                    | Server network port (default 8080)                                                                       |
+| GEOIP_PATH                            | ./geoip/                | Directory containing the `geoip` binary. Only needed with `SYS_GEOIP_NATIVE=false`                       |
+| SINGBOX_PATH                          | /usr/local/bin/sing-box | Path to the `sing-box` binary. Required by the `srs` format; without it the format returns a plain error |
+| DEBUG                                 | true                    | Determines the logging level                                                                             |
+
+```shell
+docker compose up -d
+```
 
 You can access the service in your browser via the HTTP protocol on port 8080:
 
@@ -151,23 +165,25 @@ http://0.0.0.0:8080/?format=mikrotik&site=youtube.com&data=cidr4
 http://0.0.0.0:8080/?format=comma&data=cidr4
 ```
 
-| GET Parameter   | Description                | Example                                                                                                        |
-| --------------- | -------------------------- | -------------------------------------------------------------------------------------------------------------- |
-| format          | Data export format         | ?format=text                                                                                                   |
-| data            | Data for export            | ?data=cidr4                                                                                                    |
-| site            | Portal for data export     | ?site=youtube.com                                                                                              |
-| group           | Group for data export      | ?group=youtube                                                                                                 |
-| exclude[ip4]    | Exclude IPv4 addresses     | ?exclude[ip4]=1.1.1.1&exclude[ip4]=2.2.2.2                                                                     |
-| exclude[ip6]    | Exclude IPv6 addresses     | ?exclude[ip6]=2a06:98c1:3121::a                                                                                |
-| exclude[cidr4]  | Exclude CIDRv4 zones       | ?exclude[cidr4]=1.1.1.0/24                                                                                     |
-| exclude[cidr6]  | Exclude CIDRv6 zones       | ?exclude[cidr6]=2a06:98c1::/32                                                                                 |
-| exclude[group]  | Exclude groups             | ?exclude[group]=youtube&exclude[group]=casino                                                                  |
-| exclude[site]   | Exclude portals            | ?exclude[site]=youtube.com                                                                                     |
-| exclude[domain] | Exclude domains            | ?exclude[domain]=youtube.com                                                                                   |
-| wildcard        | Keep only wildcard domains | ?wildcard=1                                                                                                    |
-| filesave        | Save as a file             | ?filesave=1                                                                                                    |
+| GET Parameter   | Description                                                                                                       | Example                                                                                                        |
+| --------------- | ----------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| format          | Data export format                                                                                                | ?format=text                                                                                                   |
+| data            | Data for export                                                                                                   | ?data=cidr4                                                                                                    |
+| site            | Portal for data export                                                                                            | ?site=youtube.com                                                                                              |
+| group           | Group for data export                                                                                             | ?group=youtube                                                                                                 |
+| exclude[ip4]    | Exclude IPv4 addresses                                                                                            | ?exclude[ip4]=1.1.1.1&exclude[ip4]=2.2.2.2                                                                     |
+| exclude[ip6]    | Exclude IPv6 addresses                                                                                            | ?exclude[ip6]=2a06:98c1:3121::a                                                                                |
+| exclude[cidr4]  | Exclude CIDRv4 zones                                                                                              | ?exclude[cidr4]=1.1.1.0/24                                                                                     |
+| exclude[cidr6]  | Exclude CIDRv6 zones                                                                                              | ?exclude[cidr6]=2a06:98c1::/32                                                                                 |
+| exclude[group]  | Exclude groups                                                                                                    | ?exclude[group]=youtube&exclude[group]=casino                                                                  |
+| exclude[site]   | Exclude portals                                                                                                   | ?exclude[site]=youtube.com                                                                                     |
+| exclude[domain] | Exclude domains                                                                                                   | ?exclude[domain]=youtube.com                                                                                   |
+| wildcard        | Keep only wildcard domains                                                                                        | ?wildcard=1                                                                                                    |
+| filesave        | Save as a file                                                                                                    | ?filesave=1                                                                                                    |
 | native          | Return the portal's raw `cidr4`/`cidr6` without applying `replace` (see [docs/REPLACE.en.md](docs/REPLACE.en.md)) | ?data=cidr4&native=1                                                                                           |
-| template        | Custom output format       | ?format=custom&template=[more](https://github.com/rekryt/iplist/blob/master/README.en.md#custom-output-format) |
+| domaintype      | Domain rule type: `suffix` (default), `full`, `keyword`, `regex` — for `geosite`, `singbox`, `srs`                | ?domaintype=full                                                                                               |
+| version         | rule-set format version `1`…`5` (default `1`) — for `singbox`, `srs`                                              | ?version=3                                                                                                     |
+| template        | Custom output format                                                                                              | ?format=custom&template=[more](https://github.com/rekryt/iplist/blob/master/README.en.md#custom-output-format) |
 
 ## SSL Setup
 
@@ -206,26 +222,37 @@ docker compose up -d
 ## Manual Launch (PHP 8.1+)
 
 ```shell
-apt-get install -y git golang
-git clone https://github.com/v2fly/geoip.git
-cd geoip
-go build .
-cd ../
-```
-
-```shell
 apt-get install -y ntpsec whois dnsutils ipcalc
 cp .env.example .env
 composer install
 php index.php
 ```
 
+`geoip.dat` and `geosite.dat` are built by the service itself — no external tools required.
+A binary is only needed for the `srs` format, which compiles the binary rule-set:
+
+```shell
+# sing-box (for the srs format)
+SINGBOX_VERSION=1.13.15
+curl -fsSL -o /tmp/sing-box.tar.gz   "https://github.com/SagerNet/sing-box/releases/download/v${SINGBOX_VERSION}/sing-box-${SINGBOX_VERSION}-linux-amd64-glibc.tar.gz"
+tar -xzf /tmp/sing-box.tar.gz -C /tmp
+install -m 0755 "/tmp/sing-box-${SINGBOX_VERSION}-linux-amd64-glibc/sing-box" /usr/local/bin/sing-box
+```
+
+If you need building `geoip.dat` through the v2fly tool (`SYS_GEOIP_NATIVE=false`),
+Go **1.25+** is required:
+
+```shell
+git clone --depth 1 https://github.com/v2fly/geoip.git
+cd geoip && go build . && cd ../
+```
+
 ## Custom Output Format
 
 To export data according to a specified template, use format=custom and template=template, where the template can include patterns such as:
 
-| свойство    | описание                              |
-| ----------- | ------------------------------------- |
+| property    | description                           |
+|-------------|---------------------------------------|
 | {group}     | Group name                            |
 | {site}      | Site name                             |
 | {data}      | Selected data                         |
@@ -293,6 +320,77 @@ Example of using tags (by portal name or group) in the configuration:
   ...
 }
 ```
+
+Domains are served as a `geosite.dat` file (same tags — by portal name and by group):
+
+```
+https://iplist.opencck.org/?format=geosite&data=domains
+```
+
+```json
+{
+  "routing": {
+    "rules": [
+      {
+        "type": "field",
+        "outboundTag": "vpn",
+        "domain": ["ext:geosite.dat:youtube.com"]
+      },
+      {
+        "type": "field",
+        "outboundTag": "vpn",
+        "domain": ["ext:geosite.dat:anime"]
+      },
+      ...
+    ]
+  },
+  ...
+}
+```
+
+By default domains are written as `RootDomain`, so a rule matches both the domain itself and all of
+its subdomains. Use the `domaintype` parameter for other behaviour: `full` — exact match only,
+`keyword` — substring match, `regex` — regular expression.
+
+## sing-box Setup (rule-set)
+
+The service serves rule-sets in two flavours: `singbox` — the JSON source, `srs` — the compiled
+binary file (smaller and faster to load). sing-box can fetch either one by URL:
+
+```json
+{
+    "route": {
+        "rule_set": [
+            {
+                "type": "remote",
+                "tag": "iplist-ip",
+                "format": "binary",
+                "url": "https://iplist.opencck.org/?format=srs&data=cidr4&group=youtube",
+                "download_detour": "direct",
+                "update_interval": "1d"
+            },
+            {
+                "type": "remote",
+                "tag": "iplist-domains",
+                "format": "source",
+                "url": "https://iplist.opencck.org/?format=singbox&data=domains&group=youtube",
+                "download_detour": "direct",
+                "update_interval": "1d"
+            }
+        ],
+        "rules": [
+            {
+                "rule_set": ["iplist-ip", "iplist-domains"],
+                "outbound": "vpn"
+            }
+        ]
+    }
+}
+```
+
+The format version is set with the `version` parameter (default `1` — readable by every sing-box
+since 1.8). For `format=srs` the source version is an upper bound: sing-box compiles the minimal
+sufficient binary version.
 
 ## Setting up Mikrotik
 
