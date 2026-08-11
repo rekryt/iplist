@@ -105,6 +105,9 @@ typings/
 # dotenv environment variables file
 .env
 
+# Временные воркспейсы генераторов (geoip/srs) — чистятся в finally + подметальщиком
+storage/tmp
+
 # parcel-bundler cache (https://parceljs.org/)
 .cache
 

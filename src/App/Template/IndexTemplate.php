@@ -637,6 +637,9 @@ use OpenCCK\App\Controller\MainController;
                         <option value="text">Text</option>
                         <option value="comma">Comma</option>
                         <option value="geoip">v2rayGeoIPDat</option>
+                        <option value="geosite">v2rayGeoSiteDat</option>
+                        <option value="singbox">Sing-box rule-set (json)</option>
+                        <option value="srs">Sing-box rule-set (srs)</option>
                         <option value="mikrotik">MikroTik Script</option>
                         <option value="switchy">SwitchyOmega RuleList</option>
                         <option value="nfset">Dnsmasq nfset</option>
@@ -644,6 +647,7 @@ use OpenCCK\App\Controller\MainController;
                         <option value="clashx">ClashX</option>
                         <option value="kvas">Keenetic KVAS</option>
                         <option value="bat">Keenetic Routes (.bat)</option>
+                        <option value="wildcard">Keenetic DNS</option>
                         <option value="amnezia">Amnezia</option>
                         <option value="pac">Proxy auto configuration (PAC)</option>
                     </select>
@@ -657,6 +661,27 @@ use OpenCCK\App\Controller\MainController;
                         <option value="cidr4">cidr4</option>
                         <option value="ip6">ip6</option>
                         <option value="cidr6">cidr6</option>
+                    </select>
+                </label>
+                <!-- Учитывается форматами geosite / singbox / srs при data=domains; показывается скриптом ниже -->
+                <label class="main-formItem" hidden>
+                    Domain type:
+                    <select name="domaintype" class="main-formSelect" disabled>
+                        <option value="">suffix (default)</option>
+                        <option value="full">full</option>
+                        <option value="keyword">keyword</option>
+                        <option value="regex">regex</option>
+                    </select>
+                </label>
+                <!-- Учитывается форматами singbox / srs; показывается скриптом ниже -->
+                <label class="main-formItem" hidden>
+                    Rule-set version:
+                    <select name="version" class="main-formSelect" disabled>
+                        <option value="">1 (sing-box 1.8+)</option>
+                        <option value="2">2 (sing-box 1.10+)</option>
+                        <option value="3">3 (sing-box 1.11+)</option>
+                        <option value="4">4 (sing-box 1.13+)</option>
+                        <option value="5">5 (sing-box 1.14+)</option>
                     </select>
                 </label>
                 <label class="main-formItem main-formItem_wide">
@@ -674,8 +699,9 @@ use OpenCCK\App\Controller\MainController;
                     </span>
                     <span class="main-formItemComment">Don't choose sites if you want to get everything</span>
                 </label>
-                <label class="main-formItem main-formItem_wide">
-                    <input class="main-formItemCheckbox" type="checkbox" name="wildcard" value="1" />
+                <!-- Применим только к доменам (формат wildcard и так отдаёт их свёрнутыми); показывается скриптом ниже -->
+                <label class="main-formItem main-formItem_wide" hidden>
+                    <input class="main-formItemCheckbox" type="checkbox" name="wildcard" value="1" checked disabled />
                     <span class="main-formItemCheckboxLabel">Only wildcard domains</span>
                 </label>
                 <label class="main-formItem main-formItem_wide">
@@ -694,5 +720,40 @@ use OpenCCK\App\Controller\MainController;
             <a href="https://github.com/rekryt/iplist/issues">Issues</a>
         </p>
     </footer>
+    <script>
+        // Показ полей, применимых только к части форматов — те же правила, что во
+        // фронтовой форме (frontend/components/base/Form.vue: showDomainType/showVersion).
+        // Без скрипта поля остаются hidden + disabled, то есть в URL не попадают
+        // и параметры берут значения по умолчанию на стороне контроллера.
+        (function () {
+            var form = document.querySelector('.main-form');
+            var format = form.elements.format;
+            var data = form.elements.data;
+            var rules = {
+                domaintype: function () {
+                    return ['geosite', 'singbox', 'srs'].indexOf(format.value) !== -1 && data.value === 'domains';
+                },
+                version: function () {
+                    return ['singbox', 'srs'].indexOf(format.value) !== -1;
+                },
+                wildcard: function () {
+                    return data.value === 'domains' && format.value !== 'wildcard';
+                }
+            };
+
+            function toggle() {
+                Object.keys(rules).forEach(function (name) {
+                    var field = form.elements[name];
+                    var visible = rules[name]();
+                    field.disabled = !visible;
+                    field.closest('label').hidden = !visible;
+                });
+            }
+
+            format.addEventListener('change', toggle);
+            data.addEventListener('change', toggle);
+            toggle();
+        })();
+    </script>
 </body>
 </html>

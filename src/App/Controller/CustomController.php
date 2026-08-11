@@ -25,6 +25,7 @@ class CustomController extends AbstractIPListController {
         }
 
         $response = [];
+        $isIpData = in_array($data, ['ip4', 'ip6', 'cidr4', 'cidr6']);
         foreach ($this->getGroups() as $groupName => $groupSites) {
             if (count($sites)) {
                 $groupSites = array_filter($groupSites, fn(Site $siteEntity) => in_array($siteEntity->name, $sites));
@@ -33,37 +34,39 @@ class CustomController extends AbstractIPListController {
                 continue;
             }
 
-            $items = [];
             foreach ($groupSites as $siteName => $siteEntity) {
-                $items = array_merge(
-                    $items,
-                    $this->generateList(
-                        $siteEntity,
-                        SiteFactory::normalizeArray(
-                            $siteEntity->{$data},
-                            in_array($data, ['ip4', 'ip6', 'cidr4', 'cidr6'])
-                        ),
-                        $data,
-                        $template
-                    )
+                // Skip per-site minimize for the common no-replace case — cidr4
+                // is already minimized at load, cidr6 is kept raw by design.
+                $rawRows = match (true) {
+                    $data === 'cidr4' && !$this->native && $siteEntity->hasReplace('cidr4')
+                        => IP4Helper::minimizeSubnets($this->resolvedCidr($siteEntity, 'cidr4')),
+                    $data === 'cidr6' && !$this->native && $siteEntity->hasReplace('cidr6')
+                        => IP6Helper::minimizeSubnets($this->resolvedCidr($siteEntity, 'cidr6')),
+                    default => $siteEntity->{$data},
+                };
+                $this->appendRenderedRows(
+                    $response,
+                    $siteEntity,
+                    SiteFactory::normalizeArray($rawRows, $isIpData),
+                    $data,
+                    $template
                 );
             }
-
-            $response = array_merge($response, $items);
         }
 
         return implode("\n", $response);
     }
 
     /**
-     * @param Site $siteEntity
-     * @param array $dataArray
-     * @param string $data
-     * @param string $template
-     * @return array
+     * @param array<int, string> $out
      */
-    private function generateList(Site $siteEntity, array $dataArray, string $data, string $template): array {
-        $items = [];
+    private function appendRenderedRows(
+        array &$out,
+        Site $siteEntity,
+        array $dataArray,
+        string $data,
+        string $template
+    ): void {
         foreach ($dataArray as $item) {
             $patterns = [
                 'group' => $siteEntity->group,
@@ -81,11 +84,13 @@ class CustomController extends AbstractIPListController {
                     break;
                 case 'cidr4':
                     $parts = explode('/', $item);
+                    $patterns['shortdata'] = $parts[0];
                     $patterns['shortmask'] = $parts[1];
                     $patterns['mask'] = IP4Helper::formatShortIpMask($patterns['shortmask']);
                     break;
                 case 'cidr6':
                     $parts = explode('/', $item);
+                    $patterns['shortdata'] = $parts[0];
                     $patterns['shortmask'] = $parts[1];
                     $patterns['mask'] = IP6Helper::formatShortIpMask($patterns['shortmask']);
                     break;
@@ -97,8 +102,7 @@ class CustomController extends AbstractIPListController {
             foreach ($patterns as $key => $value) {
                 $result = str_replace('{' . $key . '}', $value, $result);
             }
-            $items[] = $result;
+            $out[] = $result;
         }
-        return $items;
     }
 }

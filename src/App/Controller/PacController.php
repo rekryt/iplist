@@ -20,14 +20,30 @@ class PacController extends AbstractIPListController {
         }
 
         $items = [];
+        $sitesEntities = $this->getSites();
+        $isCidr4 = $data === 'cidr4';
         if (count($sites)) {
             foreach ($sites as $site) {
-                $items = array_merge($items, $this->getSites()[$site]->$data);
+                $entity = $sitesEntities[$site] ?? null;
+                if ($entity === null) {
+                    continue;
+                }
+                $rows = $isCidr4 ? $this->resolvedCidr($entity, 'cidr4') : $entity->$data;
+                foreach ($rows as $row) {
+                    $items[] = $row;
+                }
             }
         } else {
-            foreach ($this->getSites() as $siteEntity) {
-                $items = array_merge($items, $siteEntity->$data);
+            foreach ($sitesEntities as $siteEntity) {
+                $rows = $isCidr4 ? $this->resolvedCidr($siteEntity, 'cidr4') : $siteEntity->$data;
+                foreach ($rows as $row) {
+                    $items[] = $row;
+                }
             }
+        }
+
+        if ($data === 'cidr4') {
+            $items = IP4Helper::minimizeSubnets($items);
         }
 
         $response = ['const items = ['];

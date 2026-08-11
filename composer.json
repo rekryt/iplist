@@ -7,12 +7,17 @@
         }
     ],
     "require": {
-        "opencck/server": "v1.1.0",
-        "amphp/dns": "^2.2",
+        "opencck/server": "v1.1.1",
+        "amphp/dns": "v2.4.0",
         "vlucas/phpdotenv": "^5.5",
         "amphp/file": "^3.1",
         "ext-fileinfo": "*",
         "ext-libxml": "*"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^9",
+        "amphp/phpunit-util": "^3",
+        "amphp/http-client": "^5.3"
     },
     "autoload": {
         "files": [
@@ -23,6 +28,16 @@
                 "src/"
             ]
         }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "OpenCCK\\": [
+                "test/"
+            ]
+        }
+    },
+    "scripts": {
+        "test": "phpunit"
     },
     "config": {
         "allow-plugins": {

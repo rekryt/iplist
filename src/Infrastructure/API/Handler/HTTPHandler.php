@@ -22,36 +22,74 @@ final class HTTPHandler extends Handler implements HTTPHandlerInterface {
     }
 
     /**
+     * Лёгкая точка входа для healthcheck — не дёргает IPListService и контроллеры,
+     * отвечает 200 максимально быстро, чтобы docker мог отслеживать живость сервиса.
+     * @return RequestHandler
+     */
+    public function getHealthHandler(): RequestHandler {
+        return new ClosureRequestHandler(function (Request $request): Response {
+            $body = json_encode(['status' => 'ok']);
+            return new Response(
+                status: 200,
+                headers: [
+                    'content-type' => 'application/json; charset=utf-8',
+                    'content-length' => (string) strlen($body),
+                ],
+                body: $body
+            );
+        });
+    }
+
+    /**
      * @param string $controllerName
      * @return RequestHandler
      */
     public function getHandler(string $controllerName = 'main'): RequestHandler {
         return new ClosureRequestHandler(function (Request $request) use ($controllerName): Response {
+            $controllerClass = ucfirst($request->getQueryParameter('format') ?: $controllerName);
+            $startNs = hrtime(true);
+
             try {
-                $response = $this->getController(
-                    ucfirst($request->getQueryParameter('format') ?: $controllerName),
-                    $request,
-                    $this->headers ?? []
-                )();
+                $response = $this->getController($controllerClass, $request, $this->headers ?? [])();
             } catch (Throwable $e) {
                 $this->logger->warning('Exception', [
                     'exception' => $e::class,
                     'error' => $e->getMessage(),
                     'code' => $e->getCode(),
                 ]);
-                $response = new Response(
-                    status: $e->getCode() ?: 500,
-                    headers: $this->headers ?? ['content-type' => 'application/json; charset=utf-8'],
-                    body: json_encode(
-                        array_merge(
-                            ['message' => $e->getMessage(), 'code' => $e->getCode()],
-                            getEnv('DEBUG') === 'true'
-                                ? ['file' => $e->getFile() . ':' . $e->getLine(), 'trace' => $e->getTrace()]
-                                : []
-                        )
+                $errorBody = json_encode(
+                    array_merge(
+                        ['message' => $e->getMessage(), 'code' => $e->getCode()],
+                        getEnv('DEBUG') === 'true'
+                            ? ['file' => $e->getFile() . ':' . $e->getLine(), 'trace' => $e->getTrace()]
+                            : []
                     )
                 );
+                $response = new Response(
+                    status: $e->getCode() ?: 500,
+                    headers: array_merge($this->headers ?? ['content-type' => 'application/json; charset=utf-8'], [
+                        'content-length' => (string) strlen($errorBody),
+                    ]),
+                    body: $errorBody
+                );
             }
+
+            // Per-request diagnostic — one line per request, gated to DEBUG so
+            // prod logs stay quiet until an operator flips DEBUG=true to investigate.
+            $durationMs = (hrtime(true) - $startNs) / 1e6;
+            $uri = $request->getUri();
+            $pathQuery = $uri->getPath() . ($uri->getQuery() !== '' ? '?' . $uri->getQuery() : '');
+            $this->logger->debug(
+                sprintf(
+                    '%s %s → %d | %s | %.1fms | peak %.1f MiB',
+                    $request->getMethod(),
+                    $pathQuery,
+                    $response->getStatus(),
+                    $controllerClass,
+                    $durationMs,
+                    memory_get_peak_usage(true) / 1_048_576
+                )
+            );
 
             return $response;
         });

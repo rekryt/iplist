@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+    bootstrap="test/bootstrap.php"
+    colors="true"
+>
+    <coverage>
+        <include>
+            <directory suffix=".php">./test</directory>
+        </include>
+    </coverage>
+    <testsuites>
+        <testsuite name="server">
+            <directory suffix="Test.php">test</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <env name="AMP_DEBUG" value="true" />
+        <env name="HTTP_DOCUMENT_ROOT" value="" />
+        <env name="HTTP_PORT" value="8090" />
+        <env name="SYS_DNS_RESOLVE_IP4" value="false" />
+        <env name="SYS_DNS_RESOLVE_IP6" value="false" />
+        <!--
+            RUN_STRESS здесь не задаётся намеренно: StressTest это ручной инструмент
+            (см. его докблок), а в полном прогоне всех тестов в одном процессе он
+            упирается в порог харнесса и падает по таймауту независимо от кода.
+            Запуск вручную: RUN_STRESS=1 XDEBUG_MODE=off vendor/bin/phpunit
+            с фильтром по StressTest.
+        -->
+    </php>
+</phpunit>

@@ -27,8 +27,11 @@ const selectedExcludedIP4 = ref<string[]>([]);
 const selectedExcludedDomains = ref<string[]>([]);
 const selectedExcludedIP6 = ref<string[]>([]);
 const selectedExcludedCIDR6 = ref<string[]>([]);
-const isWildCard = ref(false);
+// Wildcard-домены включены по умолчанию: список 2/3-уровневых зон короче и
+// покрывает поддомены, а полный список сырых доменов нужен реже
+const isWildCard = ref(true);
 const isFileSave = ref(false);
+const isNative = ref(false);
 
 const items = computed<Group[]>(() => {
     return Object.entries(data.value as Record<string, string[]>).reduce<Group[]>((acc, [site, group]) => {
@@ -60,6 +63,9 @@ const formatList = ref([
     { label: 'Text',                    value: 'text',          dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
     { label: 'Comma',                   value: 'comma',         dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
     { label: 'v2rayGeoIPDat',           value: 'geoip',         dataTypes: ['cidr4', 'ip4', 'cidr6', 'ip6']  },
+    { label: 'v2rayGeoSiteDat',         value: 'geosite',       dataTypes: ['domains'] },
+    { label: 'Sing-box rule-set (json)',value: 'singbox',       dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
+    { label: 'Sing-box rule-set (srs)', value: 'srs',           dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
     { label: 'MikroTik Script',         value: 'mikrotik',      dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
     { label: 'SwitchyOmega RuleList',   value: 'switchy',       dataTypes: ['domains'] },
     { label: 'Dnsmasq nfset',           value: 'nfset',         dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
@@ -67,6 +73,7 @@ const formatList = ref([
     { label: 'ClashX',                  value: 'clashx',        dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
     { label: 'Keenetic KVAS',           value: 'kvas',          dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
     { label: 'Keenetic Routes (.bat)',  value: 'bat',           dataTypes: ['ip4', 'cidr4'] },
+    { label: 'Keenetic DNS',            value: 'wildcard',      dataTypes: ['domains'] },
     { label: 'Amnezia',                 value: 'amnezia',       dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
     { label: 'Proxy auto configuration (PAC)', value: 'pac',    dataTypes: ['domains', 'cidr4'] },
     { label: 'Custom',                  value: 'custom',        dataTypes: ['cidr4', 'ip4', 'domains', 'cidr6', 'ip6'] },
@@ -95,6 +102,37 @@ watch(selectedFormat, () => {
         }
     }
 });
+// Тип доменного правила: geosite пишет его в Domain.type, sing-box — выбирает
+// между domain/domain_suffix/domain_keyword/domain_regex
+const domainTypeFormats = ['geosite', 'singbox', 'srs'];
+const domainTypeList = computed(() => [
+    { label: t('domainTypeSuffix'), value: 'suffix' },
+    { label: t('domainTypeFull'), value: 'full' },
+    { label: t('domainTypeKeyword'), value: 'keyword' },
+    { label: t('domainTypeRegex'), value: 'regex' },
+]);
+const selectedDomainType = ref('suffix');
+const showDomainType = computed(
+    () => domainTypeFormats.includes(selectedFormat.value) && selectedDataType.value === 'domains'
+);
+
+// Версия формата rule-set: 1 читают все sing-box от 1.8, старшие нужны только
+// под новые элементы правил
+const versionFormats = ['singbox', 'srs'];
+const versionList = ref([
+    { label: '1 (sing-box 1.8+)', value: '1' },
+    { label: '2 (sing-box 1.10+)', value: '2' },
+    { label: '3 (sing-box 1.11+)', value: '3' },
+    { label: '4 (sing-box 1.13+)', value: '4' },
+    { label: '5 (sing-box 1.14+)', value: '5' },
+]);
+const selectedVersion = ref('1');
+const showVersion = computed(() => versionFormats.includes(selectedFormat.value));
+
+// Форматы, которые всегда отдаются файлом-вложением: чекбокс «сохранить в файл»
+// для них не нужен
+const attachmentFormats = ['geoip', 'geosite', 'srs'];
+
 const tab = ref('portals');
 const toQueryParams = (params: Record<string, never>): string => {
     const parts: string[] = [];
@@ -123,7 +161,7 @@ const toQueryParams = (params: Record<string, never>): string => {
     return parts.join('&');
 };
 
-const submit = () => {
+const url = computed(() => {
     const data = {
         format: selectedFormat.value,
     };
@@ -131,6 +169,9 @@ const submit = () => {
         data['data'] = selectedDataType.value;
         if (selectedDataType.value === 'domains' && isWildCard.value) {
             data['wildcard'] = '1';
+        }
+        if ((selectedDataType.value === 'cidr4' || selectedDataType.value === 'cidr6') && isNative.value) {
+            data['native'] = '1';
         }
     }
     if (selected.value.length > 0) {
@@ -141,6 +182,12 @@ const submit = () => {
     }
     if (selectedFormat.value === 'custom') {
         data['template'] = customTemplate.value;
+    }
+    if (showDomainType.value && selectedDomainType.value !== 'suffix') {
+        data['domaintype'] = selectedDomainType.value;
+    }
+    if (showVersion.value && selectedVersion.value !== '1') {
+        data['version'] = selectedVersion.value;
     }
 
     if (selectedExcluded.value.length > 0) {
@@ -165,11 +212,49 @@ const submit = () => {
         data['exclude[domain]'] = selectedExcludedDomains.value;
     }
 
-    if (isFileSave.value) {
+    if (isFileSave.value && !attachmentFormats.includes(selectedFormat.value)) {
         data['filesave'] = '1';
     }
 
-    window.location.href = '/?' + toQueryParams(data);
+    return window.location.origin + '/?' + toQueryParams(data);
+});
+const submit = () => {
+    window.location.href = url.value;
+};
+const copyToClipboard = (text: string) => {
+    // Modern async API
+    if (navigator.clipboard && window.isSecureContext) {
+        return navigator.clipboard
+            .writeText(text)
+            .then(() => true)
+            .catch(() => fallbackCopy(text));
+    } else {
+        // Fallback for older browsers
+        return fallbackCopy(text);
+    }
+};
+
+const fallbackCopy = (text: string) => {
+    try {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+
+        // Prevent scrolling / visual jump
+        textarea.style.position = 'fixed';
+        textarea.style.opacity = '0';
+
+        document.body.appendChild(textarea);
+        textarea.focus();
+        textarea.select();
+
+        const successful = document.execCommand('copy');
+        document.body.removeChild(textarea);
+
+        return successful;
+    } catch (err) {
+        console.error('Copy failed:', err);
+        return false;
+    }
 };
 </script>
 <i18n lang="json">
@@ -196,6 +281,13 @@ const submit = () => {
         "excludeIp": "Exclude IP",
         "excludeDomains": "Exclude domains",
         "onlyWildcard": "Only wildcard domains",
+        "nativeCidr": "Raw CIDR (no replace substitution)",
+        "domainType": "Domain rule type",
+        "domainTypeSuffix": "Domain and subdomains (suffix)",
+        "domainTypeFull": "Exact match",
+        "domainTypeKeyword": "Keyword (substring)",
+        "domainTypeRegex": "Regular expression",
+        "ruleSetVersion": "rule-set format version",
         "saveToFile": "Save as file",
         "submit": "Submit",
         "allData": "All data",
@@ -227,6 +319,13 @@ const submit = () => {
         "excludeIp": "Исключить IP",
         "excludeDomains": "Исключить домены",
         "onlyWildcard": "Только wildcard домены",
+        "nativeCidr": "Исходные CIDR без сжатия",
+        "domainType": "Тип доменного правила",
+        "domainTypeSuffix": "Домен и поддомены (суффикс)",
+        "domainTypeFull": "Точное совпадение",
+        "domainTypeKeyword": "Ключевое слово (подстрока)",
+        "domainTypeRegex": "Регулярное выражение",
+        "ruleSetVersion": "Версия формата rule-set",
         "saveToFile": "Сохранить как файл",
         "submit": "Отправить",
         "allData": "Все данные",
@@ -258,6 +357,13 @@ const submit = () => {
         "excludeIp": "排除 IP",
         "excludeDomains": "排除域名",
         "onlyWildcard": "仅限通配符域名",
+        "nativeCidr": "原始 CIDR（不应用替换）",
+        "domainType": "域名规则类型",
+        "domainTypeSuffix": "域名及其子域名（后缀）",
+        "domainTypeFull": "完全匹配",
+        "domainTypeKeyword": "关键词（子串）",
+        "domainTypeRegex": "正则表达式",
+        "ruleSetVersion": "rule-set 格式版本",
         "saveToFile": "保存为文件",
         "submit": "提交",
         "allData": "所有数据",
@@ -297,6 +403,30 @@ const submit = () => {
                         hide-details
                     ></v-select>
                 </v-col>
+                <v-col v-if="showDomainType" cols="12" md="6">
+                    <v-select
+                        v-model="selectedDomainType"
+                        :items="domainTypeList"
+                        item-title="label"
+                        item-value="value"
+                        :label="t('domainType')"
+                        variant="outlined"
+                        density="compact"
+                        hide-details
+                    ></v-select>
+                </v-col>
+                <v-col v-if="showVersion" cols="12" md="6">
+                    <v-select
+                        v-model="selectedVersion"
+                        :items="versionList"
+                        item-title="label"
+                        item-value="value"
+                        :label="t('ruleSetVersion')"
+                        variant="outlined"
+                        density="compact"
+                        hide-details
+                    ></v-select>
+                </v-col>
                 <v-col v-if="selectedFormat === 'custom'" cols="12">
                     <v-row>
                         <v-col>
@@ -317,7 +447,7 @@ const submit = () => {
                                     <ul>
                                         <li>{group} - {{ t('groupName') }}</li>
                                         <li>{site} - {{ t('siteName') }}</li>
-                                        <li>{data} - {{ t('groupName') }}</li>
+                                        <li>{data} \ {shortdata} - {{ t('data') }}</li>
                                         <li>{shortmask} - {{ t('shortmask') }}</li>
                                         <li>{mask} - {{ t('mask') }}</li>
                                     </ul>
@@ -445,7 +575,7 @@ const submit = () => {
                 </v-col>
                 <v-col class="py-0" cols="12">
                     <v-checkbox
-                        v-if="selectedDataType === 'domains'"
+                        v-if="selectedDataType === 'domains' && selectedFormat !== 'wildcard'"
                         v-model="isWildCard"
                         :label="t('onlyWildcard')"
                         :value="true"
@@ -454,7 +584,16 @@ const submit = () => {
                         hide-details
                     ></v-checkbox>
                     <v-checkbox
-                        v-if="selectedFormat !== 'geoip'"
+                        v-if="selectedDataType === 'cidr4' || selectedDataType === 'cidr6'"
+                        v-model="isNative"
+                        :label="t('nativeCidr')"
+                        :value="true"
+                        color="primary"
+                        density="compact"
+                        hide-details
+                    ></v-checkbox>
+                    <v-checkbox
+                        v-if="!attachmentFormats.includes(selectedFormat)"
                         v-model="isFileSave"
                         :label="t('saveToFile')"
                         :value="true"
@@ -466,6 +605,21 @@ const submit = () => {
                 <v-col cols="12">
                     <v-btn color="primary" block size="50" @click="submit">{{ t('submit') }}</v-btn>
                 </v-col>
+                <v-col cols="12">
+                    <client-only>
+                        <v-card color="background" class="baseForm-url pa-4 position-relative">
+                            <v-btn
+                                class="baseForm-clipboard"
+                                elevation="5"
+                                variant="text"
+                                @click="copyToClipboard(url)"
+                            >
+                                <v-icon>mdi-clipboard-multiple-outline</v-icon>
+                            </v-btn>
+                            {{ url }}
+                        </v-card>
+                    </client-only>
+                </v-col>
             </v-row>
         </v-card>
     </v-form>
@@ -473,5 +627,15 @@ const submit = () => {
 <style lang="scss">
 .baseForm {
     max-width: 920px;
+    &-url {
+        word-break: break-all;
+        font-size: 12px;
+    }
+    &-clipboard {
+        float: right;
+        min-width: 32px;
+        margin-bottom: 6px;
+        margin-left: 6px;
+    }
 }
 </style>

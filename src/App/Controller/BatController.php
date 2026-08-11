@@ -25,16 +25,32 @@ class BatController extends AbstractIPListController {
         }
 
         $response = [];
+        $sitesEntities = $this->getSites();
+        $isCidr4 = $data === 'cidr4';
         if (count($sites)) {
             foreach ($sites as $site) {
-                $response = array_merge($response, $this->getSites()[$site]->$data);
+                $entity = $sitesEntities[$site] ?? null;
+                if ($entity === null) {
+                    continue;
+                }
+                $rows = $isCidr4 ? $this->resolvedCidr($entity, 'cidr4') : $entity->$data ?? [];
+                foreach ($rows as $row) {
+                    $response[] = $row;
+                }
             }
         } else {
-            foreach ($this->getSites() as $siteEntity) {
-                $response = array_merge($response, $siteEntity->$data);
+            foreach ($sitesEntities as $siteEntity) {
+                $rows = $isCidr4 ? $this->resolvedCidr($siteEntity, 'cidr4') : $siteEntity->$data ?? [];
+                foreach ($rows as $row) {
+                    $response[] = $row;
+                }
             }
         }
         $response = SiteFactory::normalizeArray($response, true);
+
+        if ($data === 'cidr4') {
+            $response = IP4Helper::minimizeSubnets($response);
+        }
 
         return implode(
             "\n",

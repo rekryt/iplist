@@ -4,6 +4,8 @@ namespace OpenCCK\App\Controller;
 
 use OpenCCK\Domain\Entity\Site;
 use OpenCCK\Domain\Factory\SiteFactory;
+use OpenCCK\Domain\Helper\IP4Helper;
+use OpenCCK\Domain\Helper\IP6Helper;
 
 class MikrotikController extends AbstractIPListController {
     /**
@@ -19,8 +21,8 @@ class MikrotikController extends AbstractIPListController {
         if ($data == '') {
             return "# Error: The 'data' GET parameter is required in the URL to access this page";
         }
+        $appendStr = $append ? ' ' . $append : '';
 
-        $response = [];
         $lists = [];
         foreach ($this->getGroups() as $groupName => $groupSites) {
             if (count($sites)) {
@@ -30,65 +32,87 @@ class MikrotikController extends AbstractIPListController {
                 continue;
             }
 
-            $listName = $template;
-            foreach (
-                [
-                    'group' => $groupName,
-                    'data' => $data,
-                ]
-                as $key => $value
-            ) {
-                $listName = str_replace('{' . $key . '}', $value, $listName);
-            }
+            $listName = str_replace(['{group}', '{data}'], [$groupName, $data], $template);
 
+            // Flip-map dedup — $seen is reset per group so the "one add per IP
+            // per list" rule still holds across sites in the same group, without
+            // the O(N²) in_array scan. For cidr4/cidr6 the rows come from
+            // `resolvedCidr` (replace substitution applied) and are minimized
+            // PER SITE, not cross-site: otherwise one site's /16 would absorb
+            // another site's /32 and the corresponding `comment=<site>` line
+            // would vanish — the atribution is worth the occasional overlap.
             $items = [];
-            $entries = [];
+            $seen = [];
             foreach ($groupSites as $siteName => $siteEntity) {
                 if (count($sites) && !in_array($siteName, $sites)) {
                     continue;
                 }
-                $filteredItems = array_filter($siteEntity->$data, fn(string $row) => !in_array($row, $entries));
-                $items = array_merge(
-                    $items,
-                    $this->generateList($siteEntity, $listName, $filteredItems, $append ? ' ' . $append : '')
-                );
-                $entries = array_merge($entries, $filteredItems);
+                $rows = $this->siteRows($siteEntity, $data);
+                foreach ($rows as $row) {
+                    if (isset($seen[$row])) {
+                        continue;
+                    }
+                    $seen[$row] = true;
+                    $items[] =
+                        'add list=' . $listName . ' address=' . $row . ' comment=' . $siteEntity->name . $appendStr;
+                }
             }
-            $items = SiteFactory::normalizeArray($items, in_array($data, ['ip4', 'ip6', 'cidr4', 'cidr6']));
-            $items[count($items) - 1] = $items[count($items) - 1] . ';';
+
+            // Skip empty list blocks entirely — the trailing-";" line below
+            // assumes at least one entry. Appending to index -1 of an empty
+            // array raises "Undefined array key -1" and surfaces as HTTP 500
+            // once the warning is promoted to a throwable.
+            if (!$items) {
+                continue;
+            }
+            $items[array_key_last($items)] .= ';';
 
             if (!isset($lists[$listName])) {
                 $lists[$listName] = [];
             }
-            $lists[$listName] = array_merge($lists[$listName], $items);
+            foreach ($items as $item) {
+                $lists[$listName][] = $item;
+            }
         }
 
+        $response = [];
         foreach ($lists as $listName => $items) {
-            $response = array_merge($response, [
-                '/ip firewall address-list remove [find list="' . $listName . '"];',
-                ':delay 5s',
-                '',
-                '/ip firewall address-list',
-            ]);
-
-            $response = array_merge($response, $items, ['', '']);
+            $response[] = '/ip firewall address-list remove [find list="' . $listName . '" dynamic=no];';
+            $response[] = ':delay 5s';
+            $response[] = '';
+            $response[] = '/ip firewall address-list';
+            foreach ($items as $item) {
+                $response[] = $item;
+            }
+            $response[] = '';
+            $response[] = '';
         }
 
         return implode("\n", $response);
     }
 
     /**
-     * @param Site $siteEntity
-     * @param string $listName
-     * @param array $array
-     * @param string $append
-     * @return array
+     * Per-site row source. For cidr4/cidr6 we only pay for `applyReplace` +
+     * per-site `minimizeSubnets` when the site actually declares a `replace`
+     * block — otherwise the raw property is returned as-is. Skipping the
+     * O(N²) minimize pass here is the whole point of the `hasReplace` probe:
+     * both `$site->cidr4` and `$site->cidr6` are already minimized at load
+     * by `SiteFactory::create` and kept minimized across `reload`/
+     * `reloadExternal`, so returning them directly is safe.
+     *
+     * @return array<int, string>
      */
-    private function generateList(Site $siteEntity, string $listName, array $array, string $append = ''): array {
-        $items = [];
-        foreach ($array as $item) {
-            $items[] = 'add list=' . $listName . ' address=' . $item . ' comment=' . $siteEntity->name . $append;
+    private function siteRows(Site $site, string $data): array {
+        if ($data === 'cidr4') {
+            return $site->hasReplace('cidr4') && !$this->native
+                ? IP4Helper::minimizeSubnets($this->resolvedCidr($site, 'cidr4'))
+                : $this->resolvedCidr($site, 'cidr4');
         }
-        return $items;
+        if ($data === 'cidr6') {
+            return $site->hasReplace('cidr6') && !$this->native
+                ? IP6Helper::minimizeSubnets($this->resolvedCidr($site, 'cidr6'))
+                : $this->resolvedCidr($site, 'cidr6');
+        }
+        return $site->$data ?? [];
     }
 }

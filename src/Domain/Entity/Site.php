@@ -2,6 +2,7 @@
 
 namespace OpenCCK\Domain\Entity;
 
+use Amp\Dns\DnsException;
 use OpenCCK\Domain\Factory\SiteFactory;
 use OpenCCK\Domain\Helper\DNSHelper;
 use OpenCCK\Domain\Helper\IP4Helper;
@@ -30,6 +31,12 @@ final class Site {
      * @param array $cidr4 List of CIDRv4 zones of IPv4 addresses
      * @param array $cidr6 List of CIDRv6 zones of IPv6 addresses
      * @param object $external Lists of URLs to retrieve  data from external sources
+     * @param ?object $replace Per-portal CIDR-replacement map: $replace->cidr4/cidr6
+     *                        are objects whose keys are CIDR strings to drop from
+     *                        output and whose values are arrays of CIDR/IP-with-mask
+     *                        strings to substitute. Null defaults to the stable shape
+     *                        `{cidr4:{}, cidr6:{}}` so the JSON form is identical
+     *                        for portals that haven't configured any replacement.
      *
      */
     public function __construct(
@@ -42,12 +49,21 @@ final class Site {
         public array $ip6 = [],
         public array $cidr4 = [],
         public array $cidr6 = [],
-        public object $external = new stdClass()
+        public object $external = new stdClass(),
+        ?object $replace = null
     ) {
+        $this->replace = $replace ?? (object) ['cidr4' => new stdClass(), 'cidr6' => new stdClass()];
         $this->dnsHelper = new DNSHelper($dns);
         $this->isUseIpv4 = (getEnv('SYS_DNS_RESOLVE_IP4') ?? 'true') == 'true';
         $this->isUseIpv6 = (getEnv('SYS_DNS_RESOLVE_IP6') ?? 'true') == 'true';
     }
+
+    /**
+     * Per-portal CIDR-replacement map. Not promoted in the constructor
+     * signature because its default is a nested stdClass, which is not a
+     * valid constant expression for a promoted-property default.
+     */
+    public object $replace;
 
     /**
      * @return void
@@ -75,6 +91,7 @@ final class Site {
 
     /**
      * @return void
+     * @throws DnsException
      */
     public function reload(): void {
         $startTime = time();
@@ -104,6 +121,41 @@ final class Site {
             $this->ip6 = SiteFactory::normalize(array_merge($this->ip6, $ip6), true);
         }
 
+        if ((getEnv('SYS_REPLACE_ESCALATE_IPS') ?? 'true') === 'true') {
+            $aggregate = (getEnv('SYS_REPLACE_AGGREGATE_SUBNETS') ?? 'false') === 'true';
+            $thresholdIp4Narrow = max(0, (int) (getEnv('SYS_REPLACE_COLLAPSE_THRESHOLD_IP4_24') ?? 0));
+            $thresholdIp4Wide = max(0, (int) (getEnv('SYS_REPLACE_COLLAPSE_THRESHOLD_IP4_16') ?? 0));
+            $thresholdIp6Narrow = max(0, (int) (getEnv('SYS_REPLACE_COLLAPSE_THRESHOLD_IP6_64') ?? 0));
+            $thresholdIp6Wide = max(0, (int) (getEnv('SYS_REPLACE_COLLAPSE_THRESHOLD_IP6_32') ?? 0));
+            if ($this->isUseIpv4) {
+                IP4Helper::growReplace(
+                    $this->replace,
+                    $this->ip4,
+                    $aggregate,
+                    $thresholdIp4Narrow,
+                    $thresholdIp4Wide
+                );
+            }
+            if ($this->isUseIpv6) {
+                IP6Helper::growReplace(
+                    $this->replace,
+                    $this->ip6,
+                    $aggregate,
+                    $thresholdIp6Narrow,
+                    $thresholdIp6Wide
+                );
+            }
+            App::getLogger()->debug('growReplace done for ' . $this->name, [
+                'cidr4_keys' => count((array) ($this->replace->cidr4 ?? [])),
+                'cidr6_keys' => count((array) ($this->replace->cidr6 ?? [])),
+                'aggregate' => $aggregate,
+                'threshold_ip4_24' => $thresholdIp4Narrow,
+                'threshold_ip4_16' => $thresholdIp4Wide,
+                'threshold_ip6_64' => $thresholdIp6Narrow,
+                'threshold_ip6_32' => $thresholdIp6Wide,
+            ]);
+        }
+
         $this->saveConfig();
         App::getLogger()->notice('Reloaded for ' . $this->name, ['finished', time() - $startTime]);
 
@@ -119,7 +171,7 @@ final class Site {
     private function reloadExternal(): void {
         if (isset($this->external->domains)) {
             foreach ($this->external->domains as $url) {
-                $this->domains = SiteFactory::normalize(
+                $this->domains = SiteFactory::normalizeDomains(
                     array_merge($this->domains, SiteFactory::trimArray(explode("\n", file_get_contents($url))))
                 );
             }
@@ -156,10 +208,11 @@ final class Site {
 
         if (isset($this->external->cidr6) && $this->isUseIpv6) {
             foreach ($this->external->cidr6 as $url) {
-                // todo IP6Helper::minimizeSubnets
-                $this->cidr6 = SiteFactory::normalize(
-                    array_merge($this->cidr6, SiteFactory::trimArray(explode("\n", file_get_contents($url)))),
-                    true
+                $this->cidr6 = IP6Helper::minimizeSubnets(
+                    SiteFactory::normalize(
+                        array_merge($this->cidr6, SiteFactory::trimArray(explode("\n", file_get_contents($url)))),
+                        true
+                    )
                 );
             }
         }
@@ -180,6 +233,7 @@ final class Site {
             'cidr4' => SiteFactory::normalizeArray($this->cidr4, true),
             'cidr6' => SiteFactory::normalizeArray($this->cidr6, true),
             'external' => $this->external,
+            'replace' => $this->replace,
         ];
     }
 
@@ -194,6 +248,28 @@ final class Site {
     }
 
     /**
+     * Fast-path probe for the `replace` feature. Returns true iff the
+     * replacement map for `$field` has at least one key — i.e. view-time
+     * substitution would actually change something. Controllers use this
+     * to skip `applyReplace` + per-site `minimizeSubnets` on the common
+     * case (most portals ship no `replace` block).
+     *
+     * @param string $field `cidr4` or `cidr6`
+     */
+    public function hasReplace(string $field): bool {
+        $map = $this->replace->{$field} ?? null;
+        if (!$map instanceof stdClass) {
+            return false;
+        }
+        // Cheap "has any property" check — avoids a full (array) cast on
+        // the stdClass, which would allocate just to discard the result.
+        foreach ($map as $_) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * @param bool $wildcard
      * @return array
      */
@@ -205,6 +281,14 @@ final class Site {
                 $wildcardDomain = array_slice($parts, -2);
                 if (in_array(implode('.', $wildcardDomain), SiteFactory::TWO_LEVEL_DOMAIN_ZONES)) {
                     $wildcardDomain = array_slice($parts, -3);
+                }
+                // Пустая метка в результате означает мусорный ввод вроде
+                // `DNSdumpster..`: его две последние метки пусты, и запись
+                // схлопывалась в `.` — суффикс-джокер, встававший первой строкой
+                // списка доменов. Штатно такое отсекает SiteFactory::normalizeDomains
+                // при загрузке, здесь — страховка для Site, собранных напрямую.
+                if (in_array('', $wildcardDomain, true)) {
+                    continue;
                 }
                 $domains[] = implode('.', $wildcardDomain);
             }

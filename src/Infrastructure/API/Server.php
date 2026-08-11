@@ -21,6 +21,8 @@ use Amp\Socket;
 use Monolog\Logger;
 use OpenCCK\App\Service\IPListService;
 use OpenCCK\Infrastructure\API\Handler\HTTPHandler;
+use OpenCCK\Infrastructure\Storage\TempWorkspace;
+use Revolt\EventLoop;
 use Throwable;
 
 use function OpenCCK\getEnv;
@@ -28,8 +30,8 @@ use function OpenCCK\getEnv;
 final class Server implements AppModuleInterface {
     private static Server $_instance;
 
-    private int $connectionLimit = 1024;
-    private int $connectionPerIpLimit = 200;
+    private int $connectionLimit = 100000;
+    private int $connectionPerIpLimit = 100000;
 
     /**
      * @param ?HttpServer $httpServer
@@ -100,15 +102,35 @@ final class Server implements AppModuleInterface {
             $router = new Router($this->httpServer, $this->logger, $this->errorHandler);
             $httpHandlerInstance = HTTPHandler::getInstance($this->logger);
             $router->addRoute('GET', '/', $httpHandlerInstance->getHandler('main'));
+            $router->addRoute('GET', '/health', $httpHandlerInstance->getHealthHandler());
             $router->addRoute('GET', '/favicon', $httpHandlerInstance->getHandler('favicon'));
             $router->addRoute('GET', '/{name:.+}', $httpHandlerInstance->getHandler('main'));
             $router->setFallback(new DocumentRoot($this->httpServer, $this->errorHandler, PATH_ROOT . '/public'));
 
             $this->httpServer->start($router, $this->errorHandler);
+            $this->startTempSweeper();
         } catch (Socket\SocketException $e) {
             $this->logger->warning($e->getMessage());
         } catch (Throwable $e) {
             $this->logger->error($e->getMessage());
+        }
+    }
+
+    /**
+     * Подметание осиротевших воркспейсов из storage/tmp: штатно каждый запрос
+     * убирает за собой в finally, но после SIGKILL/падения процесса каталог
+     * остаётся. Разовый прогон на старте + периодический по таймеру.
+     * @return void
+     */
+    private function startTempSweeper(): void {
+        $ttl = max(0, (int) (getEnv('SYS_TMP_TTL') ?? 900));
+        $interval = max(0, (int) (getEnv('SYS_TMP_SWEEP_INTERVAL') ?? 600));
+
+        // queue(), а не прямой вызов: старт сервера не должен ждать обхода файловой системы
+        EventLoop::queue(fn() => TempWorkspace::sweep($ttl));
+
+        if ($interval > 0) {
+            EventLoop::repeat($interval, fn() => TempWorkspace::sweep($ttl));
         }
     }
 
